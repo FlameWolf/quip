@@ -1,7 +1,12 @@
-.action-bar > .d-flex > div {
+.action-buttons {
+	display: flex;
+	justify-content: end;
+}
+.action-bar > .action-buttons > div {
+	display: flex;
+	align-items: center;
 	cursor: pointer;
-	padding-left: 0.75rem;
-	padding-right: 0.75rem;
+	padding: 0.75rem;
 	margin-left: 0.5rem;
 	margin-right: 0.5rem;
 }

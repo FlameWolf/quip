@@ -19,9 +19,9 @@ export default props => {
 		document.querySelector(".emoji-picker__wrapper").style.removeProperty("visibility");
 	});
 	return (
-		<div {...props} class="bg-white text-black border rounded mt-2">
+		<div {...props} class="bg-white text-black border rounded p-2">
 			<div ref={editableDiv} class="p-2 outline-0" contentEditable={true} on:input={removeFormatting} on:blur={() => setCaret(position(editableDiv).pos)}></div>
-			<div class="d-flex justify-content-end p-1 border-top">
+			<div class="d-flex justify-content-end pt-2 border-top">
 				<div class="emoji-bar">
 					<For each={popularEmoji}>
 					{

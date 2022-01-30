@@ -15,12 +15,17 @@ export default props => {
 	};
 	const toggleReply = event => {
 		let sourceActionBar = event.target.closest(".action-bar");
-		let editorInstance = document.getElementById("reply-editor") || <Editor id="reply-editor"/>;
-		if(editorInstance.parentElement === sourceActionBar) {
+		let editorInstance = document.getElementById("reply-editor") || <Editor id="reply-editor" classList={{ "mx-2": true, "mb-2": true }}/>;
+		let editorParent = editorInstance.parentElement;
+		const isAttachedToCurrent = (editorParent === sourceActionBar);
+		if(isAttachedToCurrent) {
 			sourceActionBar.removeChild(editorInstance);
 		} else {
+			editorParent?.querySelector(".action-buttons > div:last-child").click();
 			sourceActionBar.appendChild(editorInstance);
 		}
+		setReplyFlag(!isAttachedToCurrent);
+		editorParent = null;
 		editorInstance = null;
 		sourceActionBar = null;
 	};
@@ -29,11 +34,11 @@ export default props => {
 			<div class="card-body">
 				<p class="card-text">{props.text}</p>
 			</div>
-			<div class="card-footer action-bar p-2">
-				<div class="d-flex justify-content-end">
+			<div class="action-bar">
+				<div class="action-buttons">
 					<div onClick={toggleFave}>{faveFlag() ? <BsStarFill color="gold"/> : <BsStar/>}</div>
 					<div onClick={toggleRepeat}>{repeatFlag() ? <FiRepeat color="green"/> : <FiRepeat/>}</div>
-					<div onClick={toggleReply}><BsChatRight/></div>
+					<div onClick={toggleReply}>{replyFlag() ? <BsChatRight color="blue"/> : <BsChatRight/>}</div>
 				</div>
 			</div>
 		</div>
