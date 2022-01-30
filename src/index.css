@@ -1,0 +1,32 @@
+.action-bar > .d-flex > div {
+	cursor: pointer;
+	padding-left: 0.75rem;
+	padding-right: 0.75rem;
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+}
+.outline-0 {
+	outline: none;
+}
+div[contenteditable] {
+	min-height: 4rem;
+}
+.emoji-bar {
+	display: flex;
+	width: 100%;
+	border-radius: 50rem;
+	overflow: hidden;
+	margin-right: auto;
+	user-select: none;
+}
+.emoji-bar > div {
+	display: flex;
+	align-items: center;
+	background-color: var(--bs-light);
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	border-radius: 50rem;
+	cursor: pointer;
+	margin-left: 0.25rem;
+	margin-right: 0.25rem;
+}
