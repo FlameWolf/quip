@@ -19,7 +19,7 @@ export const removeFormatting = elem => {
 };
 
 export const innerHtmlAsText = elem => {
-	return elem.innerHTML.replace(/<div>(.*?)<\/div>/g, "\n$1\n").replace(/<br>/g, "\n").replace(/&nbsp;/g, " ");
+	return elem.innerHTML.replace(/<div>(.*?)<\/div>/g, "\n$1\n").replace(/<br>/g, "\n").replace(/&nbsp;/g, " ").trimEnd();
 };
 
 export const insertTextAtCaret = text => {

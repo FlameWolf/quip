@@ -22,6 +22,7 @@ export default props => {
 			sourceActionBar.removeChild(editorInstance);
 		} else {
 			editorParent?.querySelector(".action-buttons > div:last-child").click();
+			editorInstance.dataset["parentPostId"] = props.postId;
 			sourceActionBar.appendChild(editorInstance);
 		}
 		setReplyFlag(!isAttachedToCurrent);
@@ -30,7 +31,7 @@ export default props => {
 		sourceActionBar = null;
 	};
 	return (
-		<div data-post-id={props.postId} class="list-group-item p-0">
+		<div class="list-group-item p-0">
 			<div class="card-body">
 				<p class="card-text">{props.text}</p>
 			</div>
