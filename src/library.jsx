@@ -1,25 +1,25 @@
 import nodeEmoji from "node-emoji";
 import { position } from "caret-pos";
 
+export const editorCharLimit = 256;
+
 export const removeDescendantAttributes = elem => {
 	[...elem.querySelectorAll("*")].forEach(node => [...node.attributes].forEach(attrib => node.removeAttribute(attrib.name)));
 };
 
-export const removeFormatting = event => {
-	let target = event.target;
-	removeDescendantAttributes(target);
-	const originalHtml = target.innerHTML;
-	const cleanHtml = originalHtml.replace(/<\/?(?:(?!\/?(div|br))).*?>/g, "");
+export const removeFormatting = elem => {
+	removeDescendantAttributes(elem);
+	const originalHtml = elem.innerHTML;
+	const cleanHtml = originalHtml === "<br>" ? "" : originalHtml.replace(/<\/?(?:(?!\/?(div|br))).*?>/g, "");
 	if(originalHtml !== cleanHtml) {
-		const pos = position(target).pos;
-		target.innerHTML = cleanHtml;
-		position(target, pos);
+		const pos = position(elem).pos;
+		elem.innerHTML = cleanHtml;
+		position(elem, pos);
 	}
-	target = null;
 };
 
 export const innerHtmlAsText = elem => {
-	return elem.innerHTML.replace(/<div>(.*?)<\/div>/g, "\n$1\n").replace(/<br>/g, "\n");
+	return elem.innerHTML.replace(/<div>(.*?)<\/div>/g, "\n$1\n").replace(/<br>/g, "\n").replace(/&nbsp;/g, " ");
 };
 
 export const insertTextAtCaret = text => {
@@ -32,9 +32,10 @@ export const insertTextAtCaret = text => {
 	selection = null;
 };
 
-export const insertEmojo = (elem, emojo) => {
+export const insertEmojo = (elem, emojo, callback = null) => {
 	elem.focus();
 	insertTextAtCaret(emojo);
+	callback?.();
 };
 
 export const popularEmoji = [

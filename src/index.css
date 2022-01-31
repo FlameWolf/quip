@@ -35,3 +35,15 @@ div[contenteditable] {
 	margin-left: 0.25rem;
 	margin-right: 0.25rem;
 }
+.char-count {
+	display: flex;
+	align-items: center;
+	background-color: var(--bs-info);
+	font-size: 0.75rem;
+	font-weight: bold;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	border-radius: 50rem;
+	margin-left: 0.25rem;
+	margin-right: 0.25rem;
+}

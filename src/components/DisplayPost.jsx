@@ -30,7 +30,7 @@ export default props => {
 		sourceActionBar = null;
 	};
 	return (
-		<div class="list-group-item p-0">
+		<div data-post-id={props.postId} class="list-group-item p-0">
 			<div class="card-body">
 				<p class="card-text">{props.text}</p>
 			</div>
