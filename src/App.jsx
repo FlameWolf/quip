@@ -11,7 +11,7 @@ function App() {
 					<ul class="list-group">
 						<For each={quipStore.quips}>
 						{
-							(quip, index) => <DisplayPost postId={quip.id} text={quip.content}/>
+							(quip, index) => <DisplayPost post={quip}/>
 						}
 						</For>
 					</ul>

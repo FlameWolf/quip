@@ -2,8 +2,11 @@ import { createMemo, createSignal, For } from "solid-js";
 import { EmojiButton } from "@joeattardi/emoji-button";
 import { position } from "caret-pos";
 import { removeFormatting, innerHtmlAsText, insertEmojo, popularEmoji, editorCharLimit } from "../library";
+import { quipStore, setQuipStore } from "../store/quip-store";
+import { produce } from "solid-js/store";
 
 export default props => {
+	let currentInstance;
 	let editableDiv;
 	let emojiTrigger;
 	const [caret, setCaret] = createSignal(0);
@@ -25,9 +28,29 @@ export default props => {
 		removeFormatting(editableDiv);
 		setCharCount(editorCharLimit - getCharCount(getTextContent()));
 	};
+	const makeQuip = text => {
+		setQuipStore(
+			"quips",
+			produce(quips => {
+				quips.push({
+					id: quipStore.nextId,
+					content: text,
+					replyTo: currentInstance.dataset.parentPostId
+				});
+			})
+		);
+		setQuipStore({
+			nextId: (quipStore.nextId + 1)
+		});
+		editableDiv.innerHTML = "";
+		setCharCount(editorCharLimit);
+		if(props.isReply) {
+			currentInstance.closest(".action-bar").querySelector(".action-buttons > div:last-child").click();
+		}
+	};
 	const characterLimitExceeded = createMemo(() => charCount() < 0);
 	return (
-		<div {...props} class="bg-white text-black border rounded p-2">
+		<div ref={currentInstance} {...props} class="bg-white text-black border rounded p-2">
 			<div ref={editableDiv} class="p-2 outline-0" contentEditable={true} onInput={updateEditor} onBlur={_ => setCaret(position(editableDiv).pos)}></div>
 			<div class="d-flex justify-content-end pt-2 border-top">
 				<div class="emoji-bar">
@@ -39,7 +62,7 @@ export default props => {
 				</div>
 				<button ref={emojiTrigger} class="btn btn-light btn-sm px-3 rounded-pill ms-2" onClick={_ => emojiPicker.togglePicker(emojiTrigger)}>&#x2026;</button>
 				<div class="char-count" classList={{ "bg-danger": characterLimitExceeded() }}>{charCount()}</div>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" disabled={charCount() === editorCharLimit || characterLimitExceeded()} onClick={_ => console.log(getTextContent())}>Post</button>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" disabled={charCount() === editorCharLimit || characterLimitExceeded()} onClick={_ => makeQuip(getTextContent())}>Post</button>
 			</div>
 		</div>
 	);
