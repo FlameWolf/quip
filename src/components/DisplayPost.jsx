@@ -1,14 +1,33 @@
 import { createSignal, Show } from "solid-js";
-import { BsStar, BsStarFill, BsChatRight } from "solid-icons/bs";
-import { FaSolidChevronDown } from "solid-icons/fa";
+import { BsChevronDown, BsChevronUp, BsStar, BsStarFill, BsChatRight } from "solid-icons/bs";
 import { FiRepeat } from "solid-icons/fi";
 import Editor from "./Editor";
+import { quipStore, setQuipStore } from "../store/quip-store";
 
 export default props => {
-	const { id, content, hasReplies, ...rest } = { ...props.post };
+	const [threadFlag, setThreadFlag] = createSignal(false);
 	const [faveFlag, setFaveFlag] = createSignal(false);
 	const [repeatFlag, setRepeatFlag] = createSignal(false);
 	const [replyFlag, setReplyFlag] = createSignal(false);
+	const toggleThread = event => {
+		setThreadFlag(value => !value);
+		if(threadFlag() && !props.post.replies?.length) {
+			setQuipStore(
+				"quips",
+				quip => quip.id === props.post.id,
+				quip => ({
+					replies: [
+						{ id: 256, content: "Lorem ipsum dolor sit amet.", hasReplies: true },
+						{ id: 255, content: "Lorem ipsum dolor sit amet.", hasReplies: false },
+						{ id: 254, content: "Lorem ipsum dolor sit amet.", hasReplies: true },
+						{ id: 253, content: "Lorem ipsum dolor sit amet.", hasReplies: false },
+						{ id: 252, content: "Lorem ipsum dolor sit amet.", hasReplies: true }
+					],
+					hasMore: true
+				})
+			);
+		}
+	};
 	const toggleFave = event => {
 		setFaveFlag(value => !value);
 	};
@@ -24,7 +43,7 @@ export default props => {
 			sourceActionBar.removeChild(editorInstance);
 		} else {
 			editorParent?.querySelector(".action-buttons > div:last-child").click();
-			editorInstance.dataset["parentPostId"] = id;
+			editorInstance.dataset["parentPostId"] = props.post.id;
 			sourceActionBar.appendChild(editorInstance);
 		}
 		setReplyFlag(!isAttachedToCurrent);
@@ -35,12 +54,12 @@ export default props => {
 	return (
 		<div class="list-group-item p-0">
 			<div class="card-body">
-				<p class="card-text" innerHTML={content.replace(/\n/g, "<br/>")}></p>
+				<p class="card-text" innerHTML={props.post.content.replace(/\n/g, "<br/>")}></p>
 			</div>
 			<div class="action-bar">
 				<div class="action-buttons">
-					<Show when={hasReplies}>
-						<div><FaSolidChevronDown/></div>
+					<Show when={props.post.hasReplies}>
+						<div onClick={toggleThread}>{threadFlag() ? <BsChevronUp/> : <BsChevronDown/>}</div>
 					</Show>
 					<div onClick={toggleFave}>{faveFlag() ? <BsStarFill color="gold"/> : <BsStar/>}</div>
 					<div onClick={toggleRepeat}>{repeatFlag() ? <FiRepeat color="green"/> : <FiRepeat/>}</div>

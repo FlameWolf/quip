@@ -29,16 +29,26 @@ export default props => {
 		setCharCount(editorCharLimit - getCharCount(getTextContent()));
 	};
 	const makeQuip = text => {
+		const parentPostId = currentInstance.dataset.parentPostId;
 		setQuipStore(
 			"quips",
 			produce(quips => {
 				quips.push({
 					id: quipStore.nextId,
 					content: text,
-					replyTo: currentInstance.dataset.parentPostId
+					replyTo: parentPostId
 				});
 			})
 		);
+		if(parentPostId) {
+			setQuipStore(
+				"quips",
+				quip => quip.id === +parentPostId && !quip.hasReplies,
+				quip => ({
+					hasReplies: true
+				})
+			);
+		}
 		setQuipStore({
 			nextId: (quipStore.nextId + 1)
 		});
