@@ -39,8 +39,6 @@ export default props => {
 					nextId
 				});
 			}
-			console.log("Checking the store");
-			console.log(threadFlag(), post.id, post.replies || "No replies");
 		};
 		const toggleFave = event => {
 			setFaveFlag(value => !value);
