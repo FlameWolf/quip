@@ -3,29 +3,36 @@ import { BsChevronDown, BsChevronUp, BsStar, BsStarFill, BsChatRight } from "sol
 import { FiRepeat } from "solid-icons/fi";
 import Editor from "./Editor";
 import { quipStore, setQuipStore } from "../store/quip-store";
+import { produce } from "solid-js/store";
 
 export default props => {
 	const renderPost = post => {
+		const [replies, setReplies] = createSignal(post.replies || []);
+		const [hasMore, setHasMore] = createSignal(post.hasMore || false);
 		const [threadFlag, setThreadFlag] = createSignal(false);
 		const [faveFlag, setFaveFlag] = createSignal(false);
 		const [repeatFlag, setRepeatFlag] = createSignal(false);
 		const [replyFlag, setReplyFlag] = createSignal(false);
 		const toggleThread = event => {
 			setThreadFlag(value => !value);
-			if(threadFlag() && !post.replies?.length) {
+			if(threadFlag() && !replies().length) {
 				let nextId = quipStore.nextId;
+				setReplies([
+					{ id: nextId++, content: `Lorem ipsum ${Math.random()} dolor sit amet.`, replyTo: post.id, hasReplies: true },
+					{ id: nextId++, content: `Lorem ipsum ${Math.random()} dolor sit amet.`, replyTo: post.id, hasReplies: false },
+					{ id: nextId++, content: `Lorem ipsum ${Math.random()} dolor sit amet.`, replyTo: post.id, hasReplies: true },
+					{ id: nextId++, content: `Lorem ipsum ${Math.random()} dolor sit amet.`, replyTo: post.id, hasReplies: false },
+					{ id: nextId++, content: `Lorem ipsum ${Math.random()} dolor sit amet.`, replyTo: post.id, hasReplies: true }
+				]);
+				setHasMore(true);
 				setQuipStore(
 					"quips",
-					quip => quip.id === post.id,
-					quip => ({
-						replies: [
-							{ id: nextId++, content: `Lorem ipsum ${Math.random()} dolor sit amet.`, replyTo: post.id, hasReplies: true },
-							{ id: nextId++, content: `Lorem ipsum ${Math.random()} dolor sit amet.`, replyTo: post.id, hasReplies: false },
-							{ id: nextId++, content: `Lorem ipsum ${Math.random()} dolor sit amet.`, replyTo: post.id, hasReplies: true },
-							{ id: nextId++, content: `Lorem ipsum ${Math.random()} dolor sit amet.`, replyTo: post.id, hasReplies: false },
-							{ id: nextId++, content: `Lorem ipsum ${Math.random()} dolor sit amet.`, replyTo: post.id, hasReplies: true }
-						],
-						hasMore: true
+					produce(() => {
+						post = {
+							...post,
+							replies: replies(),
+							hasMore: hasMore()
+						};
 					})
 				);
 				setQuipStore({
@@ -76,12 +83,12 @@ export default props => {
 					</div>
 				</div>
 				<Show when={threadFlag()}>
-					<For each={post.replies}>
+					<For each={replies()}>
 					{
 						(reply, index) => renderPost(reply)
 					}
 					</For>
-					<Show when={post.hasMore}>
+					<Show when={hasMore()}>
 						<div class="list-group-item bg-light">
 							<div>Load more replies for <em>"{post.content.substr(0, 20)}&#x2026;"</em></div>
 						</div>
