@@ -1,6 +1,6 @@
 import Editor from "./components/Editor";
 import DisplayPost from "./components/DisplayPost";
-import { quipStore, setQuipStore } from "./store/quip-store";
+import { quipStore } from "./store/quip-store";
 
 function App() {
 	return (
