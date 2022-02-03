@@ -29,25 +29,34 @@ export default props => {
 		setCharCount(editorCharLimit - getCharCount(getTextContent()));
 	};
 	const makeQuip = text => {
-		const parentPostId = currentInstance.dataset.parentPostId;
-		setQuipStore(
-			"quips",
-			produce(quips => {
-				quips.push({
-					id: quipStore.nextId,
-					content: text,
-					replyTo: parentPostId
-				});
-			})
-		);
-		if(parentPostId) {
+		const parentPostId = +currentInstance.dataset.parentPostId;
+		const post = {
+			id: quipStore.nextId,
+			content: text,
+			replyTo: parentPostId || undefined
+		};
+		if(!parentPostId) {
 			setQuipStore(
 				"quips",
-				quip => quip.id === +parentPostId && !quip.hasReplies,
-				quip => ({
-					hasReplies: true
+				produce(quips => {
+					quips.push(post);
 				})
 			);
+		} else {
+			let parentPost = quipStore.findQuipById(parentPostId);
+			let replies = parentPost.replies || [];
+			setQuipStore(
+				"quips",
+				produce(() => {
+					parentPost = {
+						...parentPost,
+						replies: [...replies, post],
+						hasReplies: true
+					};
+				})
+			);
+			replies = null;
+			parentPost = null;
 		}
 		setQuipStore({
 			nextId: (quipStore.nextId + 1)
