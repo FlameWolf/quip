@@ -3,7 +3,6 @@ import { EmojiButton } from "@joeattardi/emoji-button";
 import { position } from "caret-pos";
 import { removeFormatting, innerHtmlAsText, insertEmojo, popularEmoji, editorCharLimit } from "../library";
 import { quipStore, setQuipStore } from "../store/quip-store";
-import { produce } from "solid-js/store";
 
 export default props => {
 	let currentInstance;
@@ -30,37 +29,23 @@ export default props => {
 	};
 	const makeQuip = text => {
 		const parentPostId = +currentInstance.dataset.parentPostId;
-		const post = {
-			id: quipStore.nextId,
-			content: text,
-			replyTo: parentPostId || undefined
-		};
-		if(!parentPostId) {
-			setQuipStore(
-				"quips",
-				produce(quips => {
-					quips.push(post);
-				})
-			);
-		} else {
-			let parentPost = quipStore.findQuipById(parentPostId);
-			let replies = parentPost.replies || [];
-			setQuipStore(
-				"quips",
-				produce(() => {
-					parentPost = {
-						...parentPost,
-						replies: [...replies, post],
-						hasReplies: true
-					};
-				})
-			);
-			replies = null;
-			parentPost = null;
+		const keyName = parentPostId ? "replies" : "quips";
+		const nextId = quipStore.nextId;
+		setQuipStore(
+			keyName,
+			posts => [
+				...posts,
+				{
+					id: nextId,
+					content: text,
+					replyTo: parentPostId || undefined
+				}
+			]
+		);
+		if(parentPostId) {
+			setQuipStore(posts, post => post.id === parentPostId, "hasReplies", true);
 		}
-		setQuipStore({
-			nextId: (quipStore.nextId + 1)
-		});
+		setQuipStore("nextId", nextId + 1);
 		editableDiv.innerHTML = "";
 		setCharCount(editorCharLimit);
 		if(props.isReply) {

@@ -1,6 +1,8 @@
 import Editor from "./components/Editor";
 import DisplayPost from "./components/DisplayPost";
+import DisplayPostList from "./components/DisplayPostList";
 import { quipStore } from "./store/quip-store";
+import { For, Show } from "solid-js";
 
 function App() {
 	return (
@@ -9,11 +11,7 @@ function App() {
 				<div class="col px-5 py-3">
 					<Editor id="post-editor" classList={{ "mb-2": true }}/>
 					<ul class="list-group">
-						<For each={quipStore.quips}>
-						{
-							(quip, index) => <DisplayPost post={quip}/>
-						}
-						</For>
+						<DisplayPostList posts={quipStore.quips}/>
 					</ul>
 				</div>
 			</div>
