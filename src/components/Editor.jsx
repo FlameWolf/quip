@@ -3,6 +3,7 @@ import { EmojiButton } from "@joeattardi/emoji-button";
 import { position } from "caret-pos";
 import { removeFormatting, innerHtmlAsText, insertEmojo, popularEmoji, editorCharLimit } from "../library";
 import { quipStore, setQuipStore } from "../store/quip-store";
+import { unwrap } from "solid-js/store";
 
 export default props => {
 	let currentInstance;
@@ -29,12 +30,11 @@ export default props => {
 	};
 	const makeQuip = text => {
 		const parentPostId = +currentInstance.dataset.parentPostId;
-		const keyName = parentPostId ? "replies" : "quips";
 		const nextId = quipStore.nextId;
 		setQuipStore(
-			keyName,
-			posts => [
-				...posts,
+			"quips",
+			quips => [
+				...quips,
 				{
 					id: nextId,
 					content: text,
@@ -42,9 +42,6 @@ export default props => {
 				}
 			]
 		);
-		if(parentPostId) {
-			setQuipStore(posts, post => post.id === parentPostId, "hasReplies", true);
-		}
 		setQuipStore("nextId", nextId + 1);
 		editableDiv.innerHTML = "";
 		setCharCount(editorCharLimit);

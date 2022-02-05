@@ -1,7 +1,42 @@
 import nodeEmoji from "node-emoji";
 import { position } from "caret-pos";
+import { convertPatternsToRe } from "prettier";
 
 export const editorCharLimit = 256;
+
+export const popularEmoji = [
+	nodeEmoji.get(":joy:"),
+	nodeEmoji.get(":heart:"),
+	nodeEmoji.get(":sob:"),
+	nodeEmoji.get(":heart_eyes:"),
+	nodeEmoji.get(":blush:"),
+	nodeEmoji.get(":two_hearts:"),
+	nodeEmoji.get(":kissing_heart:"),
+	nodeEmoji.get(":pensive:"),
+	nodeEmoji.get(":unamused:"),
+	nodeEmoji.get(":weary:"),
+	nodeEmoji.get(":grin:"),
+	nodeEmoji.get(":relaxed:"),
+	nodeEmoji.get(":pray:"),
+	nodeEmoji.get(":ok_hand:"),
+	nodeEmoji.get(":wink:"),
+	nodeEmoji.get(":+1:"),
+	nodeEmoji.get(":smirk:"),
+	nodeEmoji.get(":sweat_smile:"),
+	nodeEmoji.get(":fire:"),
+	nodeEmoji.get(":relieved:"),
+	nodeEmoji.get(":broken_heart:"),
+	nodeEmoji.get(":sunglasses:"),
+	nodeEmoji.get(":cry:"),
+	nodeEmoji.get(":flushed:"),
+	nodeEmoji.get(":sparkling_heart:"),
+	nodeEmoji.get(":see_no_evil:"),
+	nodeEmoji.get(":smiling_imp:"),
+	nodeEmoji.get(":scream:"),
+	nodeEmoji.get(":revolving_hearts:"),
+	nodeEmoji.get(":sleepy:"),
+	nodeEmoji.get(":confused:")
+];
 
 export const removeDescendantAttributes = elem => {
 	[...elem.querySelectorAll("*")].forEach(node => [...node.attributes].forEach(attrib => node.removeAttribute(attrib.name)));
@@ -38,36 +73,6 @@ export const insertEmojo = (elem, emojo, callback = null) => {
 	callback?.();
 };
 
-export const popularEmoji = [
-	nodeEmoji.get(":joy:"),
-	nodeEmoji.get(":heart:"),
-	nodeEmoji.get(":sob:"),
-	nodeEmoji.get(":heart_eyes:"),
-	nodeEmoji.get(":blush:"),
-	nodeEmoji.get(":two_hearts:"),
-	nodeEmoji.get(":kissing_heart:"),
-	nodeEmoji.get(":pensive:"),
-	nodeEmoji.get(":unamused:"),
-	nodeEmoji.get(":weary:"),
-	nodeEmoji.get(":grin:"),
-	nodeEmoji.get(":relaxed:"),
-	nodeEmoji.get(":pray:"),
-	nodeEmoji.get(":ok_hand:"),
-	nodeEmoji.get(":wink:"),
-	nodeEmoji.get(":+1:"),
-	nodeEmoji.get(":smirk:"),
-	nodeEmoji.get(":sweat_smile:"),
-	nodeEmoji.get(":fire:"),
-	nodeEmoji.get(":relieved:"),
-	nodeEmoji.get(":broken_heart:"),
-	nodeEmoji.get(":sunglasses:"),
-	nodeEmoji.get(":cry:"),
-	nodeEmoji.get(":flushed:"),
-	nodeEmoji.get(":sparkling_heart:"),
-	nodeEmoji.get(":see_no_evil:"),
-	nodeEmoji.get(":smiling_imp:"),
-	nodeEmoji.get(":scream:"),
-	nodeEmoji.get(":revolving_hearts:"),
-	nodeEmoji.get(":sleepy:"),
-	nodeEmoji.get(":confused:")
-];
+export const trimPost = text => {
+	return text.length > 20 ? `${text.substring(0, 20)}&#x2026;` : text;
+};

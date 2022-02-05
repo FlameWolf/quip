@@ -47,3 +47,10 @@ div[contenteditable] {
 	margin-left: 0.25rem;
 	margin-right: 0.25rem;
 }
+.has-reply,
+.reply {
+	border-left: solid 1px var(--bs-primary);
+}
+.reply {
+	background-color: #ffffdda0;
+}
