@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { BsStar, BsStarFill, BsChatRight } from "solid-icons/bs";
 import { FiRepeat } from "solid-icons/fi";
 import Editor from "./Editor";
@@ -34,6 +34,11 @@ export default props => {
 	return (
 		<>
 			<div data-post-id={post.id} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, "reply": props.isReply }}>
+				<div class="post-header">
+					<Show when={props.parentBlurb}>
+						<div innerHTML={`In reply to "${props.parentBlurb}"`}></div>
+					</Show>
+				</div>
 				<div class="card-body">
 					<p class="card-text" innerHTML={post.content.replace(/\n/g, "<br/>")}></p>
 				</div>

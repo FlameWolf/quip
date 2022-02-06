@@ -2,16 +2,17 @@ import Editor from "./components/Editor";
 import DisplayPost from "./components/DisplayPost";
 import { quipStore, setQuipStore } from "./store/quip-store";
 import { createMemo, For } from "solid-js";
+import { trimPost } from "./library";
 
 function App() {
-	const renderRecursive = (post, isReply = false) => {
+	const renderRecursive = (post, isReply = false, parentBlurb = undefined) => {
 		const replies = createMemo(() => quipStore.quips.filter(reply => reply.replyTo === post.id));
 		return (
 			<>
-				<DisplayPost post={post} hasReplies={replies().length} isReply={isReply}/>
+				<DisplayPost post={post} hasReplies={replies().length} isReply={isReply} parentBlurb={parentBlurb}/>
 				<For each={replies()}>
 				{
-					(reply, index) => renderRecursive(reply, true)
+					(reply, index) => renderRecursive(reply, true, trimPost(post.content))
 				}
 				</For>
 			</>

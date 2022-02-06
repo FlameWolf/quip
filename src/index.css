@@ -1,3 +1,10 @@
+.post-header {
+	display: flex;
+	color: var(--bs-secondary);
+	font-size: smaller;
+	padding-left: 0.5rem;
+	padding-left: 0.5rem;
+}
 .action-buttons {
 	display: flex;
 	justify-content: end;
