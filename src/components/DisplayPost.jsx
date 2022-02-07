@@ -5,6 +5,7 @@ import Editor from "./Editor";
 
 export default props => {
 	const post = props.post;
+	const handle = post.author.handle;
 	const [faveFlag, setFaveFlag] = createSignal(false);
 	const [repeatFlag, setRepeatFlag] = createSignal(false);
 	const [replyFlag, setReplyFlag] = createSignal(false);
@@ -36,7 +37,7 @@ export default props => {
 			<div data-post-id={post.id} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, "reply": props.isReply }}>
 				<div class="post-header">
 					<div>@</div>
-					<a class="handle" href="javascript:void 0">{post.author.handle}</a>
+					<a class="handle" href={`/${handle}`}>{handle}</a>
 					<div>&#xA0;</div>
 					<Show when={props.parentBlurb}>
 						<div innerHTML={`Replied to "${props.parentBlurb}"`}></div>
