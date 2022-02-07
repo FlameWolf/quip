@@ -1,6 +1,5 @@
 import nodeEmoji from "node-emoji";
 import { position } from "caret-pos";
-import { convertPatternsToRe } from "prettier";
 
 export const editorCharLimit = 256;
 
