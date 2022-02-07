@@ -2,8 +2,8 @@ import { createMemo, createSignal, For } from "solid-js";
 import { EmojiButton } from "@joeattardi/emoji-button";
 import { position } from "caret-pos";
 import { removeFormatting, innerHtmlAsText, insertEmojo, popularEmoji, editorCharLimit } from "../library";
-import { quipStore, setQuipStore } from "../store/quip-store";
-import { userStore } from "../store/user-store";
+import { quipStore, setQuipStore } from "../stores/quip-store";
+import { userStore } from "../stores/user-store";
 
 export default props => {
 	let currentInstance;
