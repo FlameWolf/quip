@@ -1,3 +1,18 @@
+.auth-panel {
+	min-width: 240px;
+	width: 50%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.card-header > .hstack > a.active {
+	color: unset;
+	font-weight: bold;
+	text-decoration: unset;
+	cursor: text;
+}
+.input-group-text.clickable {
+	cursor: pointer;
+}
 .post-header {
 	display: flex;
 	color: var(--bs-secondary);
@@ -68,4 +83,10 @@ div[contenteditable] {
 .reply {
 	background-color: #ffffdda0;
 	border-left-color: revert;
+}
+.position-absolute-middle {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
 }
