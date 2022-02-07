@@ -1,8 +1,8 @@
-import Editor from "./components/Editor";
-import DisplayPost from "./components/DisplayPost";
-import { quipStore } from "./stores/quip-store";
+import Editor from "./Editor";
+import DisplayPost from "./DisplayPost";
+import { quipStore } from "../stores/quip-store";
 import { createMemo, For } from "solid-js";
-import { trimPost } from "./library";
+import { trimPost } from "../library";
 
 export default props => {
 	const renderRecursive = (post, isReply = false, parentBlurb = undefined) => {
