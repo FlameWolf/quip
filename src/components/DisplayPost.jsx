@@ -35,8 +35,11 @@ export default props => {
 		<>
 			<div data-post-id={post.id} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, "reply": props.isReply }}>
 				<div class="post-header">
+					<div>@</div>
+					<div class="handle">{post.author.handle}</div>
+					<div>&#xA0;</div>
 					<Show when={props.parentBlurb}>
-						<div innerHTML={`In reply to "${props.parentBlurb}"`}></div>
+						<div innerHTML={`Replied to "${props.parentBlurb}"`}></div>
 					</Show>
 				</div>
 				<div class="card-body">

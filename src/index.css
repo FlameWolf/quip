@@ -2,8 +2,14 @@
 	display: flex;
 	color: var(--bs-secondary);
 	font-size: smaller;
-	padding-left: 0.5rem;
-	padding-left: 0.5rem;
+	padding: 0.5rem;
+}
+.handle {
+	font-weight: bold;
+}
+.card-body {
+	padding-top: 0.25rem;
+	padding-bottom: 0.25rem;
 }
 .action-buttons {
 	display: flex;
@@ -54,10 +60,10 @@ div[contenteditable] {
 	margin-left: 0.25rem;
 	margin-right: 0.25rem;
 }
-.has-reply,
-.reply {
-	border-left: solid 1px var(--bs-primary);
+.has-reply {
+	border-left-color: var(--bs-primary);
 }
 .reply {
 	background-color: #ffffdda0;
+	border-left-color: revert;
 }

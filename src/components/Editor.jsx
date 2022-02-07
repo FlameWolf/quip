@@ -3,7 +3,7 @@ import { EmojiButton } from "@joeattardi/emoji-button";
 import { position } from "caret-pos";
 import { removeFormatting, innerHtmlAsText, insertEmojo, popularEmoji, editorCharLimit } from "../library";
 import { quipStore, setQuipStore } from "../store/quip-store";
-import { unwrap } from "solid-js/store";
+import { userStore } from "../store/user-store";
 
 export default props => {
 	let currentInstance;
@@ -37,6 +37,7 @@ export default props => {
 				...quips,
 				{
 					id: nextId,
+					author: userStore.currentUser,
 					content: text,
 					replyTo: parentPostId || undefined
 				}
