@@ -23,7 +23,7 @@ export default props => {
 		document.querySelector(".emoji-picker__wrapper").style.removeProperty("visibility");
 	});
 	const getTextContent = () => innerHtmlAsText(editableDiv);
-	const getCharCount = text => text.match(/\p{L}\p{M}*|\S|\s/gu)?.length || 0;
+	const getCharCount = text => text.match(/\p{L}\p{M}?|\S|\s/gu)?.length || 0;
 	const updateEditor = event => {
 		removeFormatting(editableDiv);
 		setCharCount(editorCharLimit - getCharCount(getTextContent()));
