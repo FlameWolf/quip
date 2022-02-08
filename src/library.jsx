@@ -1,8 +1,9 @@
 import nodeEmoji from "node-emoji";
 import { position } from "caret-pos";
 
+export const handleRegExp = new RegExp(/^[A-Za-z][\w]{3,31}$/);
+export const passwordRegExp = new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/);
 export const editorCharLimit = 256;
-
 export const popularEmoji = [
 	nodeEmoji.get(":joy:"),
 	nodeEmoji.get(":heart:"),

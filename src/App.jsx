@@ -11,7 +11,7 @@ function App() {
 	return (
 		<Router>
 			<div class="row">
-				<div class="col px-5 py-3">
+				<div class="col px-md-5 py-3">
 					<Routes>
 						<Route path="/auth" element={<Auth/>}>
 							<Route path="/sign-up" element={<SignUp/>}/>
