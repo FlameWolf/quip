@@ -13,6 +13,7 @@ export default props => {
 	const [charCount, setCharCount] = createSignal(editorCharLimit);
 	const emojiPicker = new EmojiButton({
 		autoHide: false,
+		emojiSize: "1.25rem",
 		showAnimation: false,
 		showVariants: false
 	});
