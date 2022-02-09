@@ -1,5 +1,6 @@
 import nodeEmoji from "node-emoji";
 import { NavLink, Outlet } from "solid-app-router";
+import logoUrl from "../assets/images/logo.png";
 
 export default props => {
 	return (
@@ -7,7 +8,7 @@ export default props => {
 			<div class="pb-5 auth-panel">
 				<div class="d-flex flex-column align-items-center pb-5">
 					<div class="d-flex justify-content-center mb-4">
-						<img class="img-fluid" src="/src/assets/logo.png" alt="Quip Logo"/>
+						<img class="img-fluid" src={logoUrl} alt="Quip Logo"/>
 					</div>
 					<div class="hstack gap-3 justify-content-center bg-light text-muted w-100 py-2 rounded-pill">
 						<span class="fw-bold fst-italic">noun</span>
