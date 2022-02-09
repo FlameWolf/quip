@@ -1,7 +1,9 @@
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
-import { createSignal, onMount } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { Popover } from "bootstrap";
+import { userStore, setUserStore } from "../stores/user-store";
+import { useNavigate } from "solid-app-router";
 
 export default props => {
 	let signInForm;
@@ -12,6 +14,8 @@ export default props => {
 	const [showPassword, setShowPassword] = createSignal(false);
 	const [formValidity, setFormValidity] = createSignal(false);
 	const [formHasValue, setFormHasValue] = createSignal(false);
+	const [credentialsValid, setCredentialsValid] = createSignal(true);
+	const navigate = useNavigate();
 	const updateFormValidity = event => {
 		const username = usernameInput.value;
 		const password = passwordInput.value;
@@ -34,6 +38,14 @@ export default props => {
 		passwordInput.classList.remove("is-invalid");
 	};
 	const handleFormSubmission = event => {
+		const username = usernameInput.value;
+		const password = passwordInput.value;
+		const foundUser = userStore.users.find(user => user.handle === username && user.password === password);
+		setCredentialsValid(foundUser);
+		if(foundUser) {
+			setUserStore("currentUser", foundUser);
+			navigate("/home", { resolve: false });
+		}
 	};
 	onMount(() => {
 		new Popover(
@@ -55,6 +67,12 @@ export default props => {
 	});
 	return (
 		<form ref={signInForm} onInput={updateFormValidity}>
+			<Show when={!credentialsValid()}>
+				<div class="alert alert-danger alert-dismissible fade show">
+					<span>The credentials are invalid</span>
+					<button class="btn-close" type="button" data-bs-dismiss="alert"></button>
+				</div>
+			</Show>
 			<div class="d-flex mb-2">
 				<label>Username</label>
 				<a ref={usernameInfoToggle} class="ms-auto clickable" tabIndex={-1}>
