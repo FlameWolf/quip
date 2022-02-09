@@ -1,5 +1,5 @@
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
-import { createSignal, onMount } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 import { handleRegExp, passwordRegExp } from "../library";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { Popover } from "bootstrap";
@@ -16,6 +16,7 @@ export default props => {
 	const [showConfirmPassword, setShowConfirmPassword] = createSignal(false);
 	const [formValidity, setFormValidity] = createSignal(false);
 	const [formHasValue, setFormHasValue] = createSignal(false);
+	const [usernameExists, setUsernameExists] = createSignal(false);
 	const updateFormValidity = event => {
 		const username = usernameInput.value;
 		const password = passwordInput.value;
@@ -44,8 +45,6 @@ export default props => {
 		confirmPasswordInput.classList.remove("is-invalid");
 	};
 	const handleFormSubmission = event => {
-		event.preventDefault();
-		event.stopPropagation();
 	};
 	onMount(() => {
 		new Popover(
@@ -75,6 +74,12 @@ export default props => {
 	});
 	return (
 		<form ref={signUpForm} onInput={updateFormValidity}>
+			<Show when={usernameExists()}>
+				<div class="alert alert-danger alert-dismissible fade show">
+					<span>The username already exists</span>
+					<button class="btn-close" type="button" data-bs-dismiss="alert"></button>
+				</div>
+			</Show>
 			<div class="d-flex mb-2">
 				<label>Username</label>
 				<a ref={usernameInfoToggle} class="ms-auto clickable" tabIndex={-1}>
@@ -106,8 +111,8 @@ export default props => {
 				<span class="input-group-text clickable" onClick={event => setShowConfirmPassword(value => !value)}>{showConfirmPassword() ? BsEyeSlash : BsEye}</span>
 			</div>
 			<div class="d-flex">
-				<button class="btn btn-secondary w-50 me-1" disabled={!formHasValue()} onClick={resetForm}>Clear Form</button>
-				<button class="btn btn-primary w-50 ms-1" disabled={!formValidity()} onClick={handleFormSubmission}>Sign Up</button>
+				<button class="btn btn-secondary w-50 me-1" type="button" disabled={!formHasValue()} onClick={resetForm}>Clear Form</button>
+				<button class="btn btn-primary w-50 ms-1" type="button" disabled={!formValidity()} onClick={handleFormSubmission}>Sign Up</button>
 			</div>
 		</form>
 	);

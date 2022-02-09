@@ -34,8 +34,6 @@ export default props => {
 		passwordInput.classList.remove("is-invalid");
 	};
 	const handleFormSubmission = event => {
-		event.preventDefault();
-		event.stopPropagation();
 	};
 	onMount(() => {
 		new Popover(
@@ -78,8 +76,8 @@ export default props => {
 				<span class="input-group-text clickable" onClick={event => setShowPassword(value => !value)}>{showPassword() ? BsEyeSlash : BsEye}</span>
 			</div>
 			<div class="d-flex">
-				<button class="btn btn-secondary w-50 me-1" disabled={!formHasValue()} onClick={resetForm}>Clear Form</button>
-				<button class="btn btn-primary w-50 ms-1" disabled={!formValidity()} onClick={handleFormSubmission}>Sign In</button>
+				<button class="btn btn-secondary w-50 me-1" type="button" disabled={!formHasValue()} onClick={resetForm}>Clear Form</button>
+				<button class="btn btn-primary w-50 ms-1" type="button" disabled={!formValidity()} onClick={handleFormSubmission}>Sign In</button>
 			</div>
 		</form>
 	);
