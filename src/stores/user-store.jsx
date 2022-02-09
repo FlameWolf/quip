@@ -1,11 +1,7 @@
 import { createStore } from "solid-js/store";
 
 export const [userStore, setUserStore] = createStore({
-	currentUser: {
-		id: 1,
-		handle: "FlameWolf",
-		password: "TestPass"
-	},
+	currentUser: undefined,
 	users: [
 		{ id: 1, handle: "FlameWolf", password: "TestPass" },
 		{ id: 2, handle: "Godzilla", password: "TestPass" },
