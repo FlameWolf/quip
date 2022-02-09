@@ -12,5 +12,6 @@ export const [userStore, setUserStore] = createStore({
 		{ id: 4, handle: "Kraken" },
 		{ id: 5, handle: "Unicorn" },
 		{ id: 6, handle: "Minotaur" }
-	]
+	],
+	nextId: 7
 });

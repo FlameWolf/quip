@@ -3,6 +3,8 @@ import { createSignal, onMount, Show } from "solid-js";
 import { handleRegExp, passwordRegExp } from "../library";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { Popover } from "bootstrap";
+import { userStore, setUserStore} from "../stores/user-store";
+import { useNavigate } from "solid-app-router";
 
 export default props => {
 	let signUpForm;
@@ -17,6 +19,7 @@ export default props => {
 	const [formValidity, setFormValidity] = createSignal(false);
 	const [formHasValue, setFormHasValue] = createSignal(false);
 	const [usernameExists, setUsernameExists] = createSignal(false);
+	const navigate = useNavigate();
 	const updateFormValidity = event => {
 		const username = usernameInput.value;
 		const password = passwordInput.value;
@@ -44,7 +47,21 @@ export default props => {
 		confirmPasswordInput.classList.remove("is-valid");
 		confirmPasswordInput.classList.remove("is-invalid");
 	};
-	const handleFormSubmission = event => {
+	const handleFormSubmission = (event) => {
+		const username = usernameInput.value;
+		const password = passwordInput.value;
+		const foundUser = userStore.users.find(user => user.handle === username);
+		setUsernameExists(foundUser);
+		if(!foundUser) {
+			const newUser = {
+				id: userStore.nextId,
+				handle: username
+			};
+			setUserStore("users", users => [...users, newUser ]);
+			setUserStore("nextId", value => value + 1);
+			setUserStore("currentUser", value => newUser);
+			navigate("/home", { resolve: false });
+		}
 	};
 	onMount(() => {
 		new Popover(

@@ -31,20 +31,19 @@ export default props => {
 	};
 	const makeQuip = text => {
 		const parentPostId = +currentInstance.dataset.parentPostId;
-		const nextId = quipStore.nextId;
 		setQuipStore(
 			"quips",
 			quips => [
 				...quips,
 				{
-					id: nextId,
+					id: quipStore.nextId,
 					author: userStore.currentUser,
 					content: text,
 					replyTo: parentPostId || undefined
 				}
 			]
 		);
-		setQuipStore("nextId", nextId + 1);
+		setQuipStore("nextId", value => value + 1);
 		editableDiv.innerHTML = "";
 		setCharCount(editorCharLimit);
 		if(props.isReply) {
