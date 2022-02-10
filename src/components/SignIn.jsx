@@ -68,7 +68,7 @@ export default props => {
 	return (
 		<form ref={signInForm} onInput={updateFormValidity}>
 			<Show when={!credentialsValid()}>
-				<div class="alert alert-danger alert-dismissible fade show">
+				<div class="alert alert-danger alert-dismissible">
 					<span>The credentials are invalid</span>
 					<button class="btn-close" type="button" onClick={() => setCredentialsValid(true)}></button>
 				</div>

@@ -92,7 +92,7 @@ export default props => {
 	return (
 		<form ref={signUpForm} onInput={updateFormValidity}>
 			<Show when={usernameExists()}>
-				<div class="alert alert-danger alert-dismissible fade show">
+				<div class="alert alert-danger alert-dismissible">
 					<span>The username already exists</span>
 					<button class="btn-close" type="button" onClick={() => setUsernameExists(false)}></button>
 				</div>
