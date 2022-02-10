@@ -19,6 +19,7 @@
 		"bootstrap": "^5.1.3",
 		"bootstrap-icons": "^1.7.2",
 		"caret-pos": "^2.0.0",
+		"inter-ui": "^3.19.3",
 		"node-emoji": "^1.11.0",
 		"solid-app-router": "^0.2.1",
 		"solid-icons": "^0.3.3",
