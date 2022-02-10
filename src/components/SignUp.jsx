@@ -1,6 +1,6 @@
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
 import { createSignal, onMount, Show } from "solid-js";
-import { handleRegExp, passwordRegExp } from "../library";
+import { handleRegExp, passwordRegExp, invalidHandles } from "../library";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { Popover } from "bootstrap";
 import { userStore, setUserStore} from "../stores/user-store";
@@ -18,7 +18,7 @@ export default props => {
 	const [showConfirmPassword, setShowConfirmPassword] = createSignal(false);
 	const [formValidity, setFormValidity] = createSignal(false);
 	const [formHasValue, setFormHasValue] = createSignal(false);
-	const [usernameExists, setUsernameExists] = createSignal(false);
+	const [usernameUnavailable, setUsernameUnavailable] = createSignal(false);
 	const navigate = useNavigate();
 	const updateFormValidity = event => {
 		const username = usernameInput.value;
@@ -50,12 +50,15 @@ export default props => {
 	const submitForm = (event) => {
 		const username = usernameInput.value;
 		const password = passwordInput.value;
-		const foundUser = userStore.users.find(user => user.handle === username);
-		setUsernameExists(foundUser);
-		if(!foundUser) {
+		setUsernameUnavailable(
+			userStore.users.find(user => user.handle === username) ||
+			invalidHandles.indexOf(username) > -1
+		);
+		if(!usernameUnavailable()) {
 			const newUser = {
 				id: userStore.nextId,
-				handle: username
+				handle: username,
+				password
 			};
 			setUserStore("users", users => [...users, newUser ]);
 			setUserStore("nextId", value => value + 1);
@@ -91,10 +94,10 @@ export default props => {
 	});
 	return (
 		<form ref={signUpForm} onInput={updateFormValidity}>
-			<Show when={usernameExists()}>
+			<Show when={usernameUnavailable()}>
 				<div class="alert alert-danger alert-dismissible">
-					<span>The username already exists</span>
-					<button class="btn-close" type="button" onClick={() => setUsernameExists(false)}></button>
+					<span>The username is unavailable</span>
+					<button class="btn-close" type="button" onClick={() => setUsernameUnavailable(false)}></button>
 				</div>
 			</Show>
 			<div class="d-flex mb-2">
