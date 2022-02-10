@@ -94,7 +94,7 @@ export default props => {
 			<Show when={usernameExists()}>
 				<div class="alert alert-danger alert-dismissible fade show">
 					<span>The username already exists</span>
-					<button class="btn-close" type="button" onClick={() => setUsernameExists(true)}></button>
+					<button class="btn-close" type="button" onClick={() => setUsernameExists(false)}></button>
 				</div>
 			</Show>
 			<div class="d-flex mb-2">
