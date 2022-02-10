@@ -47,7 +47,7 @@ export default props => {
 		confirmPasswordInput.classList.remove("is-valid");
 		confirmPasswordInput.classList.remove("is-invalid");
 	};
-	const handleFormSubmission = (event) => {
+	const submitForm = (event) => {
 		const username = usernameInput.value;
 		const password = passwordInput.value;
 		const foundUser = userStore.users.find(user => user.handle === username);
@@ -94,7 +94,7 @@ export default props => {
 			<Show when={usernameExists()}>
 				<div class="alert alert-danger alert-dismissible fade show">
 					<span>The username already exists</span>
-					<button class="btn-close" type="button" data-bs-dismiss="alert"></button>
+					<button class="btn-close" type="button" onClick={() => setUsernameExists(true)}></button>
 				</div>
 			</Show>
 			<div class="d-flex mb-2">
@@ -129,7 +129,7 @@ export default props => {
 			</div>
 			<div class="d-flex">
 				<button class="btn btn-secondary w-50 me-1" type="button" disabled={!formHasValue()} onClick={resetForm}>Clear Form</button>
-				<button class="btn btn-primary w-50 ms-1" type="button" disabled={!formValidity()} onClick={handleFormSubmission}>Sign Up</button>
+				<button class="btn btn-primary w-50 ms-1" type="button" disabled={!formValidity()} onClick={submitForm}>Sign Up</button>
 			</div>
 		</form>
 	);

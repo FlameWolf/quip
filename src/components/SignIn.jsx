@@ -37,7 +37,7 @@ export default props => {
 		passwordInput.classList.remove("is-valid");
 		passwordInput.classList.remove("is-invalid");
 	};
-	const handleFormSubmission = event => {
+	const submitForm = event => {
 		const username = usernameInput.value;
 		const password = passwordInput.value;
 		const foundUser = userStore.users.find(user => user.handle === username && user.password === password);
@@ -70,7 +70,7 @@ export default props => {
 			<Show when={!credentialsValid()}>
 				<div class="alert alert-danger alert-dismissible fade show">
 					<span>The credentials are invalid</span>
-					<button class="btn-close" type="button" data-bs-dismiss="alert"></button>
+					<button class="btn-close" type="button" onClick={() => setCredentialsValid(true)}></button>
 				</div>
 			</Show>
 			<div class="d-flex mb-2">
@@ -95,7 +95,7 @@ export default props => {
 			</div>
 			<div class="d-flex">
 				<button class="btn btn-secondary w-50 me-1" type="button" disabled={!formHasValue()} onClick={resetForm}>Clear Form</button>
-				<button class="btn btn-primary w-50 ms-1" type="button" disabled={!formValidity()} onClick={handleFormSubmission}>Sign In</button>
+				<button class="btn btn-primary w-50 ms-1" type="button" disabled={!formValidity()} onClick={submitForm}>Sign In</button>
 			</div>
 		</form>
 	);
