@@ -92,9 +92,10 @@ div[contenteditable] {
 .char-count {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	background-color: var(--bs-info);
 	font-size: 0.75rem;
-	font-weight: bold;
+	width: 3rem;
 	padding-left: 0.5rem;
 	padding-right: 0.5rem;
 	border-radius: 50rem;
