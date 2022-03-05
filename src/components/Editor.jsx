@@ -1,7 +1,7 @@
-import { createMemo, createSignal, For } from "solid-js";
 import { EmojiButton } from "@joeattardi/emoji-button";
 import { position } from "caret-pos";
-import { removeFormatting, innerHtmlAsText, insertEmojo, popularEmoji, editorCharLimit } from "../library";
+import { createMemo, createSignal, For } from "solid-js";
+import { contentLengthRegExp, innerHtmlAsText, insertEmojo, maxContentLength, popularEmoji, removeFormatting } from "../library";
 import { quipStore, setQuipStore } from "../stores/quip-store";
 import { userStore } from "../stores/user-store";
 
@@ -10,7 +10,7 @@ export default props => {
 	let editableDiv;
 	let emojiTrigger;
 	const [caret, setCaret] = createSignal(0);
-	const [charCount, setCharCount] = createSignal(editorCharLimit);
+	const [charCount, setCharCount] = createSignal(maxContentLength);
 	const emojiPicker = new EmojiButton({
 		autoHide: false,
 		emojiSize: "1.25rem",
@@ -24,10 +24,10 @@ export default props => {
 		document.querySelector(".emoji-picker__wrapper").style.removeProperty("visibility");
 	});
 	const getTextContent = () => innerHtmlAsText(editableDiv);
-	const getCharCount = text => text.match(/\p{L}\p{M}?|\S|\s/gu)?.length || 0;
+	const getCharCount = text => text.match(contentLengthRegExp)?.length || 0;
 	const updateEditor = event => {
 		removeFormatting(editableDiv);
-		setCharCount(editorCharLimit - getCharCount(getTextContent()));
+		setCharCount(maxContentLength - getCharCount(getTextContent()));
 	};
 	const makeQuip = text => {
 		const parentPostId = +currentInstance.dataset.parentPostId;
@@ -45,7 +45,7 @@ export default props => {
 		);
 		setQuipStore("nextId", value => value + 1);
 		editableDiv.innerHTML = "";
-		setCharCount(editorCharLimit);
+		setCharCount(maxContentLength);
 		if(props.isReply) {
 			currentInstance.closest(".action-bar").querySelector(".action-buttons > div:last-child").click();
 		}
@@ -64,7 +64,7 @@ export default props => {
 				</div>
 				<button ref={emojiTrigger} class="btn btn-light btn-sm px-3 rounded-pill ms-2" onClick={_ => emojiPicker.togglePicker(emojiTrigger)}>&#x2026;</button>
 				<div class="char-count" classList={{ "bg-danger": characterLimitExceeded() }}>{charCount()}</div>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" disabled={charCount() === editorCharLimit || characterLimitExceeded()} onClick={_ => makeQuip(getTextContent())}>Post</button>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={_ => makeQuip(getTextContent())}>Post</button>
 			</div>
 		</div>
 	);

@@ -1,20 +1,24 @@
-import nodeEmoji from "node-emoji";
 import { position } from "caret-pos";
+import nodeEmoji from "node-emoji";
 
-export const handleRegExp = new RegExp(/^[A-Za-z][\w]{3,31}$/);
-export const passwordRegExp = new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/);
+export const handleRegExp = /^[A-Za-z][\w]{3,31}$/;
+export const passwordRegExp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
 export const invalidHandles = [
 	"auth",
 	"home",
 	"search",
 	"user",
 	"users",
+	"post",
+	"posts",
 	"quip",
 	"quips",
 	"favourite",
 	"favourites",
-	"repost",
-	"reposts",
+	"unfavourite",
+	"repeat",
+	"repeats",
+	"unrepeat",
 	"reply",
 	"replies",
 	"profile",
@@ -27,16 +31,20 @@ export const invalidHandles = [
 	"following",
 	"follower",
 	"followers",
+	"unfollow",
 	"mute",
 	"muted",
+	"unmute",
 	"block",
 	"blocked",
+	"unblock",
 	"filter",
 	"filters",
 	"list",
 	"lists",
 	"bookmark",
 	"bookmarks",
+	"unbookmark",
 	"hashtag",
 	"hashtags",
 	"notification",
@@ -46,9 +54,11 @@ export const invalidHandles = [
 	"account",
 	"accounts",
 	"security",
-	"privacy"
+	"privacy",
+	"admin"
 ];
-export const editorCharLimit = 256;
+export const contentLengthRegExp = /\p{L}\p{M}?|\S|\s/gu;
+export const maxContentLength = 256;
 export const popularEmoji = [
 	nodeEmoji.get(":joy:"),
 	nodeEmoji.get(":heart:"),
