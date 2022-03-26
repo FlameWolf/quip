@@ -93,6 +93,11 @@ export const popularEmoji = [
 	nodeEmoji.get(":confused:")
 ];
 
+export const getCookie = name => {
+	const cookie = RegExp(name + "=[^;]+").exec(document.cookie);
+	return decodeURIComponent(cookie?.toString().replace(/^[^=]+./, "") || "");
+};
+
 export const removeDescendantAttributes = elem => {
 	[...elem.querySelectorAll("*")].forEach(node => [...node.attributes].forEach(attrib => node.removeAttribute(attrib.name)));
 };
