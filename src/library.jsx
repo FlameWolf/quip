@@ -93,6 +93,10 @@ export const popularEmoji = [
 	nodeEmoji.get(":confused:")
 ];
 
+export const setCookie = (name, value, { path = undefined, domain = undefined, maxAge = undefined, expires = undefined, secure = undefined, sameSite = undefined }) => {
+	document.cookie = [`${name}=${value}`, path && `path=${path}`, domain && `domain=${domain}`, maxAge && `max-age=${maxAge}`, expires && `expires=${expires}`, secure && "secure", sameSite && "samesite"].filter(x => x).join("; ");
+};
+
 export const getCookie = name => {
 	const cookie = RegExp(name + "=[^;]+").exec(document.cookie);
 	return decodeURIComponent(cookie?.toString().replace(/^[^=]+./, "") || "");
