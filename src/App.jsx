@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes, useLocation, useNavigate } from "solid-app-router";
 import { lazy, onMount } from "solid-js";
-import { getCookie } from "./library";
-import { userStore } from "./stores/user-store";
+import { refreshAuthToken } from "./secure-fetch";
+import { authStore } from "./stores/auth-store";
 const Auth = lazy(() => import("./components/Auth"));
 const SignUp = lazy(() => import("./components/SignUp"));
 const SignIn = lazy(() => import("./components/SignIn"));
@@ -17,24 +17,9 @@ function App() {
 	onMount(async () => {
 		const location = useLocation();
 		const navigate = useNavigate();
-		const refreshAuthTokenUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/refresh-auth-token`;
-		const userId = getCookie(import.meta.env.VITE_USER_ID_COOKIE_NAME);
-		const handle = getCookie(import.meta.env.VITE_HANDLE_COOKIE_NAME);
-		const response = await fetch(refreshAuthTokenUrl, {
-			method: "GET",
-			headers: {
-				"X-UID": userId,
-				"X-Slug": handle
-			},
-			credentials: "include",
-			mode: "cors"
-		});
-		if (response.status === 200) {
-		} else {
-		}
+		await refreshAuthToken();
 		if (protectedRoutes.indexOf(location.pathname) > -1) {
-			const currentUser = userStore.currentUser;
-			if (!currentUser) {
+			if (!authStore.token) {
 				navigate("/auth", { resolve: false });
 			}
 		}
