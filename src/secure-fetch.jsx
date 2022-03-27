@@ -1,5 +1,5 @@
 import { getCookie } from "./library";
-import { authStore } from "./stores/auth-store";
+import { authStore, setAuthStore } from "./stores/auth-store";
 
 export const refreshAuthToken = async () => {
 	const refreshAuthTokenUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/refresh-auth-token`;
@@ -47,9 +47,12 @@ export const secureFetch = async (
 	if (authToken) {
 		const createdDate = new Date(authStore.createdAt);
 		const expiryDate = createdDate.setMilliseconds(createdDate.getMilliseconds() + parseInt(authStore.expiresIn));
-		if (new Date() < expiryDate()) {
-			Object.assign(init.headers, {
-				Authorization: `Bearer ${authToken}`,
+		if (new Date() < expiryDate) {
+			Object.assign(init, {
+				headers: {
+					...init.headers,
+					Authorization: `Bearer ${authToken}`
+				},
 				credentials: "include",
 				mode: "cors"
 			});
