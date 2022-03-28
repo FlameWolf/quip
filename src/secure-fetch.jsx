@@ -1,6 +1,10 @@
 import { getCookie } from "./library";
 import { authStore, setAuthStore } from "./stores/auth-store";
 
+const enforcedInitOptions = {
+	credentials: "include",
+	mode: "cors"
+};
 export const refreshAuthToken = async () => {
 	const refreshAuthTokenUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/refresh-auth-token`;
 	const userId = getCookie(import.meta.env.VITE_USER_ID_COOKIE_NAME);
@@ -11,14 +15,15 @@ export const refreshAuthToken = async () => {
 			"X-UID": userId,
 			"X-Slug": handle
 		},
-		credentials: "include",
-		mode: "cors"
+		...enforcedInitOptions
 	});
 	if (response.status === 200) {
 		const { token, createdAt, expiresIn } = await response.json();
-		setAuthStore({ token, createdAt, expiresIn });
+		setAuthStore({ userId, handle, token, createdAt, expiresIn });
 	} else {
 		setAuthStore({
+			userId: undefined,
+			handle: undefined,
 			token: undefined,
 			createdAt: undefined,
 			expiresIn: undefined
@@ -43,6 +48,7 @@ export const secureFetch = async (
 		signal: undefined
 	}
 ) => {
+	Object.assign(init, enforcedInitOptions);
 	const authToken = authStore.token;
 	if (authToken) {
 		const createdDate = new Date(authStore.createdAt);
@@ -52,9 +58,7 @@ export const secureFetch = async (
 				headers: {
 					...init.headers,
 					Authorization: `Bearer ${authToken}`
-				},
-				credentials: "include",
-				mode: "cors"
+				}
 			});
 			return await fetch(resource, init);
 		}
