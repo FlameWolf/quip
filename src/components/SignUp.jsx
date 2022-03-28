@@ -3,10 +3,9 @@ import { useNavigate } from "solid-app-router";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
 import { createSignal, onMount, Show } from "solid-js";
-import { handleRegExp, passwordRegExp } from "../library";
+import { handleRegExp, passwordRegExp, setCookie } from "../library";
 import { secureFetch } from "../secure-fetch";
 import { setAuthStore } from "../stores/auth-store";
-import { setUserStore, userStore } from "../stores/user-store";
 
 export default props => {
 	let signUpForm;
@@ -20,7 +19,7 @@ export default props => {
 	const [showConfirmPassword, setShowConfirmPassword] = createSignal(false);
 	const [formValidity, setFormValidity] = createSignal(false);
 	const [formHasValue, setFormHasValue] = createSignal(false);
-	const [usernameUnavailable, setUsernameUnavailable] = createSignal(false);
+	const [signUpError, setSignUpError] = createSignal();
 	const navigate = useNavigate();
 	const updateFormValidity = event => {
 		const username = usernameInput.value;
@@ -61,23 +60,15 @@ export default props => {
 			body: JSON.stringify({ handle: username, password })
 		});
 		if (response.status === 201) {
-			const data = await response.json();
-			delete data.userId;
-			setAuthStore(data);
+			setSignUpError(undefined);
+			const { userId, token, createdAt, expiresIn } = await response.json();
+			const cookieOptions = { path: "/", maxAge: 60 * 60 * 24 * 360 };
+			setCookie(import.meta.env.VITE_USER_ID_COOKIE_NAME, userId, cookieOptions);
+			setCookie(import.meta.env.VITE_HANDLE_COOKIE_NAME, username, cookieOptions);
+			setAuthStore({ userId, handle: username, token, createdAt, expiresIn });
+			navigate("/home", { resolve: false });
 		} else if (response.status >= 400) {
-			const body = await response.text();
-		}
-		setUsernameUnavailable(false);
-		if (!usernameUnavailable()) {
-			const newUser = {
-				id: userStore.nextId,
-				handle: username,
-				password
-			};
-			setUserStore("users", users => [...users, newUser]);
-			setUserStore("nextId", value => value + 1);
-			setUserStore("currentUser", value => newUser);
-			// navigate("/home", { resolve: false });
+			setSignUpError(await response.text());
 		}
 	};
 	onMount(() => {
@@ -99,10 +90,10 @@ export default props => {
 	});
 	return (
 		<form ref={signUpForm} onInput={updateFormValidity}>
-			<Show when={usernameUnavailable()}>
+			<Show when={signUpError()}>
 				<div class="alert alert-danger alert-dismissible">
-					<span>The username is unavailable</span>
-					<button class="btn-close" type="button" onClick={() => setUsernameUnavailable(false)}></button>
+					<span>{signUpError()}</span>
+					<button class="btn-close" type="button" onClick={() => setSignUpError(undefined)}></button>
 				</div>
 			</Show>
 			<div class="d-flex mb-2">
