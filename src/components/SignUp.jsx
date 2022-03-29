@@ -50,21 +50,21 @@ export default props => {
 	};
 	const submitForm = async event => {
 		const signUpUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/sign-up`;
-		const username = usernameInput.value;
+		const handle = usernameInput.value;
 		const password = passwordInput.value;
 		const response = await secureFetch(signUpUrl, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"
 			},
-			body: JSON.stringify({ handle: username, password })
+			body: JSON.stringify({ handle, password })
 		});
 		if (response.status === 201) {
 			setSignUpError(undefined);
 			const { userId, token, createdAt, expiresIn } = await response.json();
 			setCookie(import.meta.env.VITE_USER_ID_COOKIE_NAME, userId, cookieOptions);
-			setCookie(import.meta.env.VITE_HANDLE_COOKIE_NAME, username, cookieOptions);
-			setAuthStore({ userId, handle: username, token, createdAt, expiresIn });
+			setCookie(import.meta.env.VITE_HANDLE_COOKIE_NAME, handle, cookieOptions);
+			setAuthStore({ userId, handle, token, createdAt, expiresIn });
 			navigate("/home", { resolve: false });
 		} else if (response.status >= 400) {
 			setSignUpError(await response.text());
