@@ -98,45 +98,31 @@ export default props => {
 			</Show>
 			<div class="d-flex mb-2">
 				<label>Username</label>
-				<a ref={usernameInfoToggle} class="ms-auto clickable" tabIndex={-1}>
-					<AiOutlineInfoCircle />
-				</a>
+				<a ref={usernameInfoToggle} class="ms-auto clickable" tabIndex={-1}><AiOutlineInfoCircle/></a>
 			</div>
 			<div class="input-group mb-4">
 				<span class="input-group-text">@</span>
-				<input ref={usernameInput} class="form-control" type="text" placeholder="Username" pattern={handleRegExp.source} />
+				<input ref={usernameInput} class="form-control" type="text" placeholder="Username" pattern={handleRegExp.source}/>
 			</div>
 			<div class="d-flex mb-2">
 				<label>Password</label>
-				<a ref={passwordInfoToggle} class="ms-auto clickable" tabIndex={-1}>
-					<AiOutlineInfoCircle />
-				</a>
+				<a ref={passwordInfoToggle} class="ms-auto clickable" tabIndex={-1}><AiOutlineInfoCircle/></a>
 			</div>
 			<div class="input-group mb-4">
-				<input ref={passwordInput} class="form-control" type={showPassword() ? "text" : "password"} placeholder="Password" pattern={passwordRegExp.source} />
-				<span class="input-group-text clickable" onClick={event => setShowPassword(value => !value)}>
-					{showPassword() ? BsEyeSlash : BsEye}
-				</span>
+				<input ref={passwordInput} class="form-control" type={showPassword() ? "text" : "password"} placeholder="Password" pattern={passwordRegExp.source}/>
+				<span class="input-group-text clickable" onClick={event => setShowPassword(value => !value)}>{showPassword() ? BsEyeSlash : BsEye}</span>
 			</div>
 			<div class="d-flex mb-2">
 				<label>Confirm password</label>
-				<a ref={confirmPasswordInfoToggle} class="ms-auto clickable" tabIndex={-1}>
-					<AiOutlineInfoCircle />
-				</a>
+				<a ref={confirmPasswordInfoToggle} class="ms-auto clickable" tabIndex={-1}><AiOutlineInfoCircle/></a>
 			</div>
 			<div class="input-group mb-4">
-				<input ref={confirmPasswordInput} class="form-control" type={showConfirmPassword() ? "text" : "password"} placeholder="Confirm password" />
-				<span class="input-group-text clickable" onClick={event => setShowConfirmPassword(value => !value)}>
-					{showConfirmPassword() ? BsEyeSlash : BsEye}
-				</span>
+				<input ref={confirmPasswordInput} class="form-control" type={showConfirmPassword() ? "text" : "password"} placeholder="Confirm password"/>
+				<span class="input-group-text clickable" onClick={event => setShowConfirmPassword(value => !value)}>{showConfirmPassword() ? BsEyeSlash : BsEye}</span>
 			</div>
 			<div class="d-flex">
-				<button class="btn btn-secondary w-50 me-1" type="button" disabled={!formHasValue()} onClick={resetForm}>
-					Clear Form
-				</button>
-				<button class="btn btn-primary w-50 ms-1" type="button" disabled={!formValidity()} onClick={submitForm}>
-					Sign Up
-				</button>
+				<button class="btn btn-secondary w-50 me-1" type="button" disabled={!formHasValue()} onClick={resetForm}>Clear Form</button>
+				<button class="btn btn-primary w-50 ms-1" type="button" disabled={!formValidity()} onClick={submitForm}>Sign Up</button>
 			</div>
 		</form>
 	);
