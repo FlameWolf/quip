@@ -6,37 +6,11 @@
 		<meta name="theme-color" content="#000000"/>
 		<base target="_blank"/>
 		<link rel="shortcut icon" type="image/ico" href="/src/assets/favicon.png"/>
-		<script type="application/javascript">
-			/*<![CDATA[*/
-			const registerServiceWorker = async () => {
-				if ("serviceWorker" in navigator) {
-					try {
-						const registration = await navigator.serviceWorker.register("/service-worker.js", { scope: "/" });
-						if (registration.installing) {
-							console.log("SW installing");
-						} else if (registration.waiting) {
-							console.log("SW waiting");
-						} else if (registration.active) {
-							console.log("SW active");
-						}
-					} catch (err) {
-						console.log({ err });
-					}
-				}
-			};
-			/*]]>*/
-		</script>
 		<title>Quip</title>
 	</head>
 	<body>
 		<noscript>JavaScript should be enabled to run this app.</noscript>
 		<div id="root" class="container-fluid"></div>
-		<script type="application/javascript">
-			/*<![CDATA[*/
-			registerServiceWorker().then(() => {
-				import("/src/index.jsx");
-			});
-			/*]]>*/
-		</script>
+		<script src="/src/index.jsx" type="module"></script>
 	</body>
 </html>
