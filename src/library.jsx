@@ -1,6 +1,7 @@
 import { position } from "caret-pos";
 import nodeEmoji from "node-emoji";
 
+export const cookieOptions = { path: "/", maxAge: 60 * 60 * 24 * 360 };
 export const handleRegExp = /^[A-Za-z][\w]{3,31}$/;
 export const passwordRegExp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
 export const invalidHandles = [
