@@ -3,7 +3,7 @@ import { useNavigate } from "solid-app-router";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
 import { createSignal, onMount, Show } from "solid-js";
-import { handleRegExp, passwordRegExp, setCookie } from "../library";
+import { cookieOptions, handleRegExp, passwordRegExp, setCookie } from "../library";
 import { secureFetch } from "../secure-fetch";
 import { setAuthStore } from "../stores/auth-store";
 
@@ -62,7 +62,6 @@ export default props => {
 		if (response.status === 201) {
 			setSignUpError(undefined);
 			const { userId, token, createdAt, expiresIn } = await response.json();
-			const cookieOptions = { path: "/", maxAge: 60 * 60 * 24 * 360 };
 			setCookie(import.meta.env.VITE_USER_ID_COOKIE_NAME, userId, cookieOptions);
 			setCookie(import.meta.env.VITE_HANDLE_COOKIE_NAME, username, cookieOptions);
 			setAuthStore({ userId, handle: username, token, createdAt, expiresIn });
