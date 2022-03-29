@@ -5,6 +5,7 @@ const enforcedInitOptions = {
 	credentials: "include",
 	mode: "cors"
 };
+
 export const refreshAuthToken = async () => {
 	const refreshAuthTokenUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/refresh-auth-token`;
 	const userId = getCookie(import.meta.env.VITE_USER_ID_COOKIE_NAME);
