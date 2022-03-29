@@ -1,9 +1,11 @@
+import { Popover } from "bootstrap";
+import { useNavigate } from "solid-app-router";
+import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
 import { createSignal, onMount, Show } from "solid-js";
-import { AiOutlineInfoCircle } from "solid-icons/ai";
-import { Popover } from "bootstrap";
-import { userStore, setUserStore } from "../stores/user-store";
-import { useNavigate } from "solid-app-router";
+import { cookieOptions, setCookie } from "../library";
+import { secureFetch } from "../secure-fetch";
+import { setAuthStore } from "../stores/auth-store";
 
 export default props => {
 	let signInForm;
@@ -14,7 +16,7 @@ export default props => {
 	const [showPassword, setShowPassword] = createSignal(false);
 	const [formValidity, setFormValidity] = createSignal(false);
 	const [formHasValue, setFormHasValue] = createSignal(false);
-	const [credentialsValid, setCredentialsValid] = createSignal(true);
+	const [signInError, setSignInError] = createSignal();
 	const navigate = useNavigate();
 	const updateFormValidity = event => {
 		const username = usernameInput.value;
@@ -37,60 +39,62 @@ export default props => {
 		passwordInput.classList.remove("is-valid");
 		passwordInput.classList.remove("is-invalid");
 	};
-	const submitForm = event => {
-		const username = usernameInput.value;
+	const submitForm = async event => {
+		const signInUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/sign-in`;
+		const handle = usernameInput.value;
 		const password = passwordInput.value;
-		const foundUser = userStore.users.find(user => user.handle === username && user.password === password);
-		setCredentialsValid(foundUser);
-		if(foundUser) {
-			setUserStore("currentUser", foundUser);
+		const response = await secureFetch(signInUrl, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({ handle, password })
+		});
+		if (response.status === 200) {
+			setSignInError(undefined);
+			const { userId, token, createdAt, expiresIn } = await response.json();
+			setCookie(import.meta.env.VITE_USER_ID_COOKIE_NAME, userId, cookieOptions);
+			setCookie(import.meta.env.VITE_HANDLE_COOKIE_NAME, handle, cookieOptions);
+			setAuthStore({ userId, handle, token, createdAt, expiresIn });
 			navigate("/home", { resolve: false });
+		} else if (response.status >= 400) {
+			setSignInError(await response.text());
 		}
 	};
 	onMount(() => {
-		new Popover(
-			usernameInfoToggle,
-			{
-				content: "Username is required",
-				trigger: "focus",
-				placement: "auto"
-			}
-		);
-		new Popover(
-			passwordInfoToggle,
-			{
-				content: "Password is required",
-				trigger: "focus",
-				placement: "auto"
-			}
-		);
+		new Popover(usernameInfoToggle, {
+			content: "Username is required",
+			trigger: "focus",
+			placement: "auto"
+		});
+		new Popover(passwordInfoToggle, {
+			content: "Password is required",
+			trigger: "focus",
+			placement: "auto"
+		});
 	});
 	return (
 		<form ref={signInForm} onInput={updateFormValidity}>
-			<Show when={!credentialsValid()}>
+			<Show when={signInError()}>
 				<div class="alert alert-danger alert-dismissible">
-					<span>The credentials are invalid</span>
-					<button class="btn-close" type="button" onClick={() => setCredentialsValid(true)}></button>
+					<span>{signInError()}</span>
+					<button class="btn-close" type="button" onClick={() => setSignInError(undefined)}></button>
 				</div>
 			</Show>
 			<div class="d-flex mb-2">
 				<label>Username</label>
-				<a ref={usernameInfoToggle} class="ms-auto clickable" tabIndex={-1}>
-					<AiOutlineInfoCircle/>
-				</a>
+				<a ref={usernameInfoToggle} class="ms-auto clickable" tabIndex={-1}><AiOutlineInfoCircle /></a>
 			</div>
 			<div class="input-group mb-4">
 				<span class="input-group-text">@</span>
-				<input ref={usernameInput} class="form-control" type="text" placeholder="Username" required={true}/>
+				<input ref={usernameInput} class="form-control" type="text" placeholder="Username" required={true} />
 			</div>
 			<div class="d-flex mb-2">
 				<label>Password</label>
-				<a ref={passwordInfoToggle} class="ms-auto clickable" tabIndex={-1}>
-					<AiOutlineInfoCircle/>
-				</a>
+				<a ref={passwordInfoToggle} class="ms-auto clickable" tabIndex={-1}><AiOutlineInfoCircle /></a>
 			</div>
 			<div class="input-group mb-4">
-				<input ref={passwordInput} class="form-control" type={showPassword() ? "text" : "password"} placeholder="Password" required={true}/>
+				<input ref={passwordInput} class="form-control" type={showPassword() ? "text" : "password"} placeholder="Password" required={true} />
 				<span class="input-group-text clickable" onClick={event => setShowPassword(value => !value)}>{showPassword() ? BsEyeSlash : BsEye}</span>
 			</div>
 			<div class="d-flex">
