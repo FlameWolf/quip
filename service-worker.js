@@ -1,7 +1,7 @@
 const authCacheName = "auth";
-const authBaseUrl = "https://localhost:4096/auth/";
+const refreshTokenUrl = "https://localhost:4096/auth/refresh-token";
 
-const verifyAuthToken = authData => {
+const validateToken = authData => {
 	const authToken = authData.token;
 	if (authToken) {
 		const createdDate = new Date(authData.createdAt);
@@ -13,12 +13,12 @@ const verifyAuthToken = authData => {
 	return false;
 };
 
-const interceptAuthResponse = async request => {
+const interceptRefreshTokenRequest = async request => {
 	const authCache = await caches.open(authCacheName);
 	const cachedReponse = await authCache.match(request);
 	if (cachedReponse) {
 		const authData = await cachedReponse.json();
-		if (verifyAuthToken(authData)) {
+		if (validateToken(authData)) {
 			return new Response(JSON.stringify(authData), {
 				status: 200,
 				headers: {
@@ -31,13 +31,15 @@ const interceptAuthResponse = async request => {
 	const status = response.status;
 	if (status === 200) {
 		authCache.put(request, response);
+	} else {
+		authCache.delete(request);
 	}
 	return response;
 };
 
 self.addEventListener("fetch", async event => {
 	const request = event.request;
-	if (request.url.startsWith(authBaseUrl) && request.method === "GET") {
-		return event.respondWith(await interceptAuthResponse(request));
+	if (request.url === refreshTokenUrl) {
+		return event.respondWith(await interceptRefreshTokenRequest(request));
 	}
 });

@@ -6,11 +6,11 @@ const enforcedInitOptions = {
 	mode: "cors"
 };
 
-export const refreshAuthToken = async () => {
-	const refreshAuthTokenUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/refresh-auth-token`;
+export const refreshToken = async () => {
+	const refreshTokenUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/refresh-token`;
 	const userId = getCookie(import.meta.env.VITE_USER_ID_COOKIE_NAME);
 	const handle = getCookie(import.meta.env.VITE_HANDLE_COOKIE_NAME);
-	const response = await fetch(refreshAuthTokenUrl, {
+	const response = await fetch(refreshTokenUrl, {
 		method: "GET",
 		headers: {
 			"X-UID": userId,
@@ -63,7 +63,7 @@ export const secureFetch = async (
 			});
 			return await fetch(resource, init);
 		}
-		await refreshAuthToken();
+		await refreshToken();
 		return await secureFetch(resource, init);
 	}
 	return await fetch(resource, init);
