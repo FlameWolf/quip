@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes, useLocation, useNavigate } from "solid-app-router";
 import { lazy, onMount } from "solid-js";
-import { refreshToken } from "./secure-fetch";
-import { authStore } from "./stores/auth-store";
+import { authChannelName, getAuthDataAction } from "../auth-library";
+import { authStore, setAuthStore } from "./stores/auth-store";
 const Auth = lazy(() => import("./components/Auth"));
 const SignUp = lazy(() => import("./components/SignUp"));
 const SignIn = lazy(() => import("./components/SignIn"));
@@ -11,15 +11,19 @@ const NotFound = lazy(() => import("./components/NotFound"));
 
 function App() {
 	const protectedRoutes = ["/", "/home"];
-	onMount(async () => {
+	onMount(() => {
 		const location = useLocation();
 		const navigate = useNavigate();
-		await refreshToken();
-		if (protectedRoutes.indexOf(location.pathname) > -1) {
-			if (!authStore.token) {
+		const authChannel = new BroadcastChannel(authChannelName);
+		authChannel.addEventListener("message", event => {
+			setAuthStore(event.data);
+			if (protectedRoutes.indexOf(location.pathname) > -1 && !authStore.token) {
 				navigate("/auth", { resolve: false });
 			}
-		}
+		});
+		navigator.serviceWorker.controller.postMessage({
+			action: getAuthDataAction
+		});
 	});
 	return (
 		<div class="row">

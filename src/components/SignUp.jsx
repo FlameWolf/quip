@@ -3,9 +3,8 @@ import { useNavigate } from "solid-app-router";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
 import { createSignal, onMount, Show } from "solid-js";
-import { cookieOptions, handleRegExp, passwordRegExp, setCookie } from "../library";
-import { secureFetch } from "../secure-fetch";
-import { setAuthStore } from "../stores/auth-store";
+import { setAuthDataAction } from "../../auth-library";
+import { handleRegExp, passwordRegExp } from "../library";
 
 export default props => {
 	let signUpForm;
@@ -52,7 +51,7 @@ export default props => {
 		const signUpUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/sign-up`;
 		const handle = usernameInput.value;
 		const password = passwordInput.value;
-		const response = await secureFetch(signUpUrl, {
+		const response = await fetch(signUpUrl, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"
@@ -61,10 +60,10 @@ export default props => {
 		});
 		if (response.status === 201) {
 			setSignUpError(undefined);
-			const { userId, token, createdAt, expiresIn } = await response.json();
-			setCookie(import.meta.env.VITE_USER_ID_COOKIE_NAME, userId, cookieOptions);
-			setCookie(import.meta.env.VITE_HANDLE_COOKIE_NAME, handle, cookieOptions);
-			setAuthStore({ userId, handle, token, createdAt, expiresIn });
+			navigator.serviceWorker.controller.postMessage({
+				action: setAuthDataAction,
+				payload: { handle }
+			});
 			navigate("/home", { resolve: false });
 		} else if (response.status >= 400) {
 			setSignUpError(await response.text());
