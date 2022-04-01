@@ -1,7 +1,12 @@
 import { position } from "caret-pos";
 import nodeEmoji from "node-emoji";
 
-export const cookieOptions = { path: "/", maxAge: 60 * 60 * 24 * 360 };
+export const cookieOptions = {
+	path: "/",
+	maxAge: 60 * 60 * 24 * 360,
+	secure: true,
+	sameSite: "strict"
+};
 export const handleRegExp = /^[A-Za-z][\w]{3,31}$/;
 export const passwordRegExp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
 export const invalidHandles = [
@@ -95,7 +100,7 @@ export const popularEmoji = [
 ];
 
 export const setCookie = (name, value, { path = undefined, domain = undefined, maxAge = undefined, expires = undefined, secure = undefined, sameSite = undefined }) => {
-	document.cookie = [`${name}=${value}`, path && `path=${path}`, domain && `domain=${domain}`, maxAge && `max-age=${maxAge}`, expires && `expires=${expires}`, secure && "secure", sameSite && "samesite"].filter(x => x).join("; ");
+	document.cookie = [`${name}=${value}`, path && `path=${path}`, domain && `domain=${domain}`, maxAge && `max-age=${maxAge}`, expires && `expires=${expires}`, secure && "secure", sameSite && `samesite=${sameSite}`].filter(x => x).join("; ");
 };
 
 export const getCookie = name => {
