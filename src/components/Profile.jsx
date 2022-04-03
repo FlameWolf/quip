@@ -1,7 +1,7 @@
-import { userStore } from "../stores/user-store";
-import { quipStore } from "../stores/quip-store";
 import { useParams } from "solid-app-router";
 import { createMemo, For } from "solid-js";
+import { quipStore } from "../stores/quip-store";
+import { userStore } from "../stores/user-store";
 import DisplayPost from "./DisplayPost";
 
 export default props => {
@@ -10,7 +10,7 @@ export default props => {
 		user => user.handle.toLowerCase() === params.handle.toLowerCase()
 	);
 	const userQuips = createMemo(
-		() => quipStore.quips.filter(quip => quip.author.id === profileUser.id)
+		() => quipStore.quips.filter(quip => quip.author._id === profileUser.id)
 	);
 	return (
 		<>
