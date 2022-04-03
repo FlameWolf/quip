@@ -1,6 +1,6 @@
-import { createSignal, Show } from "solid-js";
-import { BsStar, BsStarFill, BsChatRight } from "solid-icons/bs";
+import { BsChatRight, BsStar, BsStarFill } from "solid-icons/bs";
 import { FiRepeat } from "solid-icons/fi";
+import { createSignal, Show } from "solid-js";
 import Editor from "./Editor";
 
 export default props => {
@@ -24,7 +24,7 @@ export default props => {
 			sourceActionBar.removeChild(editorInstance);
 		} else {
 			editorParent?.querySelector(".action-buttons > div:last-child").click();
-			editorInstance.dataset["parentPostId"] = post.id;
+			editorInstance.dataset["parentPostId"] = post._id;
 			sourceActionBar.appendChild(editorInstance);
 		}
 		setReplyFlag(!isAttachedToCurrent);
@@ -34,17 +34,17 @@ export default props => {
 	};
 	return (
 		<>
-			<div data-post-id={post.id} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, "reply": props.isReply }}>
+			<div data-post-id={post._id} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, "reply": props.isReply }}>
 				<div class="post-header">
 					<div>@</div>
-					<a class="handle" href={`/${handle}`}>{handle}</a>
+					<a class="author.handle" href={`/${handle}`}>{handle}</a>
 					<div>&#xA0;</div>
 					<Show when={props.parentBlurb}>
 						<div innerHTML={`Replied to "${props.parentBlurb}"`}></div>
 					</Show>
 				</div>
 				<div class="card-body">
-					<p class="card-text" innerHTML={post.content.replace(/\n/g, "<br/>")}></p>
+					<p class="card-text" innerHTML={post.content?.replace(/\n/g, "<br/>")}></p>
 				</div>
 				<div class="action-bar">
 					<div class="action-buttons">
