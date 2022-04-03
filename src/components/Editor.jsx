@@ -36,7 +36,7 @@ export default props => {
 			quips => [
 				...quips,
 				{
-					id: quipStore.nextId,
+					_id: quipStore.nextId,
 					author: userStore.currentUser,
 					content: text,
 					replyTo: parentPostId || undefined
