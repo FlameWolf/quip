@@ -144,5 +144,5 @@ export const insertEmojo = (elem, emojo, callback = null) => {
 };
 
 export const trimPost = text => {
-	return text.length > 20 ? `${text.substring(0, 20)}&#x2026;` : text;
+	return text && text.length > 20 ? `${text.substring(0, 20)}&#x2026;` : text;
 };
