@@ -1,6 +1,5 @@
 "use strict";
 
-// import { apiBaseUrl, authBaseUrl, authCacheName, authChannelName, getAuthDataAction, refreshToken, requestInitOptions, setAuthDataAction, validateToken } from "./auth-library";
 const apiBaseUrl = "https://quip-rest-api.herokuapp.com/";
 const authBaseUrl = `${apiBaseUrl}auth/`;
 const refreshTokenUrl = `${authBaseUrl}refresh-token`;
@@ -60,7 +59,7 @@ const setToken = async value => {
 const getToken = async () => {
 	const tokenCache = await caches.open(authCacheName);
 	const cachedToken = await tokenCache.match("/");
-	Object.assign(authData, await cachedToken.json());
+	Object.assign(authData, cachedToken ? await cachedToken.json() : {});
 };
 
 const interceptAuthRequest = async request => {
