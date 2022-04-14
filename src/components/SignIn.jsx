@@ -50,7 +50,7 @@ export default props => {
 		});
 		if (response.status === 200) {
 			setSignInError(undefined);
-			navigator.serviceWorker.controller.postMessage({
+			navigator.serviceWorker.controller?.postMessage({
 				action: setAuthDataAction,
 				payload: { handle }
 			});

@@ -21,7 +21,7 @@ function App() {
 				navigate("/auth", { resolve: false });
 			}
 		});
-		navigator.serviceWorker.controller.postMessage({
+		navigator.serviceWorker.controller?.postMessage({
 			action: getAuthDataAction
 		});
 	});

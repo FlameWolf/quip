@@ -60,7 +60,7 @@ export default props => {
 		});
 		if (response.status === 201) {
 			setSignUpError(undefined);
-			navigator.serviceWorker.controller.postMessage({
+			navigator.serviceWorker.controller?.postMessage({
 				action: setAuthDataAction,
 				payload: { handle }
 			});
