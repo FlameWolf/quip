@@ -66,11 +66,10 @@ const interceptAuthRequest = async request => {
 	const authCache = await caches.open(authCacheName);
 	const response = await fetch(request, requestInitOptions);
 	const status = response.status;
-	if (status === 200 || status === 201) {
-		authCache.put("/", response.clone());
-	} else {
-		authCache.delete("/");
-	}
+	await dispatch({
+		action: setAuthDataAction,
+		payload: status === 200 || status === 201 ? response.clone() : {}
+	});
 	return response;
 };
 
