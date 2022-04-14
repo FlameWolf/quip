@@ -11,13 +11,14 @@ const requestInitOptions = {
 	credentials: "include",
 	mode: "cors"
 };
-const authData = {
+const defaultAuthData = {
 	userId: undefined,
 	handle: undefined,
 	token: undefined,
 	createdAt: undefined,
 	expiresIn: undefined
 };
+const authData = Object.assign({}, defaultAuthData);
 const authChannel = new BroadcastChannel(authChannelName);
 
 const validateToken = value => {
@@ -59,7 +60,7 @@ const setToken = async value => {
 const getToken = async () => {
 	const tokenCache = await caches.open(authCacheName);
 	const cachedToken = await tokenCache.match("/");
-	Object.assign(authData, cachedToken ? await cachedToken.json() : {});
+	Object.assign(authData, cachedToken ? await cachedToken.json() : defaultAuthData);
 };
 
 const interceptAuthRequest = async request => {
@@ -68,7 +69,7 @@ const interceptAuthRequest = async request => {
 	const status = response.status;
 	await dispatch({
 		action: setAuthDataAction,
-		payload: status === 200 || status === 201 ? response.clone() : {}
+		payload: status === 200 || status === 201 ? await response.clone().json() : {}
 	});
 	return response;
 };
@@ -78,16 +79,7 @@ const interceptApiRequest = async request => {
 		const response = await refreshToken(authData);
 		await dispatch({
 			action: setAuthDataAction,
-			payload:
-				response.status === 200
-					? await response.json()
-					: {
-						userId: undefined,
-						handle: undefined,
-						token: undefined,
-						createdAt: undefined,
-						expiresIn: undefined
-					}
+			payload: response.status === 200 ? await response.json() : defaultAuthData
 		});
 	}
 	const authToken = authData.token;
