@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes, useLocation, useNavigate } from "solid-app-router";
 import { lazy, onMount } from "solid-js";
-import { authChannelName, getAuthDataAction } from "../auth-library";
 import { authStore, setAuthStore } from "./stores/auth-store";
+import { authChannelName, getAuthDataAction } from "/auth-library";
 const Auth = lazy(() => import("./components/Auth"));
 const SignUp = lazy(() => import("./components/SignUp"));
 const SignIn = lazy(() => import("./components/SignIn"));

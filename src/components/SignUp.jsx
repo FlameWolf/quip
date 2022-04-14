@@ -3,8 +3,8 @@ import { useNavigate } from "solid-app-router";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
 import { createSignal, onMount, Show } from "solid-js";
-import { setAuthDataAction } from "../../auth-library";
 import { handleRegExp, passwordRegExp } from "../library";
+import { setAuthDataAction } from "/auth-library";
 
 export default props => {
 	let signUpForm;
