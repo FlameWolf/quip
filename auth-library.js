@@ -1,6 +1,6 @@
 "use strict";
 
-export const apiBaseUrl = "https://localhost:4096/";
+export const apiBaseUrl = "https://quip-rest-api.herokuapp.com/";
 export const authBaseUrl = `${apiBaseUrl}auth/`;
 export const refreshTokenUrl = `${authBaseUrl}refresh-token`;
 export const authCacheName = "AUTH_CACHE";

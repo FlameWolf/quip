@@ -1,7 +1,7 @@
 "use strict";
 
 // import { apiBaseUrl, authBaseUrl, authCacheName, authChannelName, getAuthDataAction, refreshToken, requestInitOptions, setAuthDataAction, validateToken } from "./auth-library";
-const apiBaseUrl = "https://localhost:4096/";
+const apiBaseUrl = "https://quip-rest-api.herokuapp.com/";
 const authBaseUrl = `${apiBaseUrl}auth/`;
 const refreshTokenUrl = `${authBaseUrl}refresh-token`;
 const authCacheName = "AUTH_CACHE";
@@ -12,29 +12,6 @@ const requestInitOptions = {
 	credentials: "include",
 	mode: "cors"
 };
-
-const validateToken = authData => {
-	const authToken = authData.token;
-	if (authToken) {
-		const createdDate = new Date(authData.createdAt);
-		const expiryDate = createdDate.setMilliseconds(createdDate.getMilliseconds() + parseInt(authData.expiresIn));
-		if (new Date() < expiryDate) {
-			return true;
-		}
-	}
-	return false;
-};
-
-const refreshToken = async authData => {
-	return await fetch(refreshTokenUrl, {
-		headers: {
-			"X-UID": authData.userId,
-			"X-Slug": authData.handle
-		},
-		...requestInitOptions
-	});
-};
-
 const authData = {
 	userId: undefined,
 	handle: undefined,
@@ -43,6 +20,28 @@ const authData = {
 	expiresIn: undefined
 };
 const authChannel = new BroadcastChannel(authChannelName);
+
+const validateToken = value => {
+	const authToken = value.token;
+	if (authToken) {
+		const createdDate = new Date(value.createdAt);
+		const expiryDate = createdDate.setMilliseconds(createdDate.getMilliseconds() + parseInt(value.expiresIn));
+		if (new Date() < expiryDate) {
+			return true;
+		}
+	}
+	return false;
+};
+
+const refreshToken = async value => {
+	return await fetch(refreshTokenUrl, {
+		headers: {
+			"X-UID": value.userId,
+			"X-Slug": value.handle
+		},
+		...requestInitOptions
+	});
+};
 
 const setToken = async value => {
 	Object.assign(authData, value);
@@ -79,18 +78,18 @@ const interceptAuthRequest = async request => {
 const interceptApiRequest = async request => {
 	if (!validateToken(authData)) {
 		const response = await refreshToken(authData);
-		self.postMessage({
+		await dispatch({
 			action: setAuthDataAction,
 			payload:
 				response.status === 200
 					? await response.json()
 					: {
-							userId: undefined,
-							handle: undefined,
-							token: undefined,
-							createdAt: undefined,
-							expiresIn: undefined
-					  }
+						userId: undefined,
+						handle: undefined,
+						token: undefined,
+						createdAt: undefined,
+						expiresIn: undefined
+					}
 		});
 	}
 	const authToken = authData.token;
@@ -102,8 +101,7 @@ const interceptApiRequest = async request => {
 	return await fetch(request, requestInitOptions);
 };
 
-self.addEventListener("message", async event => {
-	const { action, payload } = event.data;
+const dispatch = async ({ action, payload }) => {
 	switch (action) {
 		case setAuthDataAction:
 			await setToken(payload);
@@ -115,7 +113,9 @@ self.addEventListener("message", async event => {
 			break;
 	}
 	authChannel.postMessage(authData);
-});
+};
+
+self.addEventListener("message", async event => await dispatch(event.data));
 
 self.addEventListener("fetch", event => {
 	const request = event.request;
