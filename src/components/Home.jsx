@@ -6,7 +6,7 @@ import Editor from "./Editor";
 
 export default props => {
 	let loadMoreButton;
-	const postsUrl = `${import.meta.env.VITE_API_BASE_URL}/timeline`;
+	const postsUrl = `${import.meta.env.VITE_API_BASE_URL}timeline`;
 	const [lastPostId, setLastPostId] = createSignal("");
 	const loadPosts = async (lastPostId = undefined) => {
 		const response = await fetch(lastPostId ? `${postsUrl}?lastPostId=${lastPostId}` : postsUrl);
