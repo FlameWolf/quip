@@ -3,6 +3,8 @@
 const apiBaseUrl = "https://quip-rest-api.herokuapp.com/";
 const authBaseUrl = `${apiBaseUrl}auth/`;
 const refreshTokenUrl = `${authBaseUrl}refresh-token`;
+const refreshTokenKey = "refreshToken";
+const authTokenKey = "authToken";
 const authCacheName = "AUTH_CACHE";
 const authChannelName = "AUTH_CHANNEL";
 const setAuthDataAction = "SET_AUTH_DATA";
@@ -14,8 +16,8 @@ const requestInitOptions = {
 const defaultAuthData = {
 	userId: undefined,
 	handle: undefined,
-	authToken: undefined,
-	refreshToken: undefined,
+	[authTokenKey]: undefined,
+	[refreshTokenKey]: undefined,
 	createdAt: undefined,
 	expiresIn: undefined
 };
@@ -23,7 +25,7 @@ const authData = Object.assign({}, defaultAuthData);
 const authChannel = new BroadcastChannel(authChannelName);
 
 const validateToken = value => {
-	if (value.authToken) {
+	if (value[authTokenKey]) {
 		const createdDate = new Date(value.createdAt);
 		const expiryDate = createdDate.setMilliseconds(createdDate.getMilliseconds() + parseInt(value.expiresIn));
 		if (new Date() < expiryDate) {
@@ -86,7 +88,7 @@ const interceptApiRequest = async request => {
 			payload: response.status === 200 ? await response.json() : defaultAuthData
 		});
 	}
-	const authToken = authData.authToken;
+	const authToken = authData[authTokenKey];
 	if (authToken) {
 		const headers = new Headers(request.headers);
 		headers.set("Authorization", `Bearer ${authToken}`);
@@ -106,9 +108,13 @@ const dispatch = async ({ action, payload }) => {
 		default:
 			break;
 	}
-	delete payload.refreshToken;
-	payload.token = payload.authToken;
-	delete payload.authToken;
+	if (refreshTokenKey in payload) {
+		delete payload[refreshTokenKey];
+	}
+	if (authTokenKey in payload) {
+		payload.token = payload[authTokenKey];
+		delete payload[authTokenKey];
+	}
 	authChannel.postMessage(payload);
 };
 
