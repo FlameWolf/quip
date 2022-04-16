@@ -14,7 +14,8 @@ const requestInitOptions = {
 const defaultAuthData = {
 	userId: undefined,
 	handle: undefined,
-	token: undefined,
+	authToken: undefined,
+	refreshToken: undefined,
 	createdAt: undefined,
 	expiresIn: undefined
 };
@@ -22,8 +23,7 @@ const authData = Object.assign({}, defaultAuthData);
 const authChannel = new BroadcastChannel(authChannelName);
 
 const validateToken = value => {
-	const authToken = value.token;
-	if (authToken) {
+	if (value.authToken) {
 		const createdDate = new Date(value.createdAt);
 		const expiryDate = createdDate.setMilliseconds(createdDate.getMilliseconds() + parseInt(value.expiresIn));
 		if (new Date() < expiryDate) {
@@ -35,6 +35,10 @@ const validateToken = value => {
 
 const refreshToken = async value => {
 	return await fetch(refreshTokenUrl, {
+		method: "POST",
+		body: JSON.stringify({
+			refreshToken: value.refreshToken
+		}),
 		headers: {
 			"X-UID": value.userId,
 			"X-Slug": value.handle
@@ -43,10 +47,10 @@ const refreshToken = async value => {
 	});
 };
 
-const setToken = async value => {
+const setAuthData = async value => {
 	Object.assign(authData, value);
-	const tokenCache = await caches.open(authCacheName);
-	await tokenCache.put(
+	const authCache = await caches.open(authCacheName);
+	await authCache.put(
 		"/",
 		new Response(JSON.stringify(authData), {
 			status: 200,
@@ -57,21 +61,29 @@ const setToken = async value => {
 	);
 };
 
-const getToken = async () => {
-	const tokenCache = await caches.open(authCacheName);
-	const cachedToken = await tokenCache.match("/");
-	Object.assign(authData, cachedToken ? await cachedToken.json() : defaultAuthData);
+const getAuthData = async () => {
+	const authCache = await caches.open(authCacheName);
+	const cachedAuthData = await authCache.match("/");
+	Object.assign(authData, cachedAuthData ? await cachedAuthData.json() : defaultAuthData);
 };
 
 const interceptAuthRequest = async request => {
-	const authCache = await caches.open(authCacheName);
 	const response = await fetch(request, requestInitOptions);
 	const status = response.status;
+	const payload = status === 200 || status === 201 ? await response.json() : defaultAuthData;
 	await dispatch({
 		action: setAuthDataAction,
-		payload: status === 200 || status === 201 ? await response.clone().json() : {}
+		payload
 	});
-	return response;
+	delete payload.refreshToken;
+	payload.token = payload.authToken;
+	delete payload.authToken;
+	return new Response(JSON.stringify(payload), {
+		status,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	});
 };
 
 const interceptApiRequest = async request => {
@@ -82,7 +94,7 @@ const interceptApiRequest = async request => {
 			payload: response.status === 200 ? await response.json() : defaultAuthData
 		});
 	}
-	const authToken = authData.token;
+	const authToken = authData.authToken;
 	if (authToken) {
 		const headers = new Headers(request.headers);
 		headers.set("Authorization", `Bearer ${authToken}`);
@@ -94,10 +106,10 @@ const interceptApiRequest = async request => {
 const dispatch = async ({ action, payload }) => {
 	switch (action) {
 		case setAuthDataAction:
-			await setToken(payload);
+			await setAuthData(payload);
 			break;
 		case getAuthDataAction:
-			await getToken();
+			await getAuthData();
 			break;
 		default:
 			break;
