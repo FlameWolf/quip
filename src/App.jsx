@@ -12,6 +12,7 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const authBaseUrl = `${apiBaseUrl}auth/`;
 const refreshTokenUrl = `${authBaseUrl}refresh-token`;
 navigator.serviceWorker.controller?.postMessage({
+	action: "init",
 	payload: {
 		apiBaseUrl,
 		authBaseUrl,
