@@ -1,18 +1,20 @@
 "use strict";
 
-const apiBaseUrl = "https://quip-rest-api.herokuapp.com/";
-const authBaseUrl = `${apiBaseUrl}auth/`;
-const refreshTokenUrl = `${authBaseUrl}refresh-token`;
-const refreshTokenKey = "refreshToken";
-const authTokenKey = "authToken";
-const authCacheName = "AUTH_CACHE";
-const authChannelName = "AUTH_CHANNEL";
-const setAuthDataAction = "SET_AUTH_DATA";
-const getAuthDataAction = "GET_AUTH_DATA";
+const env = {
+	apiBaseUrl: undefined,
+	authBaseUrl: undefined,
+	refreshTokenUrl: undefined,
+	authCacheName: undefined,
+	authChannelName: undefined,
+	setAuthDataAction: undefined,
+	getAuthDataAction: undefined
+};
 const requestInitOptions = {
 	credentials: "include",
 	mode: "cors"
 };
+const refreshTokenKey = "refreshToken";
+const authTokenKey = "authToken";
 const defaultAuthData = {
 	userId: undefined,
 	handle: undefined,
@@ -22,7 +24,7 @@ const defaultAuthData = {
 	expiresIn: undefined
 };
 const authData = Object.assign({}, defaultAuthData);
-const authChannel = new BroadcastChannel(authChannelName);
+const authChannel = new BroadcastChannel(env.authChannelName);
 
 const validateToken = value => {
 	if (value[authTokenKey]) {
@@ -36,7 +38,7 @@ const validateToken = value => {
 };
 
 const refreshToken = async value => {
-	return await fetch(refreshTokenUrl, {
+	return await fetch(env.refreshTokenUrl, {
 		method: "POST",
 		body: JSON.stringify({
 			refreshToken: value.refreshToken
@@ -52,7 +54,7 @@ const refreshToken = async value => {
 
 const setAuthData = async value => {
 	Object.assign(authData, value);
-	const authCache = await caches.open(authCacheName);
+	const authCache = await caches.open(env.authCacheName);
 	await authCache.put(
 		"/",
 		new Response(JSON.stringify(authData), {
@@ -65,7 +67,7 @@ const setAuthData = async value => {
 };
 
 const getAuthData = async () => {
-	const authCache = await caches.open(authCacheName);
+	const authCache = await caches.open(env.authCacheName);
 	const cachedAuthData = await authCache.match("/");
 	Object.assign(authData, cachedAuthData ? await cachedAuthData.json() : defaultAuthData);
 };
@@ -74,7 +76,7 @@ const interceptAuthRequest = async request => {
 	const response = await fetch(request, requestInitOptions);
 	const status = response.status;
 	await dispatch({
-		action: setAuthDataAction,
+		action: env.setAuthDataAction,
 		payload: status === 200 || status === 201 ? await response.json() : defaultAuthData
 	});
 	return new Response("", { status });
@@ -84,7 +86,7 @@ const interceptApiRequest = async request => {
 	if (!validateToken(authData)) {
 		const response = await refreshToken(authData);
 		await dispatch({
-			action: setAuthDataAction,
+			action: env.setAuthDataAction,
 			payload: response.status === 200 ? await response.json() : defaultAuthData
 		});
 	}
@@ -99,14 +101,15 @@ const interceptApiRequest = async request => {
 
 const dispatch = async ({ action, payload }) => {
 	switch (action) {
-		case setAuthDataAction:
+		case env.setAuthDataAction:
 			await setAuthData(payload);
 			break;
-		case getAuthDataAction:
+		case env.getAuthDataAction:
 			await getAuthData();
 			break;
 		default:
-			break;
+			Object.assign(env, payload);
+			return;
 	}
 	if (refreshTokenKey in payload) {
 		delete payload[refreshTokenKey];
@@ -123,9 +126,9 @@ self.addEventListener("message", async event => await dispatch(event.data));
 self.addEventListener("fetch", event => {
 	const request = event.request;
 	const url = request.url;
-	if (url.startsWith(authBaseUrl)) {
+	if (url.startsWith(env.authBaseUrl)) {
 		event.respondWith(interceptAuthRequest(request));
-	} else if (url.startsWith(apiBaseUrl)) {
+	} else if (url.startsWith(env.apiBaseUrl)) {
 		event.respondWith(interceptApiRequest(request));
 	}
 });

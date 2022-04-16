@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes, useLocation, useNavigate } from "solid-app-router";
 import { lazy, onMount } from "solid-js";
-import { authChannelName, getAuthDataAction } from "./auth-library";
 import { authStore, setAuthStore } from "./stores/auth-store";
 const Auth = lazy(() => import("./components/Auth"));
 const SignUp = lazy(() => import("./components/SignUp"));
@@ -9,12 +8,27 @@ const Home = lazy(() => import("./components/Home"));
 const Profile = lazy(() => import("./components/Profile"));
 const NotFound = lazy(() => import("./components/NotFound"));
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+const authBaseUrl = `${apiBaseUrl}auth/`;
+const refreshTokenUrl = `${authBaseUrl}refresh-token`;
+navigator.serviceWorker.controller?.postMessage({
+	payload: {
+		apiBaseUrl,
+		authBaseUrl,
+		refreshTokenUrl,
+		authCacheName: import.meta.env.VITE_AUTH_CACHE_NAME,
+		authChannelName: import.meta.env.VITE_AUTH_CHANNEL_NAME,
+		setAuthDataAction: import.meta.env.VITE_SET_AUTH_DATA_ACTION,
+		getAuthDataAction: import.meta.env.VITE_GET_AUTH_DATA_ACTION
+	}
+});
+
 function App() {
 	const protectedRoutes = ["/", "/home"];
 	onMount(() => {
 		const location = useLocation();
 		const navigate = useNavigate();
-		const authChannel = new BroadcastChannel(authChannelName);
+		const authChannel = new BroadcastChannel(import.meta.env.VITE_AUTH_CHANNEL_NAME);
 		authChannel.addEventListener("message", event => {
 			setAuthStore(event.data);
 			if (protectedRoutes.indexOf(location.pathname) > -1 && !authStore.token) {
@@ -22,7 +36,7 @@ function App() {
 			}
 		});
 		navigator.serviceWorker.controller?.postMessage({
-			action: getAuthDataAction
+			action: import.meta.env.VITE_GET_AUTH_DATA_ACTION
 		});
 	});
 	return (

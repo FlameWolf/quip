@@ -3,7 +3,6 @@ import { useNavigate } from "solid-app-router";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
 import { createSignal, onMount, Show } from "solid-js";
-import { setAuthDataAction } from "../auth-library";
 
 export default props => {
 	let signInForm;
@@ -51,7 +50,7 @@ export default props => {
 		if (response.status === 200) {
 			setSignInError(undefined);
 			navigator.serviceWorker.controller?.postMessage({
-				action: setAuthDataAction,
+				action: import.meta.env.VITE_SET_AUTH_DATA_ACTION,
 				payload: { handle }
 			});
 			navigate("/home", { resolve: false });
@@ -81,18 +80,18 @@ export default props => {
 			</Show>
 			<div class="d-flex mb-2">
 				<label>Username</label>
-				<a ref={usernameInfoToggle} class="ms-auto clickable" tabIndex={-1}><AiOutlineInfoCircle /></a>
+				<a ref={usernameInfoToggle} class="ms-auto clickable" tabIndex={-1}><AiOutlineInfoCircle/></a>
 			</div>
 			<div class="input-group mb-4">
 				<span class="input-group-text">@</span>
-				<input ref={usernameInput} class="form-control" type="text" placeholder="Username" required={true} />
+				<input ref={usernameInput} class="form-control" type="text" placeholder="Username" required={true}/>
 			</div>
 			<div class="d-flex mb-2">
 				<label>Password</label>
-				<a ref={passwordInfoToggle} class="ms-auto clickable" tabIndex={-1}><AiOutlineInfoCircle /></a>
+				<a ref={passwordInfoToggle} class="ms-auto clickable" tabIndex={-1}><AiOutlineInfoCircle/></a>
 			</div>
 			<div class="input-group mb-4">
-				<input ref={passwordInput} class="form-control" type={showPassword() ? "text" : "password"} placeholder="Password" required={true} />
+				<input ref={passwordInput} class="form-control" type={showPassword() ? "text" : "password"} placeholder="Password" required={true}/>
 				<span class="input-group-text clickable" onClick={event => setShowPassword(value => !value)}>{showPassword() ? BsEyeSlash : BsEye}</span>
 			</div>
 			<div class="d-flex">

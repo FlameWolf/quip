@@ -3,7 +3,6 @@ import { useNavigate } from "solid-app-router";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
 import { createSignal, onMount, Show } from "solid-js";
-import { setAuthDataAction } from "../auth-library";
 import { handleRegExp, passwordRegExp } from "../library";
 
 export default props => {
@@ -61,7 +60,7 @@ export default props => {
 		if (response.status === 201) {
 			setSignUpError(undefined);
 			navigator.serviceWorker.controller?.postMessage({
-				action: setAuthDataAction,
+				action: import.meta.env.VITE_SET_AUTH_DATA_ACTION,
 				payload: { handle }
 			});
 			navigate("/home", { resolve: false });
