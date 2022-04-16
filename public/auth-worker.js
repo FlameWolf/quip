@@ -41,7 +41,8 @@ const refreshToken = async value => {
 		}),
 		headers: {
 			"X-UID": value.userId,
-			"X-Slug": value.handle
+			"X-Slug": value.handle,
+			"Content-Type": "application/json"
 		},
 		...requestInitOptions
 	});
