@@ -115,7 +115,10 @@ const dispatch = async ({ action, payload }) => {
 		default:
 			break;
 	}
-	authChannel.postMessage(authData);
+	delete payload.refreshToken;
+	payload.token = payload.authToken;
+	delete payload.authToken;
+	authChannel.postMessage(payload);
 };
 
 self.addEventListener("message", async event => await dispatch(event.data));
