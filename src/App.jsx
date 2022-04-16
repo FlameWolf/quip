@@ -11,15 +11,6 @@ const NotFound = lazy(() => import("./components/NotFound"));
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const authBaseUrl = `${apiBaseUrl}auth/`;
 const refreshTokenUrl = `${authBaseUrl}refresh-token`;
-console.log({
-	apiBaseUrl,
-	authBaseUrl,
-	refreshTokenUrl,
-	authCacheName: import.meta.env.VITE_AUTH_CACHE_NAME,
-	authChannelName: import.meta.env.VITE_AUTH_CHANNEL_NAME,
-	setAuthDataAction: import.meta.env.VITE_SET_AUTH_DATA_ACTION,
-	getAuthDataAction: import.meta.env.VITE_GET_AUTH_DATA_ACTION
-});
 navigator.serviceWorker.controller?.postMessage({
 	action: "init",
 	payload: {
