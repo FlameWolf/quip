@@ -13,21 +13,18 @@ const requestInitOptions = {
 	credentials: "include",
 	mode: "cors"
 };
-const refreshTokenKey = "refreshToken";
-const authTokenKey = "authToken";
 const defaultAuthData = {
 	userId: undefined,
 	handle: undefined,
-	[authTokenKey]: undefined,
-	[refreshTokenKey]: undefined,
+	authToken: undefined,
+	refreshToken: undefined,
 	createdAt: undefined,
 	expiresIn: undefined
 };
 const authData = Object.assign({}, defaultAuthData);
-const authChannel = new BroadcastChannel(env.authChannelName);
 
 const validateToken = value => {
-	if (value[authTokenKey]) {
+	if (value.authToken) {
 		const createdDate = new Date(value.createdAt);
 		const expiryDate = createdDate.setMilliseconds(createdDate.getMilliseconds() + parseInt(value.expiresIn));
 		if (new Date() < expiryDate) {
@@ -90,7 +87,7 @@ const interceptApiRequest = async request => {
 			payload: response.status === 200 ? await response.json() : defaultAuthData
 		});
 	}
-	const authToken = authData[authTokenKey];
+	const authToken = authData.authToken;
 	if (authToken) {
 		const headers = new Headers(request.headers);
 		headers.set("Authorization", `Bearer ${authToken}`);
@@ -111,14 +108,20 @@ const dispatch = async ({ action, payload }) => {
 			Object.assign(env, payload);
 			return;
 	}
-	if (refreshTokenKey in payload) {
-		delete payload[refreshTokenKey];
-	}
-	if (authTokenKey in payload) {
-		payload.token = payload[authTokenKey];
-		delete payload[authTokenKey];
-	}
-	authChannel.postMessage(payload);
+	const authChannel = new BroadcastChannel(env.authChannelName);
+	authChannel.postMessage(
+		Object.assign(
+			{},
+			{
+				userId: authData.userId,
+				handle: authData.handle,
+				token: authData.authToken,
+				createdAt: authData.createdAt,
+				expiresIn: authData.expiresIn
+			}
+		)
+	);
+	authChannel.close();
 };
 
 self.addEventListener("message", async event => await dispatch(event.data));
