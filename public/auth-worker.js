@@ -71,20 +71,11 @@ const getAuthData = async () => {
 const interceptAuthRequest = async request => {
 	const response = await fetch(request, requestInitOptions);
 	const status = response.status;
-	const payload = status === 200 || status === 201 ? await response.json() : defaultAuthData;
 	await dispatch({
 		action: setAuthDataAction,
-		payload
+		payload: status === 200 || status === 201 ? await response.json() : defaultAuthData
 	});
-	delete payload.refreshToken;
-	payload.token = payload.authToken;
-	delete payload.authToken;
-	return new Response(JSON.stringify(payload), {
-		status,
-		headers: {
-			"Content-Type": "application/json"
-		}
-	});
+	return new Response("", { status });
 };
 
 const interceptApiRequest = async request => {
