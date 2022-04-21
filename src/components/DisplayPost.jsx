@@ -6,6 +6,7 @@ import Editor from "./Editor";
 export default props => {
 	const post = props.post;
 	const handle = post.author.handle;
+	const repeatedBy = post.repeatedBy;
 	const [faveFlag, setFaveFlag] = createSignal(false);
 	const [repeatFlag, setRepeatFlag] = createSignal(false);
 	const [replyFlag, setReplyFlag] = createSignal(false);
@@ -38,9 +39,13 @@ export default props => {
 				<div class="post-header">
 					<div>@</div>
 					<a class="author.handle" href={`/${handle}`}>{handle}</a>
-					<div>&#xA0;</div>
 					<Show when={props.parentBlurb}>
+						<div>&#xA0;</div>
 						<div innerHTML={`Replied to "${props.parentBlurb}"`}></div>
+					</Show>
+					<Show when={repeatedBy}>
+						<div>&#xA0;</div>
+						<div>Repeated by @{repeatedBy}</div>
 					</Show>
 				</div>
 				<div class="card-body">
