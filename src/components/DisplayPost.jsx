@@ -45,7 +45,7 @@ export default props => {
 					</Show>
 					<Show when={repeatedBy}>
 						<div>&#xA0;</div>
-						<div>Repeated by @{repeatedBy}</div>
+						<div>Repeated by @{repeatedBy.handle}</div>
 					</Show>
 				</div>
 				<div class="card-body">
