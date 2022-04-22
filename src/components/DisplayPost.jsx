@@ -3,18 +3,33 @@ import { FiRepeat } from "solid-icons/fi";
 import { createSignal, Show } from "solid-js";
 import Editor from "./Editor";
 
+const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}posts/`;
+const favouriteUrl = `${postsBaseUrl}favourite/`;
+const unfavouriteUrl = `${postsBaseUrl}unfavourite/`;
+const repeatUrl = `${postsBaseUrl}repeat/`;
+const unrepeatUrl = `${postsBaseUrl}unrepeat/`;
+
 export default props => {
 	const post = props.post;
+	const postId = post._id;
 	const handle = post.author.handle;
 	const repeatedBy = post.repeatedBy;
-	const [faveFlag, setFaveFlag] = createSignal(false);
-	const [repeatFlag, setRepeatFlag] = createSignal(false);
+	const [faveFlag, setFaveFlag] = createSignal(post.favourited);
+	const [repeatFlag, setRepeatFlag] = createSignal(post.repeated);
 	const [replyFlag, setReplyFlag] = createSignal(false);
 	const toggleFave = event => {
-		setFaveFlag(value => !value);
+		fetch(`${faveFlag() ? unfavouriteUrl : favouriteUrl}${postId}`).then(response => {
+			if(response.status === 200) {
+				setFaveFlag(value => !value);
+			}
+		});
 	};
 	const toggleRepeat = event => {
-		setRepeatFlag(value => !value);
+		fetch(`${repeatFlag() ? unrepeatUrl : repeatUrl}${postId}`).then(response => {
+			if(response.status === 200) {
+				setRepeatFlag(value => !value);
+			}
+		});
 	};
 	const toggleReply = event => {
 		let sourceActionBar = event.target.closest(".action-bar");
@@ -25,7 +40,7 @@ export default props => {
 			sourceActionBar.removeChild(editorInstance);
 		} else {
 			editorParent?.querySelector(".action-buttons > div:last-child").click();
-			editorInstance.dataset["parentPostId"] = post._id;
+			editorInstance.dataset["parentPostId"] = postId;
 			sourceActionBar.appendChild(editorInstance);
 		}
 		setReplyFlag(!isAttachedToCurrent);
