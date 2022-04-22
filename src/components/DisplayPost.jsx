@@ -26,7 +26,7 @@ export default props => {
 	};
 	const toggleRepeat = event => {
 		fetch(`${repeatFlag() ? unrepeatUrl : repeatUrl}${postId}`).then(response => {
-			if(response.status === 200) {
+			if(response.status === 200 || response.status === 201) {
 				setRepeatFlag(value => !value);
 			}
 		});
