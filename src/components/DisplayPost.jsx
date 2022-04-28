@@ -1,6 +1,7 @@
 import { BsChatRight, BsStar, BsStarFill } from "solid-icons/bs";
 import { FiRepeat } from "solid-icons/fi";
 import { createSignal, Show } from "solid-js";
+import DisplayPostMinimal from "./DisplayPostMinimal";
 import Editor from "./Editor";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}posts/`;
@@ -14,6 +15,7 @@ export default props => {
 	const postId = post._id;
 	const handle = post.author.handle;
 	const repeatedBy = post.repeatedBy;
+	const attachments = post.attachments;
 	const [faveFlag, setFaveFlag] = createSignal(post.favourited);
 	const [repeatFlag, setRepeatFlag] = createSignal(post.repeated);
 	const [replyFlag, setReplyFlag] = createSignal(false);
@@ -50,7 +52,7 @@ export default props => {
 	};
 	return (
 		<>
-			<div data-post-id={post._id} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, "reply": props.isReply }}>
+			<div data-post-id={postId} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, "reply": props.isReply }}>
 				<div class="post-header">
 					<div>@</div>
 					<a class="author.handle" href={`/${handle}`}>{handle}</a>
@@ -65,6 +67,11 @@ export default props => {
 				</div>
 				<div class="card-body">
 					<p class="card-text" innerHTML={post.content?.replace(/\n/g, "<br/>")}></p>
+					<Show when={attachments}>
+						<Show when={attachments.post}>
+							<DisplayPostMinimal post={attachments.post}/>
+						</Show>
+					</Show>
 				</div>
 				<div class="action-bar">
 					<div class="action-buttons">
