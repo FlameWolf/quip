@@ -5,7 +5,7 @@ export default props => {
 	const handle = post.author.handle;
 	return (
 		<>
-			<div data-post-id={post._id} class="list-group-item p-0 rounded" classList={{ "reply": props.isReply }}>
+			<div data-post-id={post._id} class="card" classList={{ "reply": props.isReply }}>
 				<div class="post-header">
 					<div>@</div>
 					<a class="author.handle" href={`/${handle}`}>{handle}</a>
