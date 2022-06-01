@@ -92,7 +92,7 @@ export default props => {
 			</div>
 			<div class="input-group mb-4">
 				<input ref={passwordInput} class="form-control" type={showPassword() ? "text" : "password"} placeholder="Password" required={true}/>
-				<span class="input-group-text clickable" onClick={event => setShowPassword(value => !value)}>{showPassword() ? BsEyeSlash : BsEye}</span>
+				<span class="input-group-text clickable" onClick={event => setShowPassword(value => !value)}>{showPassword() ? BsEyeSlash({}) : BsEye({})}</span>
 			</div>
 			<div class="d-flex">
 				<button class="btn btn-secondary w-50 me-1" type="button" disabled={!formHasValue()} onClick={resetForm}>Clear Form</button>
