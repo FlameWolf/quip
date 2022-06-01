@@ -68,6 +68,15 @@ export default props => {
 				<div class="card-body">
 					<p class="card-text" innerHTML={post.content?.replace(/\n/g, "<br/>")}></p>
 					<Show when={attachments}>
+						<Show when={attachments.poll}>
+							<h6>Poll</h6>
+						</Show>
+						<Show when={attachments.mediaFile}>
+							<Show when={attachments.mediaFile.fileType === "image"}>
+								<img class="img-fluid" alt={attachments.mediaFile.description} src={attachments.mediaFile.src}/>
+							</Show>
+							<h6>{JSON.stringify(attachments.mediaFile)}</h6>
+						</Show>
 						<Show when={attachments.post}>
 							<DisplayPostMinimal post={attachments.post}/>
 						</Show>
