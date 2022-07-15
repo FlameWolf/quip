@@ -15,6 +15,6 @@ export default defineConfig({
 			cert: fs.readFileSync("./src/certificates/cert.pem"),
 			passphrase: "Pass@123"
 		},
-		port: 3000
+		port: +process.env.PORT || 3000
 	}
 });
