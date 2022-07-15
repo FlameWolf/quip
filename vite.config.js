@@ -1,5 +1,7 @@
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
+import Mkcert from "vite-plugin-mkcert";
+import fs from "fs";
 
 export default defineConfig({
 	plugins: [solidPlugin()],
@@ -8,6 +10,11 @@ export default defineConfig({
 		polyfillDynamicImport: false
 	},
 	server: {
-		https: true
+		https: {
+			key: fs.readFileSync("./src/certificates/key.pem"),
+			cert: fs.readFileSync("./src/certificates/cert.pem"),
+			passphrase: "Pass@123"
+		},
+		port: 3000
 	}
 });
