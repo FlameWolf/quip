@@ -52,6 +52,30 @@ body {
 	padding-top: 0.25rem;
 	padding-bottom: 0.25rem;
 }
+.card-body.poll{
+	padding: 0 0 0.5rem 0;
+}
+.poll-option {
+	width: calc(100% - 2rem);
+}
+.poll-bar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: var(--bs-primary);
+	min-width: 0.5%;
+	height: 100%;
+	opacity: 0.25;
+}
+.poll-value {
+	position: absolute;
+	top: 50%;
+	right: 0;
+	color: var(--bs-info);
+	text-align: center;
+	width: 2rem;
+	transform: translateY(-50%);
+}
 .action-buttons {
 	display: flex;
 	justify-content: end;

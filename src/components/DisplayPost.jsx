@@ -1,6 +1,8 @@
 import { BsChatRight, BsStar, BsStarFill } from "solid-icons/bs";
 import { FiRepeat } from "solid-icons/fi";
 import { createSignal, Show } from "solid-js";
+import { authStore } from "../stores/auth-store";
+import DisplayPoll from "./DisplayPoll";
 import DisplayPostMinimal from "./DisplayPostMinimal";
 import Editor from "./Editor";
 
@@ -69,7 +71,7 @@ export default props => {
 					<p class="card-text" innerHTML={post.content?.replace(/\n/g, "<br/>")}></p>
 					<Show when={attachments}>
 						<Show when={attachments.poll}>
-							<h6>Poll</h6>
+							<DisplayPoll poll={attachments.poll} isOwnPoll={post.author._id === authStore.userId}/>
 						</Show>
 						<Show when={attachments.mediaFile}>
 							<Show when={attachments.mediaFile.fileType === "image"}>
