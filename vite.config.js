@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
-import Mkcert from "vite-plugin-mkcert";
 import fs from "fs";
 
 export default defineConfig({
