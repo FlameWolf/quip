@@ -113,6 +113,9 @@ div[contenteditable] {
 	margin-left: 0.25rem;
 	margin-right: 0.25rem;
 }
+[class^="popupPicker"] {
+	user-select: none;
+}
 .char-count {
 	display: flex;
 	align-items: center;
