@@ -19,12 +19,6 @@ export default props => {
 		setCharCount(maxContentLength - getCharCount(getTextContent()));
 	};
 	const makeQuip = text => {
-		console.log({
-			_id: quipStore.nextId,
-			author: authStore.handle,
-			content: text,
-			replyTo: currentInstance.dataset.parentPostId || undefined
-		});
 		const parentPostId = currentInstance.dataset.parentPostId;
 		setQuipStore(
 			"quips",

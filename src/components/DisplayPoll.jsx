@@ -9,7 +9,6 @@ export default props => {
 	const secondPercentage = (votes.second/(totalVotes || 1)) * 100;
 	const thirdPercentage = (votes.third/(totalVotes || 1)) * 100;
 	const fourthPercentage = (votes.fourth/(totalVotes || 1)) * 100;
-	console.log(poll, totalVotes);
 
 	return (
 		<div class="card-body poll">

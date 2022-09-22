@@ -45,7 +45,6 @@ export default props => {
 		} else {
 			editorParent?.querySelector(".action-buttons > div:last-child").click();
 			editorInstance.dataset["parentPostId"] = postId;
-			console.log(postId);
 			sourceActionBar.appendChild(editorInstance);
 		}
 		setReplyFlag(!isAttachedToCurrent);
