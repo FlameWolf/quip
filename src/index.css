@@ -113,7 +113,7 @@ div[contenteditable] {
 	margin-left: 0.25rem;
 	margin-right: 0.25rem;
 }
-[class^="popupPicker"] {
+.searchContainer, .emojiButton {
 	user-select: none;
 }
 .char-count {

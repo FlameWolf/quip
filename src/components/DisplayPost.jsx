@@ -77,7 +77,9 @@ export default props => {
 							<Show when={attachments.mediaFile.fileType === "image"}>
 								<img class="img-fluid" alt={attachments.mediaFile.description} src={attachments.mediaFile.src}/>
 							</Show>
-							<h6>{JSON.stringify(attachments.mediaFile)}</h6>
+							<Show when={attachments.mediaFile.fileType === "video"}>
+								<video class="img-fluid" alt={attachments.mediaFile.description} src={attachments.mediaFile.src} controls={true}/>
+							</Show>
 						</Show>
 						<Show when={attachments.post}>
 							<DisplayPostMinimal post={attachments.post}/>

@@ -46,11 +46,14 @@ export default props => {
 			showAnimation: false,
 			showVariants: false
 		}, {
-			referenceElement: emojiTrigger,
-			position: "bottom-end",
+			position: {
+				top: "1rem",
+				right: "1rem"
+			},
 			hideOnClickOutside: false,
 			hideOnEmojiSelect: false,
-			showCloseButton: false
+			showCloseButton: true,
+			hideOnEscape: true
 		});
 		emojiPopup.addEventListener("emoji:select", selection => {
 			position(editableDiv, caret());
