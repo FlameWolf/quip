@@ -3,7 +3,7 @@ import { position } from "caret-pos";
 import { createMemo, createSignal, For, onMount } from "solid-js";
 import { contentLengthRegExp, innerHtmlAsText, insertEmojo, maxContentLength, popularEmoji, removeFormatting } from "../library";
 import { quipStore, setQuipStore } from "../stores/quip-store";
-import { userStore } from "../stores/user-store";
+import { authStore } from "../stores/auth-store";
 
 export default props => {
 	let currentInstance;
@@ -19,14 +19,20 @@ export default props => {
 		setCharCount(maxContentLength - getCharCount(getTextContent()));
 	};
 	const makeQuip = text => {
-		const parentPostId = +currentInstance.dataset.parentPostId;
+		console.log({
+			_id: quipStore.nextId,
+			author: authStore.handle,
+			content: text,
+			replyTo: currentInstance.dataset.parentPostId || undefined
+		});
+		const parentPostId = currentInstance.dataset.parentPostId;
 		setQuipStore(
 			"quips",
 			quips => [
 				...quips,
 				{
 					_id: quipStore.nextId,
-					author: userStore.currentUser,
+					author: authStore.handle,
 					content: text,
 					replyTo: parentPostId || undefined
 				}

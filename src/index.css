@@ -52,6 +52,9 @@ body {
 	padding-top: 0.25rem;
 	padding-bottom: 0.25rem;
 }
+.card-body > .img-fluid {
+	max-height: 25rem;
+}
 .card-body.poll{
 	padding: 0 0 0.5rem 0;
 }
