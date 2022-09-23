@@ -10,6 +10,8 @@ export default props => {
 	let editableDiv;
 	let emojiTrigger;
 	let emojiPopup;
+	const createPostUrl = `${import.meta.env.VITE_API_BASE_URL}posts/create`;
+	const createReplyUrl = `${import.meta.env.VITE_API_BASE_URL}posts/reply/`;
 	const [caret, setCaret] = createSignal(0);
 	const [charCount, setCharCount] = createSignal(maxContentLength);
 	const getTextContent = () => innerHtmlAsText(editableDiv);
@@ -18,43 +20,45 @@ export default props => {
 		removeFormatting(editableDiv);
 		setCharCount(maxContentLength - getCharCount(getTextContent()));
 	};
-	const makeQuip = text => {
+	const makeQuip = async text => {
 		const parentPostId = currentInstance.dataset.parentPostId;
-		setQuipStore(
-			"quips",
-			quips => [
-				...quips,
-				{
-					_id: quipStore.nextId,
-					author: authStore.handle,
-					content: text,
-					replyTo: parentPostId || undefined
-				}
-			]
-		);
-		setQuipStore("nextId", value => value + 1);
-		editableDiv.innerHTML = "";
-		setCharCount(maxContentLength);
-		if(props.isReply) {
-			currentInstance.closest(".action-bar").querySelector(".action-buttons > div:last-child").click();
+		const formData = new FormData();
+		formData.append("content", text);
+		const response = await fetch(parentPostId ? `${createReplyUrl}${parentPostId}` : createPostUrl, {
+			method: "POST",
+			body: formData
+		});
+		if (response.status === 201) {
+			const payload = await response.json();
+			const post = payload.reply || payload.post;
+			post.author = { handle: authStore.handle };
+			setQuipStore("quips", quips => [post, ...quips]);
+			editableDiv.innerHTML = "";
+			setCharCount(maxContentLength);
+			if (props.isReply) {
+				currentInstance.closest(".action-bar").querySelector(".action-buttons > div:last-child").click();
+			}
 		}
 	};
 	const characterLimitExceeded = createMemo(() => charCount() < 0);
 	onMount(() => {
-		emojiPopup = createPopup({
-			emojiSize: "1.25rem",
-			showAnimation: false,
-			showVariants: false
-		}, {
-			position: {
-				top: "1rem",
-				right: "1rem"
+		emojiPopup = createPopup(
+			{
+				emojiSize: "1.25rem",
+				showAnimation: false,
+				showVariants: false
 			},
-			hideOnClickOutside: false,
-			hideOnEmojiSelect: false,
-			showCloseButton: true,
-			hideOnEscape: true
-		});
+			{
+				position: {
+					top: "1rem",
+					right: "1rem"
+				},
+				hideOnClickOutside: false,
+				hideOnEmojiSelect: false,
+				showCloseButton: true,
+				hideOnEscape: true
+			}
+		);
 		emojiPopup.addEventListener("emoji:select", selection => {
 			position(editableDiv, caret());
 			insertEmojo(editableDiv, selection.emoji, updateEditor);
