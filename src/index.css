@@ -79,6 +79,10 @@ body {
 	width: 2rem;
 	transform: translateY(-50%);
 }
+.media-preview {
+	min-width: 3rem;
+	min-height: 3rem;
+}
 .action-buttons {
 	display: flex;
 	justify-content: end;
