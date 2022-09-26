@@ -3,6 +3,7 @@ import { position } from "caret-pos";
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { contentLengthRegExp, innerHtmlAsText, insertEmojo, maxContentLength, popularEmoji, removeFormatting } from "../library";
 import { BsImage } from "solid-icons/bs";
+import { BiRegularPoll } from "solid-icons/bi";
 import { VsChromeClose } from "solid-icons/vs";
 import { quipStore, setQuipStore } from "../stores/quip-store";
 import { authStore } from "../stores/auth-store";
@@ -17,6 +18,8 @@ export default props => {
 	const createReplyUrl = `${import.meta.env.VITE_API_BASE_URL}posts/reply/`;
 	const [caret, setCaret] = createSignal(0);
 	const [charCount, setCharCount] = createSignal(maxContentLength);
+	const [hasPoll, setHasPoll] = createSignal(false);
+	const [poll, setPoll] = createSignal({});
 	const [mediaFile, setMediaFile] = createSignal();
 	const getTextContent = () => innerHtmlAsText(editableDiv);
 	const getCharCount = text => text.match(contentLengthRegExp)?.length || 0;
@@ -24,10 +27,24 @@ export default props => {
 		removeFormatting(editableDiv);
 		setCharCount(maxContentLength - getCharCount(getTextContent()));
 	};
+	const updatePoll = event => {
+		const sender = event.target;
+		setPoll({ ...poll(), [sender.name]: sender.value });
+		console.log(poll());
+	};
+	const resetEditor = () => {
+		editableDiv.innerHTML = "";
+		setHasPoll(false);
+		setMediaFile();
+		setCharCount(maxContentLength);
+	};
 	const makeQuip = async () => {
 		const parentPostId = currentInstance.dataset.parentPostId;
 		const formData = new FormData();
 		formData.append("content", getTextContent());
+		if (hasPoll()) {
+			formData.append("poll", JSON.stringify(poll()));
+		}
 		if (mediaFile()) {
 			formData.append("media", mediaFile());
 		}
@@ -40,9 +57,7 @@ export default props => {
 			const post = payload.reply || payload.post;
 			post.author = { handle: authStore.handle };
 			setQuipStore("quips", quips => [post, ...quips]);
-			editableDiv.innerHTML = "";
-			setMediaFile();
-			setCharCount(maxContentLength);
+			resetEditor();
 			if (props.isReply) {
 				currentInstance.closest(".action-bar").querySelector(".action-buttons > div:last-child").click();
 			}
@@ -75,6 +90,16 @@ export default props => {
 	return (
 		<div ref={currentInstance} {...props} class="bg-white text-black border rounded p-2">
 			<div ref={editableDiv} class="p-2 outline-0" contentEditable={true} onInput={updateEditor} onBlur={_ => setCaret(position(editableDiv).pos)}></div>
+			<Show when={hasPoll()}>
+				<div class="card mb-1">
+					<div class="card-body px-2" onInput={updatePoll}>
+						<input class="form-control my-1" name="first" type="text" placeholder="Option 1"/>
+						<input class="form-control my-1" name="second" type="text" placeholder="Option 2"/>
+						<input class="form-control my-1" name="third" type="text" placeholder="Option 3 (Optional)"/>
+						<input class="form-control my-1" name="fourth" type="text" placeholder="Option 4 (Optional)"/>
+					</div>
+				</div>
+			</Show>
 			<Show when={mediaFile()}>
 				<div class="d-inline-block position-relative card-body pt-0 media-preview" onClick={_ => setMediaFile()}>
 					<img class="img-fluid" src={URL.createObjectURL(mediaFile())}/>
@@ -93,6 +118,7 @@ export default props => {
 				</div>
 				<button ref={emojiTrigger} class="btn btn-light btn-sm px-3 rounded-pill ms-2" onClick={_ => emojiPopup.toggle()}>&#x2026;</button>
 				<div class="char-count" classList={{ "bg-danger": characterLimitExceeded() }}>{charCount()}</div>
+				<button class="btn btn-sm px-3 rounded-pill ms-2" classList={{ "btn-secondary": !hasPoll(), "btn-primary": hasPoll() }} onClick={_ => setHasPoll(!hasPoll())}><BiRegularPoll/></button>
 				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" onClick={_ => mediaFileInput.click()}><BsImage/></button>
 				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={_ => makeQuip()}>Post</button>
 				<input ref={mediaFileInput} onInput={event => setMediaFile(event.target.files?.[0])} class="visually-hidden" type="file"/>
