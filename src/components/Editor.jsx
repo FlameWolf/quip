@@ -30,7 +30,6 @@ export default props => {
 	const updatePoll = event => {
 		const sender = event.target;
 		setPoll({ ...poll(), [sender.name]: sender.value });
-		console.log(poll());
 	};
 	const resetEditor = () => {
 		editableDiv.innerHTML = "";
@@ -43,7 +42,19 @@ export default props => {
 		const formData = new FormData();
 		formData.append("content", getTextContent());
 		if (hasPoll()) {
-			formData.append("poll", JSON.stringify(poll()));
+			const currentPoll = poll();
+			const { days, hours, minutes } = currentPoll;
+			if (days || hours || minutes) {
+				currentPoll.duration = (
+					((parseInt(days) || 0) * 60 * 24) +
+					((parseInt(hours) || 0) * 60) +
+					(parseInt(minutes) || 0)
+				) * 60 * 1000;
+			}
+			delete currentPoll.minutes;
+			delete currentPoll.hours;
+			delete currentPoll.days;
+			formData.append("poll", JSON.stringify(currentPoll));
 		}
 		if (mediaFile()) {
 			formData.append("media", mediaFile());
@@ -91,12 +102,57 @@ export default props => {
 		<div ref={currentInstance} {...props} class="bg-white text-black border rounded p-2">
 			<div ref={editableDiv} class="p-2 outline-0" contentEditable={true} onInput={updateEditor} onBlur={_ => setCaret(position(editableDiv).pos)}></div>
 			<Show when={hasPoll()}>
-				<div class="card mb-1">
-					<div class="card-body px-2" onInput={updatePoll}>
+				<div class="card mb-1" onInput={updatePoll}>
+					<div class="card-body px-2">
 						<input class="form-control my-1" name="first" type="text" placeholder="Option 1"/>
 						<input class="form-control my-1" name="second" type="text" placeholder="Option 2"/>
 						<input class="form-control my-1" name="third" type="text" placeholder="Option 3 (Optional)"/>
 						<input class="form-control my-1" name="fourth" type="text" placeholder="Option 4 (Optional)"/>
+					</div>
+					<div class="card-footer">
+						<p>Duration</p>
+						<div class="row gx-2">
+							<div class="col-4">
+								<div class="bg-light border rounded p-2">
+									<p>Days</p>
+									<select name="days" class="form-select">
+										<option>0</option>
+										<option selected="true">1</option>
+										<For each={[...Array(5).keys()]}>
+										{
+											(day, index) => <option>{day + 2}</option>
+										}
+										</For>
+									</select>
+								</div>
+							</div>
+							<div class="col-4">
+								<div class="bg-light border rounded p-2">
+									<p>Hours</p>
+									<select name="hours" class="form-select">
+										<option>0</option>
+										<For each={[...Array(23).keys()]}>
+										{
+											(hour, index) => <option>{hour + 1}</option>
+										}
+										</For>
+									</select>
+								</div>
+							</div>
+							<div class="col-4">
+								<div class="bg-light border rounded p-2">
+									<p>Minutes</p>
+									<select name="minutes" class="form-select">
+										<option>0</option>
+										<For each={[...Array(59).keys()]}>
+										{
+											(minute, index) => <option>{minute + 1}</option>
+										}
+										</For>
+									</select>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</Show>
