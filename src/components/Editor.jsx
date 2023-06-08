@@ -99,7 +99,7 @@ export default props => {
 		});
 	});
 	return (
-		<div ref={currentInstance} {...props} class="bg-white text-black border rounded p-2">
+		<div ref={currentInstance} {...props} class="border rounded p-2">
 			<div ref={editableDiv} class="p-2 outline-0" contentEditable={true} onInput={updateEditor} onBlur={_ => setCaret(position(editableDiv).pos)}></div>
 			<Show when={hasPoll()}>
 				<div class="card mb-1" onInput={updatePoll}>
@@ -113,7 +113,7 @@ export default props => {
 						<p>Duration</p>
 						<div class="row gx-2">
 							<div class="col-4">
-								<div class="bg-light border rounded p-2">
+								<div class="border rounded p-2">
 									<p>Days</p>
 									<select name="days" class="form-select">
 										<option>0</option>
@@ -127,7 +127,7 @@ export default props => {
 								</div>
 							</div>
 							<div class="col-4">
-								<div class="bg-light border rounded p-2">
+								<div class="border rounded p-2">
 									<p>Hours</p>
 									<select name="hours" class="form-select">
 										<option>0</option>
@@ -140,7 +140,7 @@ export default props => {
 								</div>
 							</div>
 							<div class="col-4">
-								<div class="bg-light border rounded p-2">
+								<div class="border rounded p-2">
 									<p>Minutes</p>
 									<select name="minutes" class="form-select">
 										<option>0</option>
@@ -172,7 +172,7 @@ export default props => {
 					}
 					</For>
 				</div>
-				<button ref={emojiTrigger} class="btn btn-light btn-sm px-3 rounded-pill ms-2" onClick={_ => emojiPopup.toggle()}>&#x2026;</button>
+				<button ref={emojiTrigger} class="btn btn-primary btn-sm px-3 rounded-pill ms-2" onClick={_ => emojiPopup.toggle()}>&#x2026;</button>
 				<div class="char-count" classList={{ "bg-danger": characterLimitExceeded() }}>{charCount()}</div>
 				<button class="btn btn-sm px-3 rounded-pill ms-2" classList={{ "btn-secondary": !hasPoll(), "btn-primary": hasPoll() }} onClick={_ => setHasPoll(!hasPoll())}><BiRegularPoll/></button>
 				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" onClick={_ => mediaFileInput.click()}><BsImage/></button>

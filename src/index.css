@@ -55,7 +55,7 @@ body {
 .card-body > .img-fluid {
 	max-height: 25rem;
 }
-.card-body.poll{
+.card-body.poll {
 	padding: 0 0 0.5rem 0;
 }
 .poll-option {
@@ -101,6 +101,9 @@ body {
 div[contenteditable] {
 	min-height: 4rem;
 }
+.card-footer > .row > .col-4 > div {
+	background-color: var(--bs-border-color);
+}
 .emoji-bar {
 	display: flex;
 	width: 100%;
@@ -112,7 +115,7 @@ div[contenteditable] {
 .emoji-bar > div {
 	display: flex;
 	align-items: center;
-	background-color: var(--bs-light);
+	background-color: var(--bs-border-color);
 	padding-left: 0.5rem;
 	padding-right: 0.5rem;
 	border-radius: 50rem;
@@ -120,14 +123,16 @@ div[contenteditable] {
 	margin-left: 0.25rem;
 	margin-right: 0.25rem;
 }
-.searchContainer, .emojiButton {
+.searchContainer,
+.emojiButton {
 	user-select: none;
 }
 .char-count {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background-color: var(--bs-info);
+	background-color: var(--bs-tertiary-color);
+	color: var(--bs-light);
 	font-size: 0.75rem;
 	width: 3rem;
 	padding-left: 0.5rem;
@@ -140,7 +145,8 @@ div[contenteditable] {
 	border-left-color: var(--bs-primary);
 }
 .reply {
-	background-color: #ffffdda0;
+	background-color: var(--bs-border-color);
+	color: var(--bs-emphasis-color);
 	border-left-color: revert;
 }
 .position-absolute-middle {

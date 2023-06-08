@@ -67,7 +67,7 @@ export default props => {
 						<div>Repeated by @{repeatedBy.handle}</div>
 					</Show>
 				</div>
-				<div class="card-body">
+				<div class="card-body px-2">
 					<p class="card-text" innerHTML={post.content?.replace(/\n/g, "<br/>")}></p>
 					<Show when={attachments}>
 						<Show when={attachments.poll}>

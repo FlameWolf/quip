@@ -5,7 +5,7 @@ import DisplayPost from "./DisplayPost";
 export default props => {
 	const params = useParams();
 	const [profileUser] = createResource(async handle => await (await fetch(`${import.meta.env.VITE_API_BASE_URL}users/${params.handle}`)).json());
-	const [userQuips, { mutate, refetch }] = createResource(async handle => await (await fetch(`${import.meta.env.VITE_API_BASE_URL}users/${params.handle}/posts`)).json());
+	const [userQuips, { mutate, refetch }] = createResource(async handle => await (await fetch(`${import.meta.env.VITE_API_BASE_URL}users/${params.handle}/posts?lastPostId=`)).json());
 	return (
 		<Suspense fallback={<h4>Loading...</h4>}>
 			<Show when={profileUser.state === "ready"}>
