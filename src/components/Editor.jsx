@@ -174,7 +174,7 @@ export default props => {
 				</div>
 				<button ref={emojiTrigger} class="btn btn-primary btn-sm px-3 rounded-pill ms-2" onClick={_ => emojiPopup.toggle()}>&#x2026;</button>
 				<div class="char-count" classList={{ "bg-danger": characterLimitExceeded() }}>{charCount()}</div>
-				<button class="btn btn-sm px-3 rounded-pill ms-2" classList={{ "btn-secondary": !hasPoll(), "btn-primary": hasPoll() }} onClick={_ => setHasPoll(!hasPoll())}><BiRegularPoll/></button>
+				<button class="btn btn-sm px-3 rounded-pill ms-2" classList={{ "btn-secondary": !hasPoll(), "btn-primary": hasPoll() }} onClick={_ => setHasPoll(!hasPoll())}><BiRegularPoll class="poll-icon"/></button>
 				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" onClick={_ => mediaFileInput.click()}><BsImage/></button>
 				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={_ => makeQuip()}>Post</button>
 				<input ref={mediaFileInput} onInput={event => setMediaFile(event.target.files?.[0])} class="visually-hidden" type="file"/>

@@ -141,6 +141,9 @@ div[contenteditable] {
 	margin-left: 0.25rem;
 	margin-right: 0.25rem;
 }
+.poll-icon {
+	filter: invert(100);
+}
 .has-reply {
 	border-left-color: var(--bs-primary);
 }
