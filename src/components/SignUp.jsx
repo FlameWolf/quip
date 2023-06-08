@@ -1,5 +1,5 @@
 import { Popover } from "bootstrap";
-import { useNavigate } from "solid-app-router";
+import { useNavigate } from "@solidjs/router";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
 import { createSignal, onMount, Show } from "solid-js";

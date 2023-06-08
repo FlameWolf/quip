@@ -5,7 +5,7 @@ import { contentLengthRegExp, innerHtmlAsText, insertEmojo, maxContentLength, po
 import { BsImage } from "solid-icons/bs";
 import { BiRegularPoll } from "solid-icons/bi";
 import { VsChromeClose } from "solid-icons/vs";
-import { quipStore, setQuipStore } from "../stores/quip-store";
+import { setQuipStore } from "../stores/quip-store";
 import { authStore } from "../stores/auth-store";
 
 export default props => {

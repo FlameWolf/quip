@@ -1,5 +1,5 @@
-import nodeEmoji from "node-emoji";
-import { NavLink, Outlet } from "solid-app-router";
+import * as nodeEmoji from "node-emoji";
+import { NavLink, Outlet } from "@solidjs/router";
 import logoUrl from "../assets/images/logo.png";
 
 export default props => {

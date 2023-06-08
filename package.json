@@ -11,20 +11,20 @@
 	},
 	"license": "MIT",
 	"devDependencies": {
-		"vite": "^3.1.3",
-		"vite-plugin-solid": "^2.3.6"
+		"vite": "^4.3.9",
+		"vite-plugin-solid": "^2.7.0"
 	},
 	"dependencies": {
-		"@picmo/popup-picker": "^5.7.0",
-		"@popperjs/core": "^2.11.6",
-		"bootstrap": "^5.2.1",
-		"bootstrap-icons": "^1.9.1",
+		"@picmo/popup-picker": "^5.8.4",
+		"@popperjs/core": "^2.11.8",
+		"@solidjs/router": "^0.8.2",
+		"bootstrap": "^5.3.0",
+		"bootstrap-icons": "^1.10.5",
 		"caret-pos": "^2.0.0",
 		"inter-ui": "^3.19.3",
-		"node-emoji": "^1.11.0",
-		"picmo": "^5.7.0",
-		"solid-app-router": "^0.4.2",
-		"solid-icons": "^1.0.1",
-		"solid-js": "^1.5.5"
+		"node-emoji": "^2.0.2",
+		"picmo": "^5.8.4",
+		"solid-icons": "^1.0.7",
+		"solid-js": "^1.7.6"
 	}
 }

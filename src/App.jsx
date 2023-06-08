@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, useLocation, useNavigate } from "solid-app-router";
+import { Navigate, Route, Routes, useLocation, useNavigate } from "@solidjs/router";
 import { lazy, onCleanup, onMount } from "solid-js";
 import { authStore, setAuthStore } from "./stores/auth-store";
 const Auth = lazy(() => import("./components/Auth"));

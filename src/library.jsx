@@ -1,5 +1,5 @@
 import { position } from "caret-pos";
-import nodeEmoji from "node-emoji";
+import * as nodeEmoji from "node-emoji";
 
 export const cookieOptions = {
 	path: "/",

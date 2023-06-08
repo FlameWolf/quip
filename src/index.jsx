@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./index.css";
 import { render } from "solid-js/web";
-import { Router } from "solid-app-router";
+import { Router } from "@solidjs/router";
 import App from "./App";
 
 render(

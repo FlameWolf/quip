@@ -1,4 +1,4 @@
-import nodeEmoji from "node-emoji";
+import * as nodeEmoji from "node-emoji";
 
 export default props => {
 	const pageFacingUpEmojo = nodeEmoji.get(":page_facing_up:");

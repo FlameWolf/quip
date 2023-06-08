@@ -1,4 +1,4 @@
-import { useParams } from "solid-app-router";
+import { useParams } from "@solidjs/router";
 import { createMemo, For } from "solid-js";
 import { quipStore } from "../stores/quip-store";
 import { userStore } from "../stores/user-store";
