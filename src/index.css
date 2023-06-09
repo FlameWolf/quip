@@ -59,7 +59,7 @@ body {
 	padding: 0 0 0.5rem 0;
 }
 .poll-option {
-	width: calc(100% - 2rem);
+	width: calc(100% - 4rem);
 }
 .poll-bar {
 	position: absolute;
@@ -76,8 +76,14 @@ body {
 	right: 0;
 	color: var(--bs-info);
 	text-align: center;
-	width: 2rem;
+	width: 4rem;
 	transform: translateY(-50%);
+}
+.poll-value::after {
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	content: "%";
 }
 .media-preview {
 	min-width: 3rem;

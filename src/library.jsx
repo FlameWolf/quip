@@ -65,6 +65,7 @@ export const invalidHandles = [
 ];
 export const contentLengthRegExp = /\p{L}\p{M}?|\S|\s/gu;
 export const maxContentLength = 256;
+export const maxPostsToFetch = 20;
 export const popularEmoji = [
 	nodeEmoji.get(":joy:"),
 	nodeEmoji.get(":heart:"),
