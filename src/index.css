@@ -44,9 +44,14 @@ body {
 	padding: 0.5rem;
 }
 .handle {
-	color: var(--bs-secondary);
 	font-weight: bold;
 	text-decoration: none;
+}
+.handle::before {
+	content: "@";
+}
+.handle:hover {
+	text-decoration: underline;
 }
 .card-body {
 	padding-top: 0.25rem;
@@ -154,7 +159,7 @@ div[contenteditable] {
 	border-left-color: var(--bs-primary);
 }
 .reply {
-	background-color: var(--bs-border-color);
+	background-color: var(--bs-info-bg-subtle);
 	color: var(--bs-emphasis-color);
 	border-left-color: revert;
 }

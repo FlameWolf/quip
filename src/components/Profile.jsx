@@ -1,5 +1,6 @@
 import { useParams } from "@solidjs/router";
 import { createSignal, For, onMount, Show, Suspense } from "solid-js";
+import { BsPersonBadgeFill } from "solid-icons/bs";
 import { maxPostsToFetch } from "../library";
 import DisplayPost from "./DisplayPost";
 
@@ -38,7 +39,13 @@ export default props => {
 		<>
 			<div class="card mb-2">
 				<div class="card-header">
-					<div class="card-title">@{profileUser().handle}</div>
+					<div class="card-title">
+						<span class="handle">{profileUser().handle}</span>
+						<Show when={profileUser().self}>
+							<span>&#xA0;</span>
+							<BsPersonBadgeFill/>
+						</Show>
+					</div>
 				</div>
 				<div class="card-body">
 					<p>{profileUser().postsCount} Quips</p>
