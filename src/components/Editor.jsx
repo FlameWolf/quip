@@ -14,8 +14,8 @@ export default props => {
 	let emojiTrigger;
 	let emojiPopup;
 	let mediaFileInput;
-	const createPostUrl = `${import.meta.env.VITE_API_BASE_URL}posts/create`;
-	const createReplyUrl = `${import.meta.env.VITE_API_BASE_URL}posts/reply/`;
+	const createPostUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/create`;
+	const createReplyUrl = `${import.meta.env.VITE_API_BASE_URL}posts/reply`;
 	const [caret, setCaret] = createSignal(0);
 	const [charCount, setCharCount] = createSignal(maxContentLength);
 	const [hasPoll, setHasPoll] = createSignal(false);
@@ -59,7 +59,7 @@ export default props => {
 		if (mediaFile()) {
 			formData.append("media", mediaFile());
 		}
-		const response = await fetch(parentPostId ? `${createReplyUrl}${parentPostId}` : createPostUrl, {
+		const response = await fetch(parentPostId ? `${createReplyUrl}/${parentPostId}` : createPostUrl, {
 			method: "POST",
 			body: formData
 		});

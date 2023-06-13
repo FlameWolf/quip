@@ -8,8 +8,8 @@ const Home = lazy(() => import("./components/Home"));
 const Profile = lazy(() => import("./components/Profile"));
 const NotFound = lazy(() => import("./components/NotFound"));
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-const authBaseUrl = `${apiBaseUrl}auth/`;
-const refreshTokenUrl = `${authBaseUrl}refresh-token`;
+const authBaseUrl = `${apiBaseUrl}/auth`;
+const refreshTokenUrl = `${authBaseUrl}/refresh-token`;
 const authChannelName = import.meta.env.VITE_AUTH_CHANNEL_NAME;
 
 navigator.serviceWorker.controller?.postMessage({

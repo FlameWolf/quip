@@ -37,7 +37,7 @@ export default props => {
 		passwordInput.classList.remove("is-invalid");
 	};
 	const submitForm = async event => {
-		const signInUrl = `${import.meta.env.VITE_API_BASE_URL}auth/sign-in`;
+		const signInUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/sign-in`;
 		const handle = usernameInput.value;
 		const password = passwordInput.value;
 		const response = await fetch(signInUrl, {

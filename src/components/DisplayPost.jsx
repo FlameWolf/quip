@@ -6,11 +6,11 @@ import DisplayPoll from "./DisplayPoll";
 import DisplayPostMinimal from "./DisplayPostMinimal";
 import Editor from "./Editor";
 
-const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}posts/`;
-const favouriteUrl = `${postsBaseUrl}favourite/`;
-const unfavouriteUrl = `${postsBaseUrl}unfavourite/`;
-const repeatUrl = `${postsBaseUrl}repeat/`;
-const unrepeatUrl = `${postsBaseUrl}unrepeat/`;
+const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
+const favouriteUrl = `${postsBaseUrl}/favourite`;
+const unfavouriteUrl = `${postsBaseUrl}/unfavourite`;
+const repeatUrl = `${postsBaseUrl}/repeat`;
+const unrepeatUrl = `${postsBaseUrl}/unrepeat`;
 
 export default props => {
 	const post = props.post;
@@ -22,14 +22,14 @@ export default props => {
 	const [repeatFlag, setRepeatFlag] = createSignal(post.repeated);
 	const [replyFlag, setReplyFlag] = createSignal(false);
 	const toggleFave = event => {
-		fetch(`${faveFlag() ? unfavouriteUrl : favouriteUrl}${postId}`).then(response => {
+		fetch(`${faveFlag() ? unfavouriteUrl : favouriteUrl}/${postId}`).then(response => {
 			if(response.status === 200) {
 				setFaveFlag(value => !value);
 			}
 		});
 	};
 	const toggleRepeat = event => {
-		fetch(`${repeatFlag() ? unrepeatUrl : repeatUrl}${postId}`).then(response => {
+		fetch(`${repeatFlag() ? unrepeatUrl : repeatUrl}/${postId}`).then(response => {
 			if(response.status === 200 || response.status === 201) {
 				setRepeatFlag(value => !value);
 			}
