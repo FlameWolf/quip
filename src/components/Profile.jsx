@@ -1,6 +1,7 @@
 import { useParams } from "@solidjs/router";
-import { createSignal, For, onMount, Show, Suspense } from "solid-js";
+import { createSignal, For, onMount, Show } from "solid-js";
 import { BsPersonBadgeFill } from "solid-icons/bs";
+import { authStore } from "../stores/auth-store";
 import { maxPostsToFetch } from "../library";
 import DisplayPost from "./DisplayPost";
 
@@ -8,13 +9,26 @@ export default props => {
 	let loadMoreButton;
 	const params = useParams();
 	const [profileUser, setProfileUser] = createSignal("");
+	const [isSelf, setIsSelf] = createSignal(true);
+	const [followed, setFollowed] = createSignal(false);
+	const [muted, setMuted] = createSignal(false);
+	const [blocked, setBlocked] = createSignal(false);
+	const [followsMe, setFollowsMe] = createSignal(false);
 	const [lastPostId, setLastPostId] = createSignal("");
 	const [hasMore, setHasMore] = createSignal(true);
 	const [loadedQuips, setLoadedQuips] = createSignal([]);
 
 	const loadUser = async handle => {
 		const data = await (await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/${params.handle}`)).json();
-		setProfileUser(data.user);
+		const user = data.user;
+		setProfileUser(user);
+		if(authStore.userId) {
+			setIsSelf(user.self);
+			setFollowed(user.followedByMe);
+			setMuted(user.mutedByMe);
+			setBlocked(user.setBlocked);
+			setFollowsMe(user.followedMe);
+		}
 	};
 
 	const loadUserQuips = async handle => {
@@ -39,11 +53,21 @@ export default props => {
 		<>
 			<div class="card mb-2">
 				<div class="card-header">
-					<div class="card-title">
+					<div class="card-title mb-0">
 						<span class="handle">{profileUser().handle}</span>
 						<Show when={profileUser().self}>
 							<span>&#xA0;</span>
-							<BsPersonBadgeFill/>
+							<BsPersonBadgeFill color="var(--bs-primary)"/>
+						</Show>
+						<Show when={authStore.userId && !isSelf()}>
+							<div class="d-inline-grid mx-2">
+								<Show when={followsMe()}>
+									<div class="d-flex align-items-center badge bg-secondary">Follows you</div>
+								</Show>
+								<button class="btn btn-sm btn-primary">{followed() ? "Unflollow" : "Follow"}</button>
+								<button class="btn btn-sm btn-primary">{blocked() ? "Unblock": "Block"}</button>
+								<button class="btn btn-sm btn-primary">{muted() ? "Unmute" : "Mute"}</button>
+							</div>
 						</Show>
 					</div>
 				</div>

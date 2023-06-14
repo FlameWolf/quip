@@ -53,6 +53,10 @@ body {
 .handle:hover {
 	text-decoration: underline;
 }
+.card-title .d-inline-grid {
+	grid-auto-flow: column;
+	grid-column-gap: var(--bs-card-title-spacer-y);
+}
 .card-body {
 	padding-top: 0.25rem;
 	padding-bottom: 0.25rem;
