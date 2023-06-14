@@ -60,6 +60,9 @@ body {
 .card-body > .img-fluid {
 	max-height: 25rem;
 }
+.card-body > .card {
+	background-color: var(--bs-secondary-bg-subtle);
+}
 .card-body.poll {
 	padding: 0 0 0.5rem 0;
 }
@@ -159,7 +162,7 @@ div[contenteditable] {
 	border-left-color: var(--bs-primary);
 }
 .reply {
-	background-color: var(--bs-info-bg-subtle);
+	background-color: var(--bs-warning-bg-subtle);
 	color: var(--bs-emphasis-color);
 	border-left-color: revert;
 }
