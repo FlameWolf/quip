@@ -113,6 +113,9 @@ body {
 	margin-left: 0.5rem;
 	margin-right: 0.5rem;
 }
+.stroke-3 {
+	stroke-width: 3px;
+}
 .outline-0 {
 	outline: none;
 }
