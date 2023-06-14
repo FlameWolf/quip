@@ -38,10 +38,10 @@ export default props => {
 			<Editor id="post-editor" classList={{ "mb-2": true }}/>
 			<ul class="list-group">
 				<For each={quipStore.quips}>{(quip, index) => !quip.replyTo && renderRecursive(quip)}</For>
-				<li class="list-group-item">
-					<button ref={loadMoreButton} class="btn btn-primary form-control" onClick={() => loadPosts(lastPostId())}>Load More</button>
-				</li>
 			</ul>
+			<div class="my-2">
+				<button ref={loadMoreButton} class="btn btn-primary form-control" onClick={() => loadPosts(lastPostId())}>Load More</button>
+			</div>
 		</>
 	);
 };

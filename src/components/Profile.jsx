@@ -57,10 +57,10 @@ export default props => {
 					(quip, index) => <DisplayPost post={quip}/>
 				}
 				</For>
-				<li class="list-group-item">
-					<button ref={loadMoreButton} class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Posts"} onClick={loadUserQuips}></button>
-				</li>
 			</ul>
+			<div class="my-2">
+				<button ref={loadMoreButton} class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Posts"} onClick={loadUserQuips}></button>
+			</div>
 		</>
 	);
 };

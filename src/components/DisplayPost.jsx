@@ -2,6 +2,7 @@ import { BsChatRight, BsStar, BsStarFill } from "solid-icons/bs";
 import { FiRepeat } from "solid-icons/fi";
 import { createSignal, Show } from "solid-js";
 import { authStore } from "../stores/auth-store";
+import { formatTimeAgo, toLongDateString } from "../library";
 import DisplayPoll from "./DisplayPoll";
 import DisplayPostMinimal from "./DisplayPostMinimal";
 import Editor from "./Editor";
@@ -15,6 +16,7 @@ const unrepeatUrl = `${postsBaseUrl}/unrepeat`;
 export default props => {
 	const post = props.post;
 	const postId = post._id;
+	const createdAt = post.createdAt;
 	const handle = post.author.handle;
 	const repeatedBy = post.repeatedBy;
 	const attachments = post.attachments;
@@ -65,6 +67,9 @@ export default props => {
 						<div>&#xA0;</div>
 						<div>Repeated by <span class="handle">{repeatedBy.handle}</span></div>
 					</Show>
+					<div class="ms-auto">
+						<a title={toLongDateString(createdAt)}>{formatTimeAgo(createdAt)}</a>
+					</div>
 				</div>
 				<div class="card-body px-2">
 					<p class="card-text" innerHTML={post.content?.replace(/\n/g, "<br/>")}></p>

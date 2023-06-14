@@ -147,3 +147,50 @@ export const insertEmojo = (elem, emojo, callback = null) => {
 export const trimPost = text => {
 	return text && text.length > 20 ? `${text.substring(0, 20)}&#x2026;` : text;
 };
+
+export const toShortDateString = input =>
+	new Intl.DateTimeFormat("default", {
+		year: "numeric",
+		month: "short",
+		day: "2-digit",
+		hour: "2-digit",
+		minute: "2-digit",
+		hour12: true,
+		formatMatcher: "basic"
+	}).format(input.constructor === Date ? input : new Date(input));
+
+export const toLongDateString = input =>
+	new Intl.DateTimeFormat("default", {
+		weekday: "long",
+		year: "numeric",
+		month: "long",
+		day: "2-digit",
+		hour: "2-digit",
+		minute: "2-digit",
+		second: "2-digit",
+		fractionalSecondDigits: 3,
+		timeZoneName: "short",
+		timeZone: "UTC",
+		hour12: false,
+		formatMatcher: "basic"
+	}).format(input.constructor === Date ? input : new Date(input));
+
+const formatPlural = (value, unit) => `${value} ${unit}${value > 1 ? "s" : ""}`;
+
+export const formatTimeAgo = input => {
+	const dateValue = input.constructor === Date ? input : new Date(input);
+	const timeFragments = [];
+	const seconds = (new Date() - dateValue) / 1000;
+	const minutes = seconds / 60;
+	const hours = minutes / 60;
+	if (seconds > 0 && seconds < 60) {
+		timeFragments.push(formatPlural(Math.round(seconds, 2), "second"));
+	} else if (minutes > 0 && minutes < 60) {
+		timeFragments.push(formatPlural(Math.round(minutes, 2), "minute"));
+		timeFragments.push(formatPlural(Math.round(seconds % 60, 2), "second"));
+	} else if (hours > 0 && hours < 24) {
+		timeFragments.push(formatPlural(Math.round(hours, 2), "hour"));
+		timeFragments.push(formatPlural(Math.round(minutes % 60, 2), "minute"));
+	}
+	return hours >= 24 ? toShortDateString(dateValue) : `${timeFragments.join(", ")} ago`;
+};
