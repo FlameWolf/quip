@@ -69,8 +69,8 @@ export default () => {
 					</Routes>
 				</div>
 			</div>
-			<button class="bg-secondary text-light btn-theme-toggle position-absolute top-0 end-0 p-0 border-0 rounded-50 mt-1 me-1" tabIndex={1} onClick={updateTheme}>
-				<i class="bi position-absolute" classList={{ "bi-sun-fill": isDark(), "bi-moon-fill": !isDark() }}></i>
+			<button class="d-flex align-items-center justify-content-center bg-secondary text-light btn-theme-toggle position-absolute top-0 end-0 p-0 border-0 rounded-50 mt-1 me-1" tabIndex={1} onClick={updateTheme}>
+				<i class="bi" classList={{ "bi-sun-fill": isDark(), "bi-moon-fill": !isDark() }}></i>
 			</button>
 		</>
 	);
