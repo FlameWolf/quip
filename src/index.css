@@ -1,6 +1,22 @@
 body {
 	font-family: Inter;
 }
+.page-container {
+	padding-left: 2rem;
+	padding-right: 2rem;
+}
+@media (min-width: 768px) {
+	.page-container {
+		padding-left: 6.25%;
+		padding-right: 6.25%;
+	}
+}
+@media (min-width: 1024px) {
+	.page-container {
+		padding-left: 12.5%;
+		padding-right: 12.5%;
+	}
+}
 .logo {
 	filter: drop-shadow(0 0 0.25rem var(--bs-body-color));
 }
@@ -8,15 +24,8 @@ body {
 	border-radius: 50%;
 }
 .auth-panel {
-	min-width: 480px;
-	width: 50%;
-	margin-left: auto;
-	margin-right: auto;
-}
-@media (max-width: 576px) {
-	.auth-panel {
-		min-width: 100%;
-	}
+	max-width: 640px;
+	margin: 0 auto;
 }
 .card-header > .hstack > a.active {
 	color: unset;
@@ -64,13 +73,18 @@ body {
 	padding-bottom: 0.25rem;
 }
 .card-body > .img-fluid {
+	display: block;
 	max-height: 25rem;
+	margin: 0 auto;
 }
 .card-body > .card {
 	background-color: var(--bs-secondary-bg-subtle);
 }
 .card-body.poll {
 	padding: 0 0 0.5rem 0;
+}
+.text-break {
+	hyphens: auto;
 }
 .poll-option {
 	width: calc(100% - 4rem);
@@ -94,26 +108,14 @@ body {
 	transform: translateY(-50%);
 }
 .poll-value::after {
+	content: "%";
 	display: inline-block;
 	position: absolute;
 	top: 0;
-	content: "%";
 }
 .media-preview {
 	min-width: 3rem;
 	min-height: 3rem;
-}
-.action-buttons {
-	display: flex;
-	justify-content: end;
-}
-.action-bar > .action-buttons > div {
-	display: flex;
-	align-items: center;
-	cursor: pointer;
-	padding: 0.75rem;
-	margin-left: 0.5rem;
-	margin-right: 0.5rem;
 }
 .stroke-3 {
 	stroke-width: 3px;
@@ -126,6 +128,7 @@ body {
 }
 div[contenteditable] {
 	min-height: 4rem;
+	overflow-wrap: break-word;
 }
 .card-footer > .row > .col-4 > div {
 	background-color: var(--bs-border-color);

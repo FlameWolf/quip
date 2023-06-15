@@ -56,7 +56,7 @@ export default props => {
 	};
 	return (
 		<>
-			<div data-post-id={postId} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, "reply": props.isReply }}>
+			<div data-post-id={postId} class="list-group-item p-0 overflow-hidden" classList={{ "has-reply": props.hasReplies, "reply": props.isReply }}>
 				<div class="post-header">
 					<a class="handle" href={`/${handle}`}>{handle}</a>
 					<Show when={props.parentBlurb}>
@@ -72,7 +72,7 @@ export default props => {
 					</div>
 				</div>
 				<div class="card-body px-2">
-					<p class="card-text" innerHTML={post.content?.replace(/\n/g, "<br/>")}></p>
+					<p class="card-text text-break" innerHTML={post.content?.replace(/\n/g, "<br/>")}></p>
 					<Show when={attachments}>
 						<Show when={attachments.poll}>
 							<DisplayPoll poll={attachments.poll} isOwnPoll={post.author._id === authStore.userId}/>
@@ -91,10 +91,10 @@ export default props => {
 					</Show>
 				</div>
 				<div class="action-bar">
-					<div class="action-buttons">
-						<div onClick={toggleFave}>{faveFlag() ? <BsStarFill color="gold"/> : <BsStar/>}</div>
-						<div onClick={toggleRepeat}>{repeatFlag() ? <FiRepeat color="green" class="stroke-3"/> : <FiRepeat/>}</div>
-						<div onClick={toggleReply}>{replyFlag() ? <BsChatRight color="blue"/> : <BsChatRight/>}</div>
+					<div class="hstack gap-2 justify-content-end mt-2">
+						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleFave}>{faveFlag() ? <BsStarFill color="gold"/> : <BsStar/>}</button>
+						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleRepeat}>{repeatFlag() ? <FiRepeat color="green" class="stroke-3"/> : <FiRepeat/>}</button>
+						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleReply}>{replyFlag() ? <BsChatRight color="blue"/> : <BsChatRight/>}</button>
 					</div>
 				</div>
 			</div>

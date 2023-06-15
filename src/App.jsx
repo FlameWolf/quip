@@ -55,7 +55,7 @@ export default () => {
 	return (
 		<>
 			<div class="row">
-				<div class="col px-md-5 py-3">
+				<div class="col py-3 page-container">
 					<Routes>
 						<Route path="/auth" element={<Auth/>}>
 							<Route path="/sign-up" element={<SignUp/>}/>
@@ -69,7 +69,7 @@ export default () => {
 					</Routes>
 				</div>
 			</div>
-			<button class="position-absolute top-0 end-0 btn btn-sm btn-secondary rounded-50 mt-1 me-1" onClick={updateTheme}>
+			<button class="position-absolute top-0 end-0 btn btn-sm btn-secondary rounded-50 mt-1 me-1" tabIndex={1} onClick={updateTheme}>
 				<i class="bi" classList={{ "bi-sun-fill": isDark(), "bi-moon-fill": !isDark() }}></i>
 			</button>
 		</>
