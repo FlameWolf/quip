@@ -99,7 +99,7 @@ export default props => {
 		});
 	});
 	return (
-		<div ref={currentInstance} {...props} class="border rounded p-2">
+		<div ref={currentInstance} {...props} class="editor border rounded p-2">
 			<div ref={editableDiv} class="p-2 outline-0" contentEditable={true} onInput={updateEditor} onBlur={_ => setCaret(position(editableDiv).pos)}></div>
 			<Show when={hasPoll()}>
 				<div class="card mb-1" onInput={updatePoll}>

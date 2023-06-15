@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes, useLocation, useNavigate } from "@solidjs/router";
-import { lazy, onCleanup, onMount } from "solid-js";
+import { lazy, createSignal, createEffect, onMount, onCleanup } from "solid-js";
 import { authStore, setAuthStore } from "./stores/auth-store";
 const Auth = lazy(() => import("./components/Auth"));
 const SignUp = lazy(() => import("./components/SignUp"));
@@ -11,7 +11,6 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const authBaseUrl = `${apiBaseUrl}/auth`;
 const refreshTokenUrl = `${authBaseUrl}/refresh-token`;
 const authChannelName = import.meta.env.VITE_AUTH_CHANNEL_NAME;
-
 navigator.serviceWorker.controller?.postMessage({
 	action: "init",
 	payload: {
@@ -25,9 +24,18 @@ navigator.serviceWorker.controller?.postMessage({
 	}
 });
 
-function App() {
+export default () => {
 	const authChannel = new BroadcastChannel(authChannelName);
 	const protectedRoutes = ["/", "/home"];
+	const lightTheme = "light";
+	const darkTheme = "dark";
+	const [theme, setTheme] = createSignal(localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+	createEffect(() => {
+		document.body.parentElement.setAttribute("data-bs-theme", theme());
+		localStorage.setItem("theme", theme());
+	});
+	const isDark = () => theme() === darkTheme;
+	const updateTheme = () => setTheme(isDark() ? lightTheme : darkTheme);
 	onMount(() => {
 		const location = useLocation();
 		const navigate = useNavigate();
@@ -45,22 +53,25 @@ function App() {
 		authChannel.close();
 	});
 	return (
-		<div class="row">
-			<div class="col px-md-5 py-3">
-				<Routes>
-					<Route path="/auth" element={<Auth/>}>
-						<Route path="/sign-up" element={<SignUp/>}/>
-						<Route path="/sign-in" element={<SignIn/>}/>
-						<Route path="/" element={<Navigate href="/auth/sign-up"/>}/>
-					</Route>
-					<Route path="/home" element={<Home/>}/>
-					<Route path="/:handle" element={<Profile/>}/>
-					<Route path="/" element={<Navigate href="/home"/>}/>
-					<Route path="/*all" element={<NotFound/>}/>
-				</Routes>
+		<>
+			<div class="row">
+				<div class="col px-md-5 py-3">
+					<Routes>
+						<Route path="/auth" element={<Auth/>}>
+							<Route path="/sign-up" element={<SignUp/>}/>
+							<Route path="/sign-in" element={<SignIn/>}/>
+							<Route path="/" element={<Navigate href="/auth/sign-up"/>}/>
+						</Route>
+						<Route path="/home" element={<Home/>}/>
+						<Route path="/:handle" element={<Profile/>}/>
+						<Route path="/" element={<Navigate href="/home"/>}/>
+						<Route path="/*all" element={<NotFound/>}/>
+					</Routes>
+				</div>
 			</div>
-		</div>
+			<button class="position-absolute top-0 end-0 btn btn-sm btn-secondary rounded-50 mt-1 me-1" onClick={updateTheme}>
+				<i class="bi" classList={{ "bi-sun-fill": isDark(), "bi-moon-fill": !isDark() }}></i>
+			</button>
+		</>
 	);
-}
-
-export default App;
+};
