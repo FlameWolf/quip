@@ -7,9 +7,9 @@ export default props => {
 		<div class="pb-5 auth-panel">
 			<div class="d-flex flex-column align-items-center pb-5">
 				<div class="d-flex justify-content-center mb-4">
-					<img class="img-fluid" src={logoUrl} alt="Quip Logo"/>
+					<img class="logo img-fluid" src={logoUrl} alt="Quip Logo"/>
 				</div>
-				<div class="hstack gap-3 justify-content-center bg-light text-muted w-100 py-2 rounded-pill">
+				<div class="hstack gap-2 justify-content-center w-100 py-2">
 					<span class="fw-bold fst-italic">noun</span>
 					<span>a witty remark</span>
 				</div>
@@ -26,7 +26,7 @@ export default props => {
 					<Outlet/>
 				</div>
 			</div>
-			<div class="d-flex flex-fill align-items-center bg-light rounded-pill p-2 mt-5">
+			<div class="d-flex flex-fill align-items-center p-2 mt-5">
 				<div class="marquee-x">{nodeEmoji.get(":slightly_smiling_face:")}</div>
 			</div>
 		</div>

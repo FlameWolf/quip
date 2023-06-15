@@ -50,15 +50,15 @@ export default props => {
 			<div class="card mb-2">
 				<div class="card-header">
 					<div class="card-title mb-0">
-						<span class="handle d-block d-sm-inline-block me-sm-2 mb-2 mb-sm-0">{profileUser().handle}</span>
+						<span class="handle me-2">{profileUser().handle}</span>
 						<Show when={profileUser().self}>
 							<span>&#xA0;</span>
 							<BsPersonBadgeFill color="var(--bs-primary)"/>
 						</Show>
 						<Show when={authStore.userId && !isSelf()}>
-							<div class="d-flex flex-wrap d-sm-inline-grid">
+							<div class="hstack gap-2 d-sm-inline-flex flex-wrap">
 								<Show when={followsMe()}>
-									<div class="d-flex align-items-center badge bg-secondary">Follows you</div>
+									<div class="badge bg-secondary">Follows you</div>
 								</Show>
 								<button class="btn btn-sm btn-primary">{followed() ? "Unflollow" : "Follow"}</button>
 								<button class="btn btn-sm btn-primary">{muted() ? "Unmute" : "Mute"}</button>
@@ -68,7 +68,7 @@ export default props => {
 					</div>
 				</div>
 				<div class="card-body">
-					<p>{profileUser().postsCount} Quips</p>
+					<div class="py-2">{profileUser().postsCount} Quips</div>
 				</div>
 			</div>
 			<ul class="list-group">

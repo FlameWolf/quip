@@ -1,6 +1,9 @@
 body {
 	font-family: Inter;
 }
+.logo {
+	filter: drop-shadow(0 0 0.25rem var(--bs-body-color));
+}
 .rounded-50 {
 	border-radius: 50%;
 }
@@ -55,11 +58,6 @@ body {
 }
 .handle:hover {
 	text-decoration: underline;
-}
-.card-title .d-sm-inline-grid {
-	grid-auto-flow: column;
-	grid-column-gap: var(--bs-card-title-spacer-y);
-	grid-row-gap: var(--bs-card-title-spacer-y);
 }
 .card-body {
 	padding-top: 0.25rem;
