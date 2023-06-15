@@ -127,9 +127,11 @@ body {
 .outline-0 {
 	outline: none;
 }
-div[contenteditable] {
+.editor > div[contenteditable] {
 	min-height: 4rem;
+	max-height: 16rem;
 	overflow-wrap: break-word;
+	overflow-y: scroll;
 }
 .card-footer > .row > .col-4 > div {
 	background-color: var(--bs-border-color);
