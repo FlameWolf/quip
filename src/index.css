@@ -83,9 +83,6 @@ body {
 .card-body.poll {
 	padding: 0 0 0.5rem 0;
 }
-.text-break {
-	hyphens: auto;
-}
 .poll-option {
 	width: calc(100% - 4rem);
 }
