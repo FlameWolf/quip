@@ -4,9 +4,10 @@ import { quipStore, setQuipStore } from "../stores/quip-store";
 import DisplayPost from "./DisplayPost";
 import Editor from "./Editor";
 
+const postsUrl = `${import.meta.env.VITE_API_BASE_URL}/timeline`;
+
 export default props => {
 	let loadMoreButton;
-	const postsUrl = `${import.meta.env.VITE_API_BASE_URL}/timeline`;
 	const [lastPostId, setLastPostId] = createSignal("");
 	const loadPosts = async (lastPostId = undefined) => {
 		const response = await fetch(lastPostId ? `${postsUrl}?lastPostId=${lastPostId}` : postsUrl);

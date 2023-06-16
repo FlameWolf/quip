@@ -8,14 +8,15 @@ import { VsChromeClose } from "solid-icons/vs";
 import { setQuipStore } from "../stores/quip-store";
 import { authStore } from "../stores/auth-store";
 
+const createPostUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/create`;
+const createReplyUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/reply`;
+
 export default props => {
 	let currentInstance;
 	let plainTextInput;
 	let emojiPopup;
 	let mediaFileInput;
 	let editorLineHeight;
-	const createPostUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/create`;
-	const createReplyUrl = `${import.meta.env.VITE_API_BASE_URL}posts/reply`;
 	const [caret, setCaret] = createSignal(0);
 	const [hasEmojiPicker, setHasEmojiPicker] = createSignal(false);
 	const [charCount, setCharCount] = createSignal(maxContentLength);

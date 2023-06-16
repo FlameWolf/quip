@@ -5,6 +5,8 @@ import { BsEye, BsEyeSlash } from "solid-icons/bs";
 import { createSignal, onMount, Show } from "solid-js";
 import { handleRegExp, passwordRegExp } from "../library";
 
+const signUpUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/sign-up`;
+
 export default props => {
 	let signUpForm;
 	let usernameInfoToggle;
@@ -47,7 +49,6 @@ export default props => {
 		confirmPasswordInput.classList.remove("is-invalid");
 	};
 	const submitForm = async event => {
-		const signUpUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/sign-up`;
 		const handle = usernameInput.value;
 		const password = passwordInput.value;
 		const response = await fetch(signUpUrl, {

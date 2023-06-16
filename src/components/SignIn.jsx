@@ -4,6 +4,8 @@ import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
 import { createSignal, onMount, Show } from "solid-js";
 
+const signInUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/sign-in`;
+
 export default props => {
 	let signInForm;
 	let usernameInfoToggle;
@@ -37,7 +39,6 @@ export default props => {
 		passwordInput.classList.remove("is-invalid");
 	};
 	const submitForm = async event => {
-		const signInUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/sign-in`;
 		const handle = usernameInput.value;
 		const password = passwordInput.value;
 		const response = await fetch(signInUrl, {

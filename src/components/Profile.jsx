@@ -5,9 +5,12 @@ import { authStore } from "../stores/auth-store";
 import { maxPostsToFetch } from "../library";
 import DisplayPost from "./DisplayPost";
 
+const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
+
 export default props => {
 	let loadMoreButton;
 	const params = useParams();
+	const profileUrl = `${profileBaseUrl}/${params.handle}`;
 	const [profileUser, setProfileUser] = createSignal("");
 	const [isSelf, setIsSelf] = createSignal(true);
 	const [followed, setFollowed] = createSignal(false);
@@ -18,7 +21,7 @@ export default props => {
 	const [hasMore, setHasMore] = createSignal(true);
 	const [loadedQuips, setLoadedQuips] = createSignal([]);
 	const loadUser = async handle => {
-		const data = await (await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/${params.handle}`)).json();
+		const data = await (await fetch(profileUrl)).json();
 		const user = data.user;
 		setProfileUser(user);
 		if(authStore.userId) {
@@ -30,7 +33,7 @@ export default props => {
 		}
 	};
 	const loadUserQuips = async handle => {
-		const data = await (await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/${params.handle}/posts?lastPostId=${lastPostId()}`)).json();
+		const data = await (await fetch(`${profileUrl}/posts?lastPostId=${lastPostId()}`)).json();
 		const posts = data.posts;
 		const postsCount = posts.length;
 		if(postsCount) {
