@@ -45,7 +45,7 @@ export default props => {
 		if(isAttachedToCurrent) {
 			sourceActionBar.removeChild(editorInstance);
 		} else {
-			editorParent?.querySelector(".action-buttons > div:last-child").click();
+			editorParent?.querySelector(".hstack > button:last-child").click();
 			editorInstance.dataset["parentPostId"] = postId;
 			sourceActionBar.appendChild(editorInstance);
 		}

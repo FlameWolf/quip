@@ -1,7 +1,7 @@
 import { createPopup } from "@picmo/popup-picker";
 import { position } from "caret-pos";
-import { createMemo, createSignal, For, onMount, Show } from "solid-js";
-import { contentLengthRegExp, innerHtmlAsText, insertEmojo, maxContentLength, popularEmoji, removeFormatting } from "../library";
+import { createMemo, createSignal, For, Show } from "solid-js";
+import { contentLengthRegExp, insertEmojo, maxContentLength, popularEmoji } from "../library";
 import { BsImage } from "solid-icons/bs";
 import { BiRegularPoll } from "solid-icons/bi";
 import { VsChromeClose } from "solid-icons/vs";
@@ -10,29 +10,31 @@ import { authStore } from "../stores/auth-store";
 
 export default props => {
 	let currentInstance;
-	let editableDiv;
-	let emojiTrigger;
+	let plainTextInput;
 	let emojiPopup;
 	let mediaFileInput;
+	let editorLineHeight;
 	const createPostUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/create`;
 	const createReplyUrl = `${import.meta.env.VITE_API_BASE_URL}posts/reply`;
 	const [caret, setCaret] = createSignal(0);
+	const [hasEmojiPicker, setHasEmojiPicker] = createSignal(false);
 	const [charCount, setCharCount] = createSignal(maxContentLength);
 	const [hasPoll, setHasPoll] = createSignal(false);
 	const [poll, setPoll] = createSignal({});
 	const [mediaFile, setMediaFile] = createSignal();
-	const getTextContent = () => innerHtmlAsText(editableDiv);
 	const getCharCount = text => text.match(contentLengthRegExp)?.length || 0;
-	const updateEditor = event => {
-		removeFormatting(editableDiv);
-		setCharCount(maxContentLength - getCharCount(getTextContent()));
+	const updateEditor = () => {
+		const text = plainTextInput.value;
+		plainTextInput.parentNode.setAttribute("data-replicated-value", text);
+		plainTextInput.style.overflowY = plainTextInput.scrollHeight > (plainTextInput.offsetHeight + editorLineHeight) ? "scroll" : "";
+		setCharCount(maxContentLength - getCharCount(text.trim()));
 	};
 	const updatePoll = event => {
 		const sender = event.target;
 		setPoll({ ...poll(), [sender.name]: sender.value });
 	};
 	const resetEditor = () => {
-		editableDiv.innerHTML = "";
+		plainTextInput.value = "";
 		setHasPoll(false);
 		setMediaFile();
 		setCharCount(maxContentLength);
@@ -40,7 +42,7 @@ export default props => {
 	const makeQuip = async () => {
 		const parentPostId = currentInstance.dataset.parentPostId;
 		const formData = new FormData();
-		formData.append("content", getTextContent());
+		formData.append("content", plainTextInput.value.trim());
 		if (hasPoll()) {
 			const currentPoll = poll();
 			const { days, hours, minutes } = currentPoll;
@@ -70,37 +72,42 @@ export default props => {
 			setQuipStore("quips", quips => [post, ...quips]);
 			resetEditor();
 			if (props.isReply) {
-				currentInstance.closest(".action-bar").querySelector(".action-buttons > div:last-child").click();
+				currentInstance.closest(".action-bar").querySelector(".hstack > button:last-child").click();
 			}
 		}
 	};
 	const characterLimitExceeded = createMemo(() => charCount() < 0);
-	onMount(() => {
+	const toggleEmojiPopup = event => {
+		emojiPopup?.close();
 		emojiPopup = createPopup(
 			{
 				emojiSize: "1.25rem",
 				showAnimation: false,
-				showVariants: false
+				showVariants: false,
+				theme: "autoTheme"
 			},
 			{
-				position: {
-					top: "1rem",
-					right: "1rem"
-				},
+				referenceElement: event.target,
 				hideOnClickOutside: false,
 				hideOnEmojiSelect: false,
 				showCloseButton: true,
-				hideOnEscape: true
+				hideOnEscape: true,
+				onPositionLost: "close"
 			}
 		);
 		emojiPopup.addEventListener("emoji:select", selection => {
-			position(editableDiv, caret());
-			insertEmojo(editableDiv, selection.emoji, updateEditor);
+			position(plainTextInput, caret());
+			insertEmojo(plainTextInput, selection.emoji, updateEditor);
 		});
-	});
+		emojiPopup.addEventListener("picker:open", () => setHasEmojiPicker(true));
+		emojiPopup.addEventListener("picker:close", () => setHasEmojiPicker(false));
+		emojiPopup.open();
+	};
 	return (
 		<div ref={currentInstance} {...props} class="editor border rounded p-2 overflow-hidden">
-			<div ref={editableDiv} class="p-2 outline-0" contentEditable={true} onInput={updateEditor} onBlur={_ => setCaret(position(editableDiv).pos)}></div>
+			<div class="autogrow" tabIndex={-1}>
+				<textarea ref={plainTextInput} onFocus={() => editorLineHeight = parseInt(getComputedStyle(plainTextInput)?.lineHeight)} onInput={updateEditor} onBlur={() => setCaret(position(plainTextInput).pos)}></textarea>
+			</div>
 			<Show when={hasPoll()}>
 				<div class="card mb-1" onInput={updatePoll}>
 					<div class="card-body px-2">
@@ -157,7 +164,7 @@ export default props => {
 				</div>
 			</Show>
 			<Show when={mediaFile()}>
-				<div class="d-inline-block position-relative card-body pt-0 media-preview" onClick={_ => setMediaFile()}>
+				<div class="d-inline-block position-relative card-body pt-0 media-preview" onClick={() => setMediaFile()}>
 					<img class="img-fluid" src={URL.createObjectURL(mediaFile())}/>
 					<button class="position-absolute top-0 end-0 btn btn-danger border m-1">
 						<VsChromeClose/>
@@ -168,15 +175,15 @@ export default props => {
 				<div class="emoji-bar">
 					<For each={popularEmoji}>
 					{
-						(emojo, index) => <div onClick={_ => insertEmojo(editableDiv, emojo, updateEditor)}>{emojo}</div>
+						(emojo, index) => <div onClick={() => insertEmojo(plainTextInput, emojo, updateEditor)}>{emojo}</div>
 					}
 					</For>
 				</div>
-				<button ref={emojiTrigger} class="btn btn-primary btn-sm px-3 rounded-pill ms-2" onClick={_ => emojiPopup.toggle()}>&#x2026;</button>
-				<div class="char-count" classList={{ "bg-danger": characterLimitExceeded() }}>{charCount()}</div>
-				<button class="btn btn-sm px-3 rounded-pill ms-2" classList={{ "btn-secondary": !hasPoll(), "btn-primary": hasPoll() }} onClick={_ => setHasPoll(!hasPoll())}><BiRegularPoll class="poll-icon"/></button>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" onClick={_ => mediaFileInput.click()}><BsImage/></button>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={_ => makeQuip()}>Post</button>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ "active": hasEmojiPicker() }} onClick={toggleEmojiPopup}>&#x2026;</button>
+				<div class="char-count" classList={{ "bg-danger text-light": characterLimitExceeded() }}>{charCount()}</div>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ "active": hasPoll() }} onClick={() => setHasPoll(!hasPoll())}><BiRegularPoll class="poll-icon"/></button>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" onClick={() => mediaFileInput.click()}><BsImage/></button>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={() => makeQuip()}>Post</button>
 				<input ref={mediaFileInput} onInput={event => setMediaFile(event.target.files?.[0])} class="visually-hidden" type="file"/>
 			</div>
 		</div>

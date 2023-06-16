@@ -117,30 +117,40 @@ export const removeFormatting = elem => {
 	removeDescendantAttributes(elem);
 	const originalHtml = elem.innerHTML;
 	const cleanHtml = originalHtml === "<br>" ? "" : originalHtml.replace(/<\/?(?:(?!\/?(div|br))).*?>/g, "");
-	if(originalHtml !== cleanHtml) {
+	if (originalHtml !== cleanHtml) {
 		const pos = position(elem).pos;
 		elem.innerHTML = cleanHtml;
 		position(elem, pos);
 	}
 };
 
-export const innerHtmlAsText = elem => {
-	return elem.innerHTML.replace(/<div><br><\/div>/g, "\n").replace(/<div>(.*?)<\/div>/g, "$1\n").replace(/<br>/g, "\n").replace(/&nbsp;/g, " ").trimEnd();
-};
+export const innerHtmlAsText = elem =>
+	elem.innerHTML
+		.replace(/<div><br><\/div>/g, "\n")
+		.replace(/<div>(.*?)<\/div>/g, "$1\n")
+		.replace(/<br>/g, "\n")
+		.replace(/&nbsp;/g, " ")
+		.trimEnd();
 
-export const insertTextAtCaret = text => {
-	let selection = window.getSelection();
-	let range = selection.getRangeAt(0);
-	range.deleteContents();
-	range.insertNode(document.createTextNode(text));
-	selection.collapseToEnd();
-	range = null;
-	selection = null;
+export const insertTextAtCaret = (elem, text) => {
+	const currentValue = elem.value;
+	const owner = elem.ownerDocument;
+	if (typeof elem.selectionStart == "number" && typeof elem.selectionEnd == "number") {
+		const endIndex = elem.selectionEnd;
+		elem.value = currentValue.slice(0, endIndex) + text + currentValue.slice(endIndex);
+		elem.selectionStart = elem.selectionEnd = endIndex + text.length;
+	} else if (owner.selection != "undefined" && owner.selection.createRange) {
+		elem.focus();
+		const range = owner.selection.createRange();
+		range.collapse(false);
+		range.text = text;
+		range.select();
+	}
 };
 
 export const insertEmojo = (elem, emojo, callback = null) => {
 	elem.focus();
-	insertTextAtCaret(emojo);
+	insertTextAtCaret(elem, emojo);
 	callback?.();
 };
 
