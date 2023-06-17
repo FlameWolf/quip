@@ -21,7 +21,7 @@ const defaultAuthData = {
 	createdAt: undefined,
 	expiresIn: undefined
 };
-const authData = Object.assign({}, defaultAuthData);
+const authData = {};
 
 const validateToken = value => {
 	if (value.authToken) {
@@ -123,6 +123,10 @@ const dispatch = async ({ action, payload }) => {
 	);
 	authChannel.close();
 };
+
+self.addEventListener("DOMContentLoaded", async event => {
+	await getAuthData();
+});
 
 self.addEventListener("message", async event => await dispatch(event.data));
 

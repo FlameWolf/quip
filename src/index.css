@@ -164,6 +164,9 @@ body {
 	border-width: var(--bs-border-width) !important;
 	border-color: var(--bs-border-color) !important;
 }
+.picmo__picker .picmo__searchContainer .picmo__searchAccessory svg {
+	fill: var(--bs-body-color) !important;
+}
 .picmo__popupContainer .picmo__closeButton:hover {
 	background-color: var(--bs-red) !important;
 }
