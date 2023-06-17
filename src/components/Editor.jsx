@@ -79,7 +79,10 @@ export default props => {
 	};
 	const characterLimitExceeded = createMemo(() => charCount() < 0);
 	const toggleEmojiPopup = event => {
-		emojiPopup?.close();
+		if(emojiPopup) {
+			emojiPopup.toggle();
+			return;
+		}
 		emojiPopup = createPopup(
 			{
 				emojiSize: "1.25rem",
