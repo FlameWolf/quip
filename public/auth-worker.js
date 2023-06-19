@@ -124,7 +124,7 @@ const dispatch = async ({ action, payload }) => {
 	authChannel.close();
 };
 
-self.addEventListener("DOMContentLoaded", async event => {
+self.addEventListener("load", async event => {
 	await getAuthData();
 });
 
