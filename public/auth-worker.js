@@ -1,5 +1,6 @@
 "use strict";
 
+const envKey = "env";
 const env = {
 	apiBaseUrl: undefined,
 	authBaseUrl: undefined,
@@ -21,7 +22,7 @@ const defaultAuthData = {
 	createdAt: undefined,
 	expiresIn: undefined
 };
-const authData = {};
+const authData = Object.assign({}, defaultAuthData);
 
 const validateToken = value => {
 	if (value.authToken) {
@@ -49,6 +50,26 @@ const refreshToken = async value => {
 	});
 };
 
+const setEnv = async value => {
+	Object.assign(env, value);
+	const envCache = await caches.open(envKey);
+	await envCache.put(
+		"/",
+		new Response(JSON.stringify(env), {
+			status: 200,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		})
+	);
+};
+
+const getEnv = async () => {
+	const envCache = await caches.open(envKey);
+	const cachedEnvData = await envCache.match("/");
+	Object.assign(env, cachedEnvData ? await cachedEnvData.json() : {});
+};
+
 const setAuthData = async value => {
 	Object.assign(authData, value);
 	const authCache = await caches.open(env.authCacheName);
@@ -66,7 +87,24 @@ const setAuthData = async value => {
 const getAuthData = async () => {
 	const authCache = await caches.open(env.authCacheName);
 	const cachedAuthData = await authCache.match("/");
-	Object.assign(authData, cachedAuthData ? await cachedAuthData.json() : defaultAuthData);
+	Object.assign(authData, cachedAuthData ? await cachedAuthData.json() : {});
+};
+
+const interceptRequest = async request => {
+	const url = request.url;
+	if (!env.authCacheName) {
+		await getEnv();
+	}
+	if (!authData.authToken) {
+		await getAuthData();
+	}
+	if (url.startsWith(env.authBaseUrl)) {
+		return await interceptAuthRequest(request);
+	}
+	if (url.startsWith(env.apiBaseUrl)) {
+		return await interceptApiRequest(request);
+	}
+	return await fetch(request);
 };
 
 const interceptAuthRequest = async request => {
@@ -105,7 +143,7 @@ const dispatch = async ({ action, payload }) => {
 			await getAuthData();
 			break;
 		default:
-			Object.assign(env, payload);
+			await setEnv(payload);
 			return;
 	}
 	const authChannel = new BroadcastChannel(env.authChannelName);
@@ -124,18 +162,8 @@ const dispatch = async ({ action, payload }) => {
 	authChannel.close();
 };
 
-self.addEventListener("load", async event => {
-	await getAuthData();
-});
-
 self.addEventListener("message", async event => await dispatch(event.data));
 
 self.addEventListener("fetch", event => {
-	const request = event.request;
-	const url = request.url;
-	if (url.startsWith(env.authBaseUrl)) {
-		event.respondWith(interceptAuthRequest(request));
-	} else if (url.startsWith(env.apiBaseUrl)) {
-		event.respondWith(interceptApiRequest(request));
-	}
+	event.respondWith(interceptRequest(event.request));
 });
