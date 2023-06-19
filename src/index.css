@@ -154,10 +154,15 @@ body {
 .picmo__picker.autoTheme {
 	background-color: var(--bs-body-bg) !important;
 	color: var(--bs-body-color) !important;
-	width: 24rem !important;
 	border-style: solid !important;
 	border-width: var(--bs-border-width) !important;
 	border-color: var(--bs-border-color) !important;
+}
+.picmo__picker > .picmo__header > .categoryButtonsContainer {
+	--category-count: 0;
+}
+.picmo__picker .picmo__emojiContainer {
+	width: fit-content;
 }
 .picmo__picker .picmo__searchContainer .picmo__searchField {
 	border-style: solid !important;

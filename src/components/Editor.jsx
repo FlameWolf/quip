@@ -1,6 +1,6 @@
 import { createPopup } from "@picmo/popup-picker";
 import { position } from "caret-pos";
-import { createMemo, createSignal, For, Show } from "solid-js";
+import { createSignal, createMemo, onMount, Show, For } from "solid-js";
 import { contentLengthRegExp, insertEmojo, maxContentLength, popularEmoji } from "../library";
 import { BsImage } from "solid-icons/bs";
 import { BiRegularPoll } from "solid-icons/bi";
@@ -14,6 +14,7 @@ const createReplyUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/reply`;
 export default props => {
 	let currentInstance;
 	let plainTextInput;
+	let emojiTrigger;
 	let emojiPopup;
 	let mediaFileInput;
 	let editorLineHeight;
@@ -78,39 +79,37 @@ export default props => {
 		}
 	};
 	const characterLimitExceeded = createMemo(() => charCount() < 0);
-	const toggleEmojiPopup = event => {
-		if(emojiPopup) {
-			emojiPopup.toggle();
-			return;
-		}
-		emojiPopup = createPopup(
-			{
-				emojiSize: "1.25rem",
-				showAnimation: false,
-				showVariants: false,
-				theme: "autoTheme"
-			},
-			{
-				referenceElement: event.target,
-				hideOnClickOutside: false,
-				hideOnEmojiSelect: false,
-				showCloseButton: true,
-				hideOnEscape: true,
-				onPositionLost: "close"
-			}
-		);
-		emojiPopup.addEventListener("emoji:select", selection => {
-			position(plainTextInput, caret());
-			insertEmojo(plainTextInput, selection.emoji, updateEditor);
+	onMount(() => {
+		setTimeout(() => {
+			editorLineHeight = parseInt(getComputedStyle(plainTextInput).lineHeight);
+			emojiPopup = createPopup(
+				{
+					emojiSize: "1.25rem",
+					showAnimation: false,
+					showVariants: false,
+					theme: "autoTheme"
+				},
+				{
+					referenceElement: emojiTrigger,
+					hideOnClickOutside: false,
+					hideOnEmojiSelect: false,
+					showCloseButton: false,
+					hideOnEscape: true,
+					onPositionLost: "close"
+				}
+			);
+			emojiPopup.addEventListener("emoji:select", selection => {
+				position(plainTextInput, caret());
+				insertEmojo(plainTextInput, selection.emoji, updateEditor);
+			});
+			emojiPopup.addEventListener("picker:open", () => setHasEmojiPicker(true));
+			emojiPopup.addEventListener("picker:close", () => setHasEmojiPicker(false));
 		});
-		emojiPopup.addEventListener("picker:open", () => setHasEmojiPicker(true));
-		emojiPopup.addEventListener("picker:close", () => setHasEmojiPicker(false));
-		emojiPopup.open();
-	};
+	});
 	return (
 		<div ref={currentInstance} {...props} class="editor border rounded p-2 overflow-hidden">
 			<div class="autogrow" tabIndex={-1}>
-				<textarea ref={plainTextInput} onFocus={() => editorLineHeight = parseInt(getComputedStyle(plainTextInput)?.lineHeight)} onInput={updateEditor} onBlur={() => setCaret(position(plainTextInput).pos)}></textarea>
+				<textarea ref={plainTextInput} onInput={updateEditor} onBlur={() => setCaret(position(plainTextInput).pos)}></textarea>
 			</div>
 			<Show when={hasPoll()}>
 				<div class="card mb-1" onInput={updatePoll}>
@@ -183,7 +182,7 @@ export default props => {
 					}
 					</For>
 				</div>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ "active": hasEmojiPicker() }} onClick={toggleEmojiPopup}>&#x2026;</button>
+				<button ref={emojiTrigger} class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ "active": hasEmojiPicker() }} onClick={() => emojiPopup.toggle()}>&#x2026;</button>
 				<div class="char-count" classList={{ "bg-danger text-light": characterLimitExceeded() }}>{charCount()}</div>
 				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ "active": hasPoll() }} onClick={() => setHasPoll(!hasPoll())}><BiRegularPoll class="poll-icon"/></button>
 				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" onClick={() => mediaFileInput.click()}><BsImage/></button>
