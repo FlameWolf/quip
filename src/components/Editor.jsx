@@ -1,10 +1,13 @@
-import { createPopup } from "@picmo/popup-picker";
-import { position } from "caret-pos";
 import { createSignal, createMemo, onMount, Show, For } from "solid-js";
+import emojiData from "@emoji-mart/data";
+import { Picker } from "emoji-mart";
+import { computePosition, autoUpdate, offset, autoPlacement } from "@floating-ui/dom";
+import { position } from "caret-pos";
 import { contentLengthRegExp, insertEmojo, maxContentLength, popularEmoji } from "../library";
 import { BsImage } from "solid-icons/bs";
 import { BiRegularPoll } from "solid-icons/bi";
 import { VsChromeClose } from "solid-icons/vs";
+import { themeStore } from "../stores/theme-store";
 import { setQuipStore } from "../stores/quip-store";
 import { authStore } from "../stores/auth-store";
 
@@ -14,8 +17,8 @@ const createReplyUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/reply`;
 export default props => {
 	let currentInstance;
 	let plainTextInput;
+	let emojiPickerContainer;
 	let emojiTrigger;
-	let emojiPopup;
 	let mediaFileInput;
 	let editorLineHeight;
 	const [caret, setCaret] = createSignal(0);
@@ -79,35 +82,32 @@ export default props => {
 		}
 	};
 	const characterLimitExceeded = createMemo(() => charCount() < 0);
+	const dismissEmojiPicker = event => {
+		const sender = event.target;
+		if(sender != emojiTrigger && sender.getRootNode?.()?.host?.tagName != "EM-EMOJI-PICKER") {
+			setHasEmojiPicker(false);
+		}
+	};
+	const toggleEmojiMart = () => {
+		autoUpdate(emojiTrigger, emojiPickerContainer, () => {
+			computePosition(emojiTrigger, emojiPickerContainer, {
+				middleware: [offset(4), autoPlacement()]
+			}).then(({ x, y }) => {
+				Object.assign(emojiPickerContainer.style, {
+					left: `${x}px`,
+					top: `${y}px`
+				});
+			});
+		});
+		setHasEmojiPicker(!hasEmojiPicker());
+	}
 	onMount(() => {
 		setTimeout(() => {
 			editorLineHeight = parseInt(getComputedStyle(plainTextInput).lineHeight);
-			emojiPopup = createPopup(
-				{
-					emojiSize: "1.25rem",
-					showAnimation: false,
-					showVariants: false,
-					theme: "autoTheme"
-				},
-				{
-					referenceElement: emojiTrigger,
-					hideOnClickOutside: false,
-					hideOnEmojiSelect: false,
-					showCloseButton: false,
-					hideOnEscape: true,
-					onPositionLost: "close"
-				}
-			);
-			emojiPopup.addEventListener("emoji:select", selection => {
-				position(plainTextInput, caret());
-				insertEmojo(plainTextInput, selection.emoji, updateEditor);
-			});
-			emojiPopup.addEventListener("picker:open", () => setHasEmojiPicker(true));
-			emojiPopup.addEventListener("picker:close", () => setHasEmojiPicker(false));
 		});
 	});
 	return (
-		<div ref={currentInstance} {...props} class="editor border rounded p-2 overflow-hidden">
+		<div ref={currentInstance} {...props} class="editor border rounded p-2 overflow-hidden" onClick={dismissEmojiPicker}>
 			<div class="autogrow" tabIndex={-1}>
 				<textarea ref={plainTextInput} onInput={updateEditor} onBlur={() => setCaret(position(plainTextInput).pos)}></textarea>
 			</div>
@@ -182,7 +182,19 @@ export default props => {
 					}
 					</For>
 				</div>
-				<button ref={emojiTrigger} class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ "active": hasEmojiPicker() }} onClick={() => emojiPopup.toggle()}>&#x2026;</button>
+				<div ref={emojiPickerContainer} class="emoji-picker-container border rounded" classList={{ "d-none": !hasEmojiPicker() }}>
+				<button style="" class="btn btn-danger btn-sm p-0 rounded-50">
+					<i class="bi bi-x-lg"></i>
+				</button>
+				{
+					new Picker({
+						data: emojiData,
+						theme: themeStore.theme,
+						onEmojiSelect: event => insertEmojo(plainTextInput, event.native, updateEditor)
+					})
+				}
+				</div>
+				<button ref={emojiTrigger} class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ "active": hasEmojiPicker() }} onClick={toggleEmojiMart}>&#x2026;</button>
 				<div class="char-count" classList={{ "bg-danger text-light": characterLimitExceeded() }}>{charCount()}</div>
 				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ "active": hasPoll() }} onClick={() => setHasPoll(!hasPoll())}><BiRegularPoll class="poll-icon"/></button>
 				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" onClick={() => mediaFileInput.click()}><BsImage/></button>

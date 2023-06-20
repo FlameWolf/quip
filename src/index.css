@@ -2,8 +2,14 @@ body {
 	font-family: Inter;
 }
 .btn-theme-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	width: 1.75rem;
 	height: 1.75rem;
+	position: absolute;
+	top: 0;
+	right: 0;
 }
 .rounded-50 {
 	border-radius: 50%;
@@ -151,29 +157,25 @@ body {
 .card-footer > .row > .col-4 > div {
 	background-color: var(--bs-border-color);
 }
-.picmo__picker.autoTheme {
-	background-color: var(--bs-body-bg) !important;
-	color: var(--bs-body-color) !important;
-	border-style: solid !important;
-	border-width: var(--bs-border-width) !important;
-	border-color: var(--bs-border-color) !important;
+.emoji-picker-container {
+	width: max-content;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
 }
-.picmo__picker > .picmo__header > .categoryButtonsContainer {
-	--category-count: 0;
-}
-.picmo__picker .picmo__emojiContainer {
-	width: fit-content;
-}
-.picmo__picker .picmo__searchContainer .picmo__searchField {
-	border-style: solid !important;
-	border-width: var(--bs-border-width) !important;
-	border-color: var(--bs-border-color) !important;
-}
-.picmo__picker .picmo__searchContainer .picmo__searchAccessory svg {
-	fill: var(--bs-body-color) !important;
-}
-.picmo__popupContainer .picmo__closeButton:hover {
-	background-color: var(--bs-red) !important;
+.emoji-picker-container > .btn.btn-danger {
+	display: flex;
+	width: 1.5rem;
+	height: 1.5rem;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	top: 0;
+	right: 0;
+	filter: drop-shadow(0 0 1px var(--bs-body-color));
+	transform: translateX(25%) translateY(-25%);
+	z-index: 3;
 }
 .emoji-bar {
 	display: flex;

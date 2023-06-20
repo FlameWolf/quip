@@ -1,6 +1,6 @@
+import { createSignal, Show } from "solid-js";
 import { BsChatRight, BsStar, BsStarFill } from "solid-icons/bs";
 import { FiRepeat } from "solid-icons/fi";
-import { createSignal, Show } from "solid-js";
 import { authStore } from "../stores/auth-store";
 import { formatTimeAgo, toLongDateString } from "../library";
 import DisplayPoll from "./DisplayPoll";
@@ -56,7 +56,7 @@ export default props => {
 	};
 	return (
 		<>
-			<div data-post-id={postId} class="list-group-item p-0 overflow-hidden" classList={{ "has-reply": props.hasReplies, "reply": props.isReply }}>
+			<div data-post-id={postId} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, "reply": props.isReply }}>
 				<div class="post-header">
 					<a class="handle" href={`/${handle}`}>{handle}</a>
 					<Show when={props.parentBlurb}>

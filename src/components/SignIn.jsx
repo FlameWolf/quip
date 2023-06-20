@@ -1,8 +1,8 @@
+import { createSignal, onMount, Show } from "solid-js";
 import { Popover } from "bootstrap";
 import { useNavigate } from "@solidjs/router";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
-import { createSignal, onMount, Show } from "solid-js";
 
 const signInUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/sign-in`;
 

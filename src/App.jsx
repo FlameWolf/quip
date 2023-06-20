@@ -1,6 +1,9 @@
+import { lazy, createEffect, onMount, onCleanup } from "solid-js";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "@solidjs/router";
-import { lazy, createSignal, createEffect, onMount, onCleanup } from "solid-js";
+import { lightTheme, darkTheme } from "./library";
+import { themeStore, setThemeStore } from "./stores/theme-store";
 import { authStore, setAuthStore } from "./stores/auth-store";
+
 const Auth = lazy(() => import("./components/Auth"));
 const SignUp = lazy(() => import("./components/SignUp"));
 const SignIn = lazy(() => import("./components/SignIn"));
@@ -27,15 +30,12 @@ navigator.serviceWorker.controller?.postMessage({
 export default () => {
 	const authChannel = new BroadcastChannel(authChannelName);
 	const protectedRoutes = ["/", "/home"];
-	const lightTheme = "light";
-	const darkTheme = "dark";
-	const [theme, setTheme] = createSignal(localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
 	createEffect(() => {
-		document.body.parentElement.setAttribute("data-bs-theme", theme());
-		localStorage.setItem("theme", theme());
+		const theme = themeStore.theme;
+		document.body.parentElement.setAttribute("data-bs-theme", theme);
+		localStorage.setItem("theme", theme);
 	});
-	const isDark = () => theme() === darkTheme;
-	const updateTheme = () => setTheme(isDark() ? lightTheme : darkTheme);
+	const updateTheme = () => setThemeStore("theme", themeStore.isLight ? darkTheme : lightTheme);
 	onMount(() => {
 		const location = useLocation();
 		const navigate = useNavigate();
@@ -69,8 +69,8 @@ export default () => {
 					</Routes>
 				</div>
 			</div>
-			<button class="d-flex align-items-center justify-content-center bg-secondary text-light btn-theme-toggle position-absolute top-0 end-0 p-0 border-0 rounded-50 mt-1 me-1" tabIndex={1} onClick={updateTheme}>
-				<i class="bi" classList={{ "bi-sun-fill": isDark(), "bi-moon-fill": !isDark() }}></i>
+			<button class="bg-secondary text-light btn-theme-toggle p-0 border-0 rounded-50 mt-1 me-1" tabIndex={1} onClick={updateTheme}>
+				<i class="bi" classList={{ "bi-moon-fill": themeStore.isLight, "bi-sun-fill": themeStore.isDark }}></i>
 			</button>
 		</>
 	);
