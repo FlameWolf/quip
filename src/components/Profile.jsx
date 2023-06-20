@@ -1,5 +1,5 @@
 import { useParams } from "@solidjs/router";
-import { createSignal, For, onMount, Show } from "solid-js";
+import { createEffect, createSignal, For, onMount, Show } from "solid-js";
 import { BsPersonBadgeFill } from "solid-icons/bs";
 import { authStore } from "../stores/auth-store";
 import { maxPostsToFetch } from "../library";
@@ -28,7 +28,7 @@ export default props => {
 			setIsSelf(user.self);
 			setFollowed(user.followedByMe);
 			setMuted(user.mutedByMe);
-			setBlocked(user.setBlocked);
+			setBlocked(user.blockedByMe);
 			setFollowsMe(user.followedMe);
 		}
 	};
@@ -44,6 +44,18 @@ export default props => {
 		}
 		setLoadedQuips([...loadedQuips(), ...posts]);
 	};
+	const toggleAction = async (action, flag, setFlag) => {
+		const actionUrl = `${profileBaseUrl}/${flag ? `un${action}` : action}/${params.handle}`;
+		const response = await fetch(actionUrl);
+		if(response.status === 200) {
+			setFlag(!flag);
+		}
+	};
+	createEffect(() => {
+		if(blocked() && followsMe()) {
+			setFollowsMe(false);
+		}
+	});
 	onMount(async () => {
 		await loadUser();
 		await loadUserQuips();
@@ -63,9 +75,9 @@ export default props => {
 								<Show when={followsMe()}>
 									<div class="badge bg-secondary">Follows you</div>
 								</Show>
-								<button class="btn btn-sm btn-primary">{followed() ? "Unflollow" : "Follow"}</button>
-								<button class="btn btn-sm btn-primary">{muted() ? "Unmute" : "Mute"}</button>
-								<button class="btn btn-sm btn-danger">{blocked() ? "Unblock": "Block"}</button>
+								<button class="btn btn-sm btn-primary" onClick={() => toggleAction("follow", followed(), setFollowed)}>{followed() ? "Unflollow" : "Follow"}</button>
+								<button class="btn btn-sm btn-primary" onClick={() => toggleAction("mute", muted(), setMuted)}>{muted() ? "Unmute" : "Mute"}</button>
+								<button class="btn btn-sm btn-danger" onClick={() => toggleAction("block", blocked(), setBlocked)}>{blocked() ? "Unblock": "Block"}</button>
 							</div>
 						</Show>
 					</div>
