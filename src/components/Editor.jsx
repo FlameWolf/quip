@@ -2,7 +2,6 @@ import { createSignal, createMemo, onMount, Show, For } from "solid-js";
 import emojiData from "@emoji-mart/data";
 import { Picker } from "emoji-mart";
 import { computePosition, autoUpdate, offset, autoPlacement } from "@floating-ui/dom";
-import { position } from "caret-pos";
 import { contentLengthRegExp, insertEmojo, maxContentLength, popularEmoji } from "../library";
 import { BsImage } from "solid-icons/bs";
 import { BiRegularPoll } from "solid-icons/bi";
@@ -39,10 +38,10 @@ export default props => {
 		setPoll({ ...poll(), [sender.name]: sender.value });
 	};
 	const resetEditor = () => {
-		plainTextInput.value = "";
-		setHasPoll(false);
 		setMediaFile();
-		setCharCount(maxContentLength);
+		setHasPoll(false);
+		plainTextInput.value = "";
+		updateEditor();
 	};
 	const makeQuip = async () => {
 		const parentPostId = currentInstance.dataset.parentPostId;
@@ -109,7 +108,7 @@ export default props => {
 	return (
 		<div ref={currentInstance} {...props} class="editor border rounded p-2 overflow-hidden" onClick={dismissEmojiPicker}>
 			<div class="autogrow" tabIndex={-1}>
-				<textarea ref={plainTextInput} onInput={updateEditor} onBlur={() => setCaret(position(plainTextInput).pos)}></textarea>
+				<textarea ref={plainTextInput} onInput={updateEditor}></textarea>
 			</div>
 			<Show when={hasPoll()}>
 				<div class="card mb-1" onInput={updatePoll}>
