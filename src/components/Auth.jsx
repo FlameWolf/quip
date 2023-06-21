@@ -11,6 +11,7 @@ export default props => {
 				</div>
 				<div class="hstack gap-2 justify-content-center w-100 py-2">
 					<span class="fw-bold fst-italic">noun</span>
+					<span>&#xB7;</span>
 					<span>a witty remark</span>
 				</div>
 			</div>

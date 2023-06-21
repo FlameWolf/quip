@@ -27,7 +27,10 @@ body {
 	}
 }
 .logo {
-	filter: drop-shadow(0 0 0.25rem var(--bs-body-color));
+	filter: invert(20%);
+}
+:root[data-bs-theme="dark"] .logo {
+	filter: invert(80%);
 }
 .auth-panel {
 	max-width: 640px;
