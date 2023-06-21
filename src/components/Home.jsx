@@ -1,4 +1,5 @@
 import { createMemo, createSignal, For, onMount } from "solid-js";
+import { useNavigate } from "@solidjs/router";
 import { trimPost } from "../library";
 import { quipStore, setQuipStore } from "../stores/quip-store";
 import DisplayPost from "./DisplayPost";
@@ -9,17 +10,25 @@ const postsUrl = `${import.meta.env.VITE_API_BASE_URL}/timeline`;
 export default props => {
 	let loadMoreButton;
 	const [lastPostId, setLastPostId] = createSignal("");
+	const navigate = useNavigate();
 	const loadPosts = async (lastPostId = undefined) => {
 		const response = await fetch(lastPostId ? `${postsUrl}?lastPostId=${lastPostId}` : postsUrl);
-		if (response.status === 200) {
-			const posts = (await response.json()).posts;
-			if (posts.length) {
-				setQuipStore("quips", quips => [...quips, ...posts]);
-				setLastPostId(posts.at(-1)._id);
-				return;
-			}
-			loadMoreButton.textContent = "No More Posts";
-			loadMoreButton.disabled = true;
+		switch (response.status) {
+			case 200:
+				const posts = (await response.json()).posts;
+				if (posts.length) {
+					setQuipStore("quips", quips => [...quips, ...posts]);
+					setLastPostId(posts.at(-1)._id);
+					return;
+				}
+				loadMoreButton.textContent = "No More Posts";
+				loadMoreButton.disabled = true;
+				break;
+			case 401:
+				navigate("/auth");
+				break;
+			default:
+				break;
 		}
 	};
 	onMount(async () => {
