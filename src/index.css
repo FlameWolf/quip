@@ -14,24 +14,27 @@ body {
 .rounded-50 {
 	border-radius: 50%;
 }
+.page-container {
+	max-width: 100rem;
+	margin: auto;
+}
 @media (min-width: 768px) {
 	.page-container {
 		padding-left: 6.25%;
 		padding-right: 6.25%;
 	}
 }
+.auth-panel {
+	max-width: 60rem;
+	margin: auto;
+}
 .logo {
 	width: 240px;
+	max-width: 100%;
 	filter: invert(20%);
 }
 :root[data-bs-theme="dark"] .logo {
 	filter: invert(80%);
-}
-.logo-panel {
-	width: 20rem;
-}
-.form-panel {
-	max-width: 36rem;
 }
 .card-header > .hstack > a.active {
 	color: unset;
