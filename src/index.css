@@ -20,21 +20,18 @@ body {
 		padding-right: 6.25%;
 	}
 }
-@media (min-width: 1024px) {
-	.page-container {
-		padding-left: 12.5%;
-		padding-right: 12.5%;
-	}
-}
 .logo {
+	width: 240px;
 	filter: invert(20%);
 }
 :root[data-bs-theme="dark"] .logo {
 	filter: invert(80%);
 }
-.auth-panel {
-	max-width: 640px;
-	margin: 0 auto;
+.logo-panel {
+	width: 20rem;
+}
+.form-panel {
+	max-width: 36rem;
 }
 .card-header > .hstack > a.active {
 	color: unset;
