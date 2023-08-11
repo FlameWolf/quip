@@ -135,7 +135,7 @@ export const insertTextAtCaret = (elem, text) => {
 		const endIndex = elem.selectionEnd;
 		elem.value = currentValue.slice(0, endIndex) + text + currentValue.slice(endIndex);
 		elem.selectionStart = elem.selectionEnd = endIndex + text.length;
-	} else if (owner.selection != "undefined" && owner.selection.createRange) {
+	} else if (owner.selection !== "undefined" && owner.selection.createRange) {
 		elem.focus();
 		const range = owner.selection.createRange();
 		range.collapse(false);

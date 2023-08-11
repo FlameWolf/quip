@@ -83,7 +83,7 @@ export default props => {
 	const characterLimitExceeded = createMemo(() => charCount() < 0);
 	const dismissEmojiPicker = event => {
 		const sender = event.target;
-		if(sender != emojiTrigger && sender.getRootNode?.()?.host?.tagName != "EM-EMOJI-PICKER") {
+		if(sender !== emojiTrigger && sender.getRootNode?.()?.host?.tagName !== "EM-EMOJI-PICKER") {
 			setHasEmojiPicker(false);
 		}
 	};
