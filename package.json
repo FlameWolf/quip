@@ -11,22 +11,22 @@
 	},
 	"license": "MIT",
 	"devDependencies": {
-		"vite": "^4.4.8",
+		"vite": "^4.4.9",
 		"vite-plugin-solid": "^2.7.0"
 	},
 	"dependencies": {
 		"@emoji-mart/data": "^1.1.2",
-		"@floating-ui/dom": "^1.5.1",
+		"@floating-ui/dom": "^1.5.2",
 		"@popperjs/core": "^2.11.8",
-		"@solidjs/router": "^0.8.2",
+		"@solidjs/router": "^0.8.3",
 		"bootstrap": "^5.3.1",
-		"bootstrap-icons": "^1.10.5",
+		"bootstrap-icons": "^1.11.0",
 		"caret-pos": "^2.0.0",
 		"emoji-mart": "^5.5.2",
 		"inter-ui": "^3.19.3",
 		"node-emoji": "^2.1.0",
 		"picmo": "^5.8.5",
-		"solid-icons": "^1.0.11",
-		"solid-js": "^1.7.8"
+		"solid-icons": "^1.0.12",
+		"solid-js": "^1.7.11"
 	}
 }
