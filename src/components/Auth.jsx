@@ -1,4 +1,3 @@
-import { NavLink, Outlet } from "@solidjs/router";
 import logoUrl from "../assets/images/logo.svg";
 
 export default props => {
@@ -20,13 +19,13 @@ export default props => {
 				<div class="card">
 					<div class="card-header">
 						<div class="hstack gap-3">
-							<NavLink class="ms-auto" target="_self" href="sign-up">Sign Up</NavLink>
+							<a class="ms-auto" target="_self" href="/auth/sign-up">Sign Up</a>
 							<div class="vr"></div>
-							<NavLink class="me-auto" target="_self" href="sign-in">Sign In</NavLink>
+							<a class="me-auto" target="_self" href="/auth/sign-in">Sign In</a>
 						</div>
 					</div>
 					<div class="card-body text-center py-3">
-						<Outlet/>
+						{props.children}
 					</div>
 				</div>
 			</div>
