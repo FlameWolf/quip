@@ -17,13 +17,11 @@ render(
 	() => (
 		<Router root={App}>
 			<Route path="/auth" component={Auth}>
-				<Route path="/sign-up" component={SignUp}/>
 				<Route path="/sign-in" component={SignIn}/>
-				<Route path="/" component={SignUp}/>
+				<Route path={["/", "/sign-up"]} component={SignUp}/>
 			</Route>
-			<Route path="/home" component={Home}/>
 			<Route path="/:handle" component={Profile}/>
-			<Route path="/" component={Home}/>
+			<Route path={["/", "/home"]} component={Home}/>
 			<Route path="/*404" component={NotFound}/>
 		</Router>
 	),
