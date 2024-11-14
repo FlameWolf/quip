@@ -30,7 +30,7 @@ export default props => {
 	const updateEditor = () => {
 		const text = plainTextInput.value;
 		plainTextInput.parentNode.setAttribute("data-replicated-value", text);
-		plainTextInput.style.overflowY = plainTextInput.scrollHeight > (plainTextInput.offsetHeight + editorLineHeight) ? "scroll" : "";
+		plainTextInput.style.overflowY = plainTextInput.scrollHeight > plainTextInput.offsetHeight + editorLineHeight ? "scroll" : "";
 		setCharCount(maxContentLength - getCharCount(text.trim()));
 	};
 	const updatePoll = event => {
@@ -51,11 +51,7 @@ export default props => {
 			const currentPoll = poll();
 			const { days, hours, minutes } = currentPoll;
 			if (days || hours || minutes) {
-				currentPoll.duration = (
-					((parseInt(days) || 0) * 60 * 24) +
-					((parseInt(hours) || 0) * 60) +
-					(parseInt(minutes) || 0)
-				) * 60 * 1000;
+				currentPoll.duration = ((parseInt(days) || 0) * 60 * 24 + (parseInt(hours) || 0) * 60 + (parseInt(minutes) || 0)) * 60 * 1000;
 			}
 			delete currentPoll.minutes;
 			delete currentPoll.hours;
@@ -83,7 +79,7 @@ export default props => {
 	const characterLimitExceeded = createMemo(() => charCount() < 0);
 	const dismissEmojiPicker = event => {
 		const sender = event.target;
-		if(sender !== emojiTrigger && sender.getRootNode?.()?.host?.tagName !== "EM-EMOJI-PICKER") {
+		if (sender !== emojiTrigger && sender.getRootNode?.()?.host?.tagName !== "EM-EMOJI-PICKER") {
 			setHasEmojiPicker(false);
 		}
 	};
@@ -99,14 +95,14 @@ export default props => {
 			});
 		});
 		setHasEmojiPicker(!hasEmojiPicker());
-	}
+	};
 	onMount(() => {
 		setTimeout(() => {
 			editorLineHeight = parseInt(getComputedStyle(plainTextInput).lineHeight);
 		});
 	});
 	return (
-		<div ref={currentInstance} {...props} class="editor border rounded p-2 overflow-hidden" onClick={dismissEmojiPicker}>
+		<div ref={currentInstance} {...props} class="editor border rounded p-2 my-2 overflow-hidden" classList={{ "mx-2": props.isReply }} onClick={dismissEmojiPicker}>
 			<div class="autogrow" tabIndex={-1}>
 				<textarea ref={plainTextInput} onInput={updateEditor}></textarea>
 			</div>
@@ -127,11 +123,7 @@ export default props => {
 									<select name="days" class="form-select">
 										<option>0</option>
 										<option selected="true">1</option>
-										<For each={[...Array(5).keys()]}>
-										{
-											(day, index) => <option>{day + 2}</option>
-										}
-										</For>
+										<For each={[...Array(5).keys()]}>{(day, index) => <option>{day + 2}</option>}</For>
 									</select>
 								</div>
 							</div>
@@ -140,11 +132,7 @@ export default props => {
 									<p>Hours</p>
 									<select name="hours" class="form-select">
 										<option>0</option>
-										<For each={[...Array(23).keys()]}>
-										{
-											(hour, index) => <option>{hour + 1}</option>
-										}
-										</For>
+										<For each={[...Array(23).keys()]}>{(hour, index) => <option>{hour + 1}</option>}</For>
 									</select>
 								</div>
 							</div>
@@ -153,11 +141,7 @@ export default props => {
 									<p>Minutes</p>
 									<select name="minutes" class="form-select">
 										<option>0</option>
-										<For each={[...Array(59).keys()]}>
-										{
-											(minute, index) => <option>{minute + 1}</option>
-										}
-										</For>
+										<For each={[...Array(59).keys()]}>{(minute, index) => <option>{minute + 1}</option>}</For>
 									</select>
 								</div>
 							</div>
@@ -175,29 +159,35 @@ export default props => {
 			</Show>
 			<div class="d-flex justify-content-end pt-2 border-top">
 				<div class="emoji-bar">
-					<For each={popularEmoji}>
-					{
-						(emojo, index) => <div onClick={() => insertEmojo(plainTextInput, emojo, updateEditor)}>{emojo}</div>
-					}
-					</For>
+					<For each={popularEmoji}>{(emojo, index) => <div onClick={() => insertEmojo(plainTextInput, emojo, updateEditor)}>{emojo}</div>}</For>
 				</div>
 				<div ref={emojiPickerContainer} class="emoji-picker-container border rounded" classList={{ "d-none": !hasEmojiPicker() }}>
-				<button style="" class="btn btn-danger btn-sm p-0 rounded-50">
-					<i class="bi bi-x-lg"></i>
-				</button>
-				{
-					new Picker({
-						data: emojiData,
-						theme: themeStore.theme,
-						onEmojiSelect: event => insertEmojo(plainTextInput, event.native, updateEditor)
-					})
-				}
+					<button style="" class="btn btn-danger btn-sm p-0 rounded-50">
+						<i class="bi bi-x-lg"></i>
+					</button>
+					{
+						new Picker({
+							data: emojiData,
+							theme: themeStore.theme,
+							onEmojiSelect: event => insertEmojo(plainTextInput, event.native, updateEditor)
+						})
+					}
 				</div>
-				<button ref={emojiTrigger} class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ "active": hasEmojiPicker() }} onClick={toggleEmojiMart}>&#x2026;</button>
-				<div class="char-count" classList={{ "bg-danger text-light": characterLimitExceeded() }}>{charCount()}</div>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ "active": hasPoll() }} onClick={() => setHasPoll(!hasPoll())}><BiRegularPoll class="poll-icon"/></button>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" onClick={() => mediaFileInput.click()}><BsImage/></button>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={() => makeQuip()}>Post</button>
+				<button ref={emojiTrigger} class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ active: hasEmojiPicker() }} onClick={toggleEmojiMart}>
+					&#x2026;
+				</button>
+				<div class="char-count" classList={{ "bg-danger text-light": characterLimitExceeded() }}>
+					{charCount()}
+				</div>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ active: hasPoll() }} onClick={() => setHasPoll(!hasPoll())}>
+					<BiRegularPoll class="poll-icon"/>
+				</button>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" onClick={() => mediaFileInput.click()}>
+					<BsImage/>
+				</button>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={() => makeQuip()}>
+					Post
+				</button>
 				<input ref={mediaFileInput} onInput={event => setMediaFile(event.target.files?.[0])} class="visually-hidden" type="file"/>
 			</div>
 		</div>
