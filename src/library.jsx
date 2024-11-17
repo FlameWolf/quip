@@ -150,6 +150,10 @@ export const insertEmojo = (elem, emojo, callback = null) => {
 	callback?.();
 };
 
+const segmenter = new Intl.Segmenter();
+
+export const getGraphemeClusterCount = text => [...segmenter.segment(text)].length;
+
 export const trimPost = text => {
 	return text && text.length > 20 ? `${text.substring(0, 20)}&#x2026;` : text;
 };

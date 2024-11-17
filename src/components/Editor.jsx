@@ -2,7 +2,7 @@ import { createSignal, createMemo, onMount, Show, For } from "solid-js";
 import emojiData from "@emoji-mart/data";
 import { Picker } from "emoji-mart";
 import { computePosition, autoUpdate, offset, autoPlacement } from "@floating-ui/dom";
-import { contentLengthRegExp, insertEmojo, maxContentLength, popularEmoji } from "../library";
+import { getGraphemeClusterCount, insertEmojo, maxContentLength, popularEmoji } from "../library";
 import { BsImage } from "solid-icons/bs";
 import { BiRegularPoll } from "solid-icons/bi";
 import { VsChromeClose } from "solid-icons/vs";
@@ -26,12 +26,11 @@ export default props => {
 	const [hasPoll, setHasPoll] = createSignal(false);
 	const [poll, setPoll] = createSignal({});
 	const [mediaFile, setMediaFile] = createSignal();
-	const getCharCount = text => text.match(contentLengthRegExp)?.length || 0;
 	const updateEditor = () => {
 		const text = plainTextInput.value;
 		plainTextInput.parentNode.setAttribute("data-replicated-value", text);
 		plainTextInput.style.overflowY = plainTextInput.scrollHeight > plainTextInput.offsetHeight + editorLineHeight ? "scroll" : "";
-		setCharCount(maxContentLength - getCharCount(text.trim()));
+		setCharCount(maxContentLength - getGraphemeClusterCount(text.trim()));
 	};
 	const updatePoll = event => {
 		const sender = event.target;
