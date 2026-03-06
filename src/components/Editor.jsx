@@ -2,7 +2,7 @@ import { createSignal, createMemo, onMount, Show, For } from "solid-js";
 import emojiData from "@emoji-mart/data";
 import { Picker } from "emoji-mart";
 import { computePosition, autoUpdate, offset, autoPlacement } from "@floating-ui/dom";
-import { getGraphemeClusterCount, insertEmojo, maxContentLength, popularEmoji } from "../library";
+import { emptyString, getGraphemeClusterCount, insertEmojo, maxContentLength, popularEmoji } from "../library";
 import { BsImage } from "solid-icons/bs";
 import { BiRegularPoll } from "solid-icons/bi";
 import { VsChromeClose } from "solid-icons/vs";
@@ -29,7 +29,7 @@ export default props => {
 	const updateEditor = () => {
 		const text = plainTextInput.value;
 		plainTextInput.parentNode.setAttribute("data-replicated-value", text);
-		plainTextInput.style.overflowY = plainTextInput.scrollHeight > plainTextInput.offsetHeight + editorLineHeight ? "scroll" : "";
+		plainTextInput.style.overflowY = plainTextInput.scrollHeight > plainTextInput.offsetHeight + editorLineHeight ? "scroll" : emptyString;
 		setCharCount(maxContentLength - getGraphemeClusterCount(text.trim()));
 	};
 	const updatePoll = event => {
@@ -39,7 +39,7 @@ export default props => {
 	const resetEditor = () => {
 		setMediaFile();
 		setHasPoll(false);
-		plainTextInput.value = "";
+		plainTextInput.value = emptyString;
 		updateEditor();
 	};
 	const makeQuip = async () => {
@@ -161,7 +161,7 @@ export default props => {
 					<For each={popularEmoji}>{(emojo, index) => <div onClick={() => insertEmojo(plainTextInput, emojo, updateEditor)}>{emojo}</div>}</For>
 				</div>
 				<div ref={emojiPickerContainer} class="emoji-picker-container border rounded" classList={{ "d-none": !hasEmojiPicker() }}>
-					<button style="" class="btn btn-danger btn-sm p-0 rounded-50">
+					<button class="btn btn-danger btn-sm p-0 rounded-50">
 						<i class="bi bi-x-lg"></i>
 					</button>
 					{

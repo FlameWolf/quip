@@ -1,100 +1,16 @@
 import { position } from "caret-pos";
 import * as nodeEmoji from "node-emoji";
 
+export const emptyString = "";
 export const lightTheme = "light";
 export const darkTheme = "dark";
 export const handleRegExp = /^[A-Za-z][\w]{3,31}$/;
 export const passwordRegExp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
-export const invalidHandles = [
-	"auth",
-	"home",
-	"search",
-	"user",
-	"users",
-	"post",
-	"posts",
-	"quip",
-	"quips",
-	"favourite",
-	"favourites",
-	"unfavourite",
-	"repeat",
-	"repeats",
-	"unrepeat",
-	"reply",
-	"replies",
-	"profile",
-	"profiles",
-	"setting",
-	"settings",
-	"follow",
-	"followed",
-	"follows",
-	"following",
-	"follower",
-	"followers",
-	"unfollow",
-	"mute",
-	"muted",
-	"unmute",
-	"block",
-	"blocked",
-	"unblock",
-	"filter",
-	"filters",
-	"list",
-	"lists",
-	"bookmark",
-	"bookmarks",
-	"unbookmark",
-	"hashtag",
-	"hashtags",
-	"notification",
-	"notifications",
-	"message",
-	"messages",
-	"account",
-	"accounts",
-	"security",
-	"privacy",
-	"admin"
-];
+export const invalidHandles = ["auth", "home", "search", "user", "users", "post", "posts", "quip", "quips", "favourite", "favourites", "unfavourite", "repeat", "repeats", "unrepeat", "reply", "replies", "profile", "profiles", "setting", "settings", "follow", "followed", "follows", "following", "follower", "followers", "unfollow", "mute", "muted", "unmute", "block", "blocked", "unblock", "filter", "filters", "list", "lists", "bookmark", "bookmarks", "unbookmark", "hashtag", "hashtags", "notification", "notifications", "message", "messages", "account", "accounts", "security", "privacy", "admin"];
 export const contentLengthRegExp = /\p{L}\p{M}?|\S|\s/gu;
 export const maxContentLength = 256;
-export const maxPostsToFetch = 20;
-export const popularEmoji = [
-	nodeEmoji.get(":joy:"),
-	nodeEmoji.get(":heart:"),
-	nodeEmoji.get(":sob:"),
-	nodeEmoji.get(":heart_eyes:"),
-	nodeEmoji.get(":blush:"),
-	nodeEmoji.get(":two_hearts:"),
-	nodeEmoji.get(":kissing_heart:"),
-	nodeEmoji.get(":pensive:"),
-	nodeEmoji.get(":unamused:"),
-	nodeEmoji.get(":weary:"),
-	nodeEmoji.get(":grin:"),
-	nodeEmoji.get(":relaxed:"),
-	nodeEmoji.get(":pray:"),
-	nodeEmoji.get(":ok_hand:"),
-	nodeEmoji.get(":wink:"),
-	nodeEmoji.get(":+1:"),
-	nodeEmoji.get(":smirk:"),
-	nodeEmoji.get(":sweat_smile:"),
-	nodeEmoji.get(":fire:"),
-	nodeEmoji.get(":relieved:"),
-	nodeEmoji.get(":broken_heart:"),
-	nodeEmoji.get(":sunglasses:"),
-	nodeEmoji.get(":cry:"),
-	nodeEmoji.get(":flushed:"),
-	nodeEmoji.get(":sparkling_heart:"),
-	nodeEmoji.get(":see_no_evil:"),
-	nodeEmoji.get(":smiling_imp:"),
-	nodeEmoji.get(":scream:"),
-	nodeEmoji.get(":revolving_hearts:"),
-	nodeEmoji.get(":sleepy:"),
-	nodeEmoji.get(":confused:")
-];
+export const maxItemsToFetch = 20;
+export const popularEmoji = [nodeEmoji.get(":joy:"), nodeEmoji.get(":heart:"), nodeEmoji.get(":sob:"), nodeEmoji.get(":heart_eyes:"), nodeEmoji.get(":blush:"), nodeEmoji.get(":two_hearts:"), nodeEmoji.get(":kissing_heart:"), nodeEmoji.get(":pensive:"), nodeEmoji.get(":unamused:"), nodeEmoji.get(":weary:"), nodeEmoji.get(":grin:"), nodeEmoji.get(":relaxed:"), nodeEmoji.get(":pray:"), nodeEmoji.get(":ok_hand:"), nodeEmoji.get(":wink:"), nodeEmoji.get(":+1:"), nodeEmoji.get(":smirk:"), nodeEmoji.get(":sweat_smile:"), nodeEmoji.get(":fire:"), nodeEmoji.get(":relieved:"), nodeEmoji.get(":broken_heart:"), nodeEmoji.get(":sunglasses:"), nodeEmoji.get(":cry:"), nodeEmoji.get(":flushed:"), nodeEmoji.get(":sparkling_heart:"), nodeEmoji.get(":see_no_evil:"), nodeEmoji.get(":smiling_imp:"), nodeEmoji.get(":scream:"), nodeEmoji.get(":revolving_hearts:"), nodeEmoji.get(":sleepy:"), nodeEmoji.get(":confused:")];
 
 export const setCookie = (name, value, { path = undefined, domain = undefined, maxAge = undefined, expires = undefined, secure = undefined, sameSite = undefined }) => {
 	document.cookie = [`${name}=${value}`, path && `path=${path}`, domain && `domain=${domain}`, maxAge && `max-age=${maxAge}`, expires && `expires=${expires}`, secure && "secure", sameSite && `samesite=${sameSite}`].filter(x => x).join("; ");
@@ -102,7 +18,7 @@ export const setCookie = (name, value, { path = undefined, domain = undefined, m
 
 export const getCookie = name => {
 	const cookie = RegExp(name + "=[^;]+").exec(document.cookie);
-	return decodeURIComponent(cookie?.toString().replace(/^[^=]+./, "") || "");
+	return decodeURIComponent(cookie?.toString().replace(/^[^=]+./, emptyString) || emptyString);
 };
 
 export const removeDescendantAttributes = elem => {
@@ -112,7 +28,7 @@ export const removeDescendantAttributes = elem => {
 export const removeFormatting = elem => {
 	removeDescendantAttributes(elem);
 	const originalHtml = elem.innerHTML;
-	const cleanHtml = originalHtml === "<br>" ? "" : originalHtml.replace(/<\/?(?:(?!\/?(div|br))).*?>/g, "");
+	const cleanHtml = originalHtml === "<br>" ? emptyString : originalHtml.replace(/<\/?(?:(?!\/?(div|br))).*?>/g, emptyString);
 	if (originalHtml !== cleanHtml) {
 		const pos = position(elem).pos;
 		elem.innerHTML = cleanHtml;
@@ -185,7 +101,7 @@ export const toLongDateString = input =>
 		formatMatcher: "basic"
 	}).format(input.constructor === Date ? input : new Date(input));
 
-const formatPlural = (value, unit) => `${value} ${unit}${value > 1 ? "s" : ""}`;
+const formatPlural = (value, unit) => `${value} ${unit}${value > 1 ? "s" : emptyString}`;
 
 export const formatTimeAgo = input => {
 	const dateValue = input.constructor === Date ? input : new Date(input);

@@ -10,6 +10,7 @@ const Auth = lazy(() => import("./components/Auth"));
 const SignUp = lazy(() => import("./components/SignUp"));
 const SignIn = lazy(() => import("./components/SignIn"));
 const Home = lazy(() => import("./components/Home"));
+const Search = lazy(() => import("./components/Search"));
 const Profile = lazy(() => import("./components/Profile"));
 const NotFound = lazy(() => import("./components/NotFound"));
 
@@ -20,6 +21,7 @@ render(
 				<Route path="/sign-in" component={SignIn}/>
 				<Route path={["/", "/sign-up"]} component={SignUp}/>
 			</Route>
+			<Route path="/search" component={Search}/>
 			<Route path="/:handle" component={Profile}/>
 			<Route path={["/", "/home"]} component={Home}/>
 			<Route path="/*404" component={NotFound}/>

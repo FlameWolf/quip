@@ -5,10 +5,10 @@ export default props => {
 	const votes = poll.votes;
 	const inactivePoll = props.isOwnPoll || poll.expired || poll.voted;
 	const totalVotes = votes.first + votes.second + votes.third || 0 + votes.fourth || 0;
-	const firstPercentage = Math.round(((votes.first/(totalVotes || 1)) * 100), 2);
-	const secondPercentage = Math.round(((votes.second/(totalVotes || 1)) * 100), 2);
-	const thirdPercentage = Math.round(((votes.third/(totalVotes || 1)) * 100), 2);
-	const fourthPercentage = Math.round(((votes.fourth/(totalVotes || 1)) * 100), 2);
+	const firstPercentage = Math.round((votes.first / (totalVotes || 1)) * 100, 2);
+	const secondPercentage = Math.round((votes.second / (totalVotes || 1)) * 100, 2);
+	const thirdPercentage = Math.round((votes.third / (totalVotes || 1)) * 100, 2);
+	const fourthPercentage = Math.round((votes.fourth / (totalVotes || 1)) * 100, 2);
 
 	return (
 		<div class="card-body poll">

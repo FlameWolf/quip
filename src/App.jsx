@@ -48,6 +48,17 @@ export default props => {
 	});
 	return (
 		<>
+			<nav class="navbar mb-3">
+				<div class="container">
+					<a class="navbar-brand mb-0 h1" target="_self" href="/">
+						Home
+					</a>
+					<input class="form-control w-auto" type="text" placeholder="Search..."/>
+					<button class="btn btn-outline-primary" onClick={() => location.replace("/search?q=" + encodeURIComponent(document.querySelector("input").value))}>
+						Search
+					</button>
+				</div>
+			</nav>
 			<div class="row">
 				<div class="col py-3 page-container">{props.children}</div>
 			</div>

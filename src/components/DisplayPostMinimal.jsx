@@ -7,7 +7,7 @@ export default props => {
 	const handle = post.author.handle;
 	return (
 		<>
-			<div data-post-id={post._id} class="card" classList={{ "reply": props.isReply }}>
+			<div data-post-id={post._id} class="card" classList={{ reply: props.isReply }}>
 				<div class="post-header">
 					<a class="handle" href={`/${handle}`}>{handle}</a>
 					<Show when={props.parentBlurb}>

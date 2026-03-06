@@ -25,14 +25,14 @@ export default props => {
 	const [replyFlag, setReplyFlag] = createSignal(false);
 	const toggleFave = event => {
 		fetch(`${faveFlag() ? unfavouriteUrl : favouriteUrl}/${postId}`).then(response => {
-			if(response.status === 200) {
+			if (response.status === 200) {
 				setFaveFlag(value => !value);
 			}
 		});
 	};
 	const toggleRepeat = event => {
 		fetch(`${repeatFlag() ? unrepeatUrl : repeatUrl}/${postId}`).then(response => {
-			if(response.status === 200 || response.status === 201) {
+			if (response.status === 200 || response.status === 201) {
 				setRepeatFlag(value => !value);
 			}
 		});
@@ -41,8 +41,8 @@ export default props => {
 		let sourceActionBar = event.target.closest(".action-bar");
 		let editorInstance = document.getElementById("reply-editor") || <Editor id="reply-editor" isReply={true} classList={{ "mx-2": true, "mb-2": true }}/>;
 		let editorParent = editorInstance.parentElement;
-		const isAttachedToCurrent = (editorParent === sourceActionBar);
-		if(isAttachedToCurrent) {
+		const isAttachedToCurrent = editorParent === sourceActionBar;
+		if (isAttachedToCurrent) {
 			sourceActionBar.removeChild(editorInstance);
 		} else {
 			editorParent?.querySelector(".hstack > button:last-child").click();
@@ -56,7 +56,7 @@ export default props => {
 	};
 	return (
 		<>
-			<div data-post-id={postId} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, "reply": props.isReply }}>
+			<div data-post-id={postId} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, reply: props.isReply }}>
 				<div class="post-header">
 					<a class="handle" href={`/${handle}`}>{handle}</a>
 					<Show when={props.parentBlurb}>
