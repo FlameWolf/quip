@@ -145,35 +145,94 @@ export default props => {
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [isUserSearch, setIsUserSearch] = createSignal(false);
+	const [searchResults, setSearchResults] = createSignal([]);
+	const [lastScore, setLastScore] = createSignal();
+	const [lastItemId, setLastItemId] = createSignal(emptyString);
+	const [hasMore, setHasMore] = createSignal(true);
+
+	const searchUrl = `${import.meta.env.VITE_API_BASE_URL}/search`;
+
+	const parseQueryTokens = query => {
+		const tokens = {};
+		const parts = query?.q?.split(/\s+/);
+		let searchText = [];
+		for (const part of parts) {
+			const match = part.match(/^([a-z-]+):(.+)$/);
+			if (match) {
+				const [, key, value] = match;
+				tokens[key] = value;
+			} else {
+				searchText.push(part);
+			}
+		}
+		return {
+			searchText: searchText.join(" "),
+			tokens
+		};
+	};
+
 	const searchType = createMemo(() => {
-		if (searchParams.nearby === "1") {
+		const { tokens } = parseQueryTokens(searchParams);
+		if (tokens.nearby === "1") {
 			return "/nearby";
 		}
-		if (searchParams.user === "1") {
+		if (tokens.users === "1") {
 			setIsUserSearch(true);
 			return "/users";
 		}
+		setIsUserSearch(false);
 		return emptyString;
 	});
-	const searchUrl = `${import.meta.env.VITE_API_BASE_URL}/search${searchType()}`;
-	const [lastItemId, setLastItemId] = createSignal(emptyString);
-	const [hasMore, setHasMore] = createSignal(true);
-	const [searchResults, setSearchResults] = createSignal([]);
 
-	const loadSearchResults = async () => {
-		const query = searchParams.q || emptyString;
-		const tokens = query
-			.split(" ")
-			.filter(token => !["users:1", "nearby:1"].includes(token) && !token.startsWith("lat:") && !token.startsWith("long:"))
-			.join(" ");
-		const lastItemIdParamName = isUserSearch() ? "lastUserId" : "lastPostId";
-		const response = await fetch(`${searchUrl}${searchType()}?$q=${tokens}&${lastItemIdParamName}=${lastItemId()}`);
+	const buildSearchUrl = (includeLastItem = false) => {
+		const { searchText, tokens } = parseQueryTokens(searchParams);
+		const params = new URLSearchParams();
+		if (searchText.trim()) {
+			params.append("q", searchText.trim());
+		}
+		for (const [key, value] of Object.entries(tokens)) {
+			if (!["nearby", "users"].includes(key)) {
+				params.append(key, value);
+			}
+		}
+		if (includeLastItem && lastItemId()) {
+			const lastItemIdParamName = isUserSearch() ? "lastUserId" : "lastPostId";
+			params.append(lastItemIdParamName, lastItemId());
+			if (!isUserSearch() && lastScore()) {
+				const sortBy = tokens["sort-by"] || "";
+				if (!sortBy || sortBy === "match" || sortBy === "popular") {
+					params.append("lastScore", lastScore());
+				}
+			}
+		}
+		return `${searchUrl}${searchType()}?${params.toString()}`;
+	};
+
+	const loadSearchResults = async (isLoadMore = false) => {
+		if (isLoadMore) {
+			await fetchAndAppendResults();
+		} else {
+			setSearchResults([]);
+			setLastItemId(emptyString);
+			setLastScore(undefined);
+			setHasMore(true);
+			await fetchAndAppendResults();
+		}
+	};
+
+	const fetchAndAppendResults = async () => {
+		const url = buildSearchUrl(lastItemId() !== emptyString);
+		const response = await fetch(url);
 		if (response.ok) {
 			const data = await response.json();
 			const items = isUserSearch() ? data.users : data.posts;
 			const itemCount = items.length;
 			if (itemCount) {
-				setLastItemId(items[itemCount - 1]._id);
+				const lastItem = items[itemCount - 1];
+				setLastItemId(lastItem._id);
+				if (!isUserSearch()) {
+					setLastScore(lastItem.score || 0);
+				}
 			}
 			if (itemCount < maxItemsToFetch) {
 				setHasMore(false);
@@ -184,17 +243,24 @@ export default props => {
 		}
 	};
 
+	const handleLoadMore = async () => {
+		await loadSearchResults(true);
+	};
+
 	onMount(async () => {
-		await loadSearchResults();
+		await loadSearchResults(false);
 	});
 
 	return (
 		<>
 			<h2>Search Results</h2>
-			<Show when={!isUserSearch()}>
+			<Show when={searchResults().length === 0}>
+				<p>No results found. Try a different search.</p>
+			</Show>
+			<Show when={!isUserSearch() && searchResults().length > 0}>
 				<For each={searchResults()}>{(result, index) => <DisplayPost post={result}/>}</For>
 			</Show>
-			<Show when={isUserSearch()}>
+			<Show when={isUserSearch() && searchResults().length > 0}>
 				<For each={searchResults()}>
 					{result => (
 						<div class="search-result" onClick={() => navigate(`/${result.handle}`)}>
@@ -206,9 +272,11 @@ export default props => {
 					)}
 				</For>
 			</Show>
-			<div class="my-2">
-				<button ref={loadMoreButton} class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Results"} onClick={loadSearchResults}></button>
-			</div>
+			<Show when={searchResults().length > 0}>
+				<div class="my-2">
+					<button ref={loadMoreButton} class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Results"} onClick={handleLoadMore} disabled={!hasMore()}></button>
+				</div>
+			</Show>
 		</>
 	);
 };
