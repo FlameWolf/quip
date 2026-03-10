@@ -7,7 +7,7 @@ export default props => {
 	const handle = post.author.handle;
 	return (
 		<>
-			<div data-post-id={post._id} class="card" classList={{ reply: props.isReply }}>
+			<div data-post-id={post._id} class="card border px-2" classList={{ reply: props.isReply }}>
 				<div class="post-header">
 					<a class="handle" href={`/${handle}`}>{handle}</a>
 					<Show when={props.parentBlurb}>
@@ -19,7 +19,35 @@ export default props => {
 					</div>
 				</div>
 				<div class="card-body px-2 pb-2">
-					<p class="card-text" innerHTML={post.content?.replace(/\n/g, "<br/>")}></p>
+					<p class="card-text">
+						<Show when={post.content}>
+							<span>{post.content.replace(/\n/g, "<br/>")}</span>
+						</Show>
+						<Show when={post.attachments?.mediaFile}>
+							<div class="mt-2">
+								<img src={post.attachments.mediaFile.src} class="img-fluid rounded" />
+							</div>
+						</Show>
+						<Show when={post.attachments?.poll}>
+							<div class="mt-2">
+								<div class="card">
+									<div class="card-body py-3">
+										<div class="card-title">Poll</div>
+										<ul class="list-group list-group-flush">
+											<li class="list-group-item">{post.attachments.poll.first}</li>
+											<li class="list-group-item">{post.attachments.poll.second}</li>
+											<Show when={post.attachments.poll.third}>
+												<li class="list-group-item">{post.attachments.poll.third}</li>
+											</Show>
+											<Show when={post.attachments.poll.fourth}>
+												<li class="list-group-item">{post.attachments.poll.fourth}</li>
+											</Show>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</Show>
+					</p>
 				</div>
 			</div>
 		</>
