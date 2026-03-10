@@ -118,6 +118,16 @@ export default props => {
 	});
 	return (
 		<div ref={currentInstance} {...props} class="editor border rounded p-2 my-2 overflow-hidden" classList={{ "mx-2": props.isReply }} onClick={dismissEmojiPicker}>
+			<Show when={props.isEditing}>
+				<div class="alert alert-warning position-relative">
+					<span>You can edit a post only once. Editing a post will:</span>
+					<ul>
+						<li>Remove all faves and repeats</li>
+						<li>Orphan all quotes and replies except those from the post author</li>
+					</ul>
+					<button class="btn btn-primary position-absolute top-0 end-0 mt-2 me-2" onClick={() => props.onSubmit?.()}>Close Editor</button>
+				</div>
+			</Show>
 			<div class="autogrow" tabIndex={-1}>
 				<textarea ref={plainTextInput} value={props.isEditing ? props.post.content : emptyString} onInput={updateEditor}></textarea>
 			</div>
