@@ -12,52 +12,49 @@ export default props => {
 
 	return (
 		<div class="card-body poll">
-			<ul class="list-group">
-				<Show when={inactivePoll}>
-					<li class="list-group-item position-relative">
-						<div class="poll-bar" style={{ width: `${firstPercentage}%` }}></div>
-						<div class="poll-option">{poll.first}</div>
-						<div class="poll-value">{firstPercentage}</div>
-					</li>
-					<li class="list-group-item position-relative">
-						<div class="poll-bar" style={{ width: `${secondPercentage}%` }}></div>
-						<div class="poll-option">{poll.second}</div>
-						<div class="poll-value">{secondPercentage}</div>
-					</li>
-					<Show when={poll.third}>
+			<Show when={inactivePoll}>
+				<ul class="list-group">
+					<Show when={inactivePoll}>
 						<li class="list-group-item position-relative">
-							<div class="poll-bar" style={{ width: `${thirdPercentage}%` }}></div>
-							<div class="poll-option">{poll.third}</div>
-							<div class="poll-value">{thirdPercentage}</div>
+							<div class="poll-bar" style={{ width: `${firstPercentage}%` }}></div>
+							<div class="poll-option">{poll.first}</div>
+							<div class="poll-value">{firstPercentage}</div>
 						</li>
+						<li class="list-group-item position-relative">
+							<div class="poll-bar" style={{ width: `${secondPercentage}%` }}></div>
+							<div class="poll-option">{poll.second}</div>
+							<div class="poll-value">{secondPercentage}</div>
+						</li>
+						<Show when={poll.third}>
+							<li class="list-group-item position-relative">
+								<div class="poll-bar" style={{ width: `${thirdPercentage}%` }}></div>
+								<div class="poll-option">{poll.third}</div>
+								<div class="poll-value">{thirdPercentage}</div>
+							</li>
+						</Show>
+						<Show when={poll.fourth}>
+							<li class="list-group-item position-relative">
+								<div class="poll-bar" style={{ width: `${fourthPercentage}%` }}></div>
+								<div class="poll-option">{poll.fourth}</div>
+								<div class="poll-value">{fourthPercentage}</div>
+							</li>
+						</Show>
+					</Show>
+				</ul>
+			</Show>
+			<Show when={!inactivePoll}>
+				<div class="d-flex flex-column poll-buttons">
+					<button class="btn btn-outline-primary">{poll.first}</button>
+					<button class="btn btn-outline-primary">{poll.second}</button>
+					<Show when={poll.third}>
+						<button class="btn btn-outline-primary">{poll.third}</button>
 					</Show>
 					<Show when={poll.fourth}>
-						<li class="list-group-item position-relative">
-							<div class="poll-bar" style={{ width: `${fourthPercentage}%` }}></div>
-							<div class="poll-option">{poll.fourth}</div>
-							<div class="poll-value">{fourthPercentage}</div>
-						</li>
+						<button class="btn btn-outline-primary">{poll.fourth}</button>
 					</Show>
-				</Show>
-				<Show when={!inactivePoll}>
-					<li class="list-group-item">
-						<span>{poll.first}</span>
-					</li>
-					<li class="list-group-item">
-						<span>{poll.second}</span>
-					</li>
-					<Show when={poll.third}>
-						<li class="list-group-item">
-							<span>{poll.third}</span>
-						</li>
-					</Show>
-					<Show when={poll.fourth}>
-						<li class="list-group-item">
-							<span>{poll.fourth}</span>
-						</li>
-					</Show>
-				</Show>
-			</ul>
+					<button class="btn btn-outline-primary">NOTA</button>
+				</div>
+			</Show>
 		</div>
 	);
 };
