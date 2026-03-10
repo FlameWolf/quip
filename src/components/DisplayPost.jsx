@@ -84,7 +84,7 @@ export default props => {
 					</Show>
 					<Show when={attachments}>
 						<Show when={attachments.poll}>
-							<DisplayPoll poll={attachments.poll} isOwnPoll={post.author._id === authStore.userId}/>
+							<DisplayPoll postId={post._id} poll={attachments.poll} voted={post.voted} isOwnPoll={post.author._id === authStore.userId}/>
 						</Show>
 						<Show when={attachments.mediaFile}>
 							<Show when={attachments.mediaFile.fileType === "image"}>

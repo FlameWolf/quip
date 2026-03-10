@@ -1,14 +1,39 @@
 import { Show } from "solid-js";
+import { quipStore, setQuipStore } from "../stores/quip-store";
 
 export default props => {
 	const poll = props.poll;
 	const votes = poll.votes;
-	const inactivePoll = props.isOwnPoll || poll.expired || poll.voted;
+	const inactivePoll = props.isOwnPoll || poll.expired || props.voted;
 	const totalVotes = votes.first + votes.second + votes.third || 0 + votes.fourth || 0;
 	const firstPercentage = Math.round((votes.first / (totalVotes || 1)) * 100, 2);
 	const secondPercentage = Math.round((votes.second / (totalVotes || 1)) * 100, 2);
 	const thirdPercentage = Math.round((votes.third / (totalVotes || 1)) * 100, 2);
 	const fourthPercentage = Math.round((votes.fourth / (totalVotes || 1)) * 100, 2);
+	const castVoteUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/vote/${props.postId}`;
+
+	const castVote = async option => {
+		var response = await fetch(`${castVoteUrl}?option=${option}`);
+		if (response.ok) {
+			const postToUpdate = quipStore.quips.find(x => x._id === props.postId);
+			if (postToUpdate) {
+				setQuipStore("quips", quipStore.quips.map(x => x._id === props.postId ? {
+					...x,
+						attachments: {
+							...x.attachments,
+							poll: {
+								...x.attachments.poll,
+								votes: {
+									...x.attachments.poll.votes,
+									[option]: (x.attachments.poll.votes[option]) || 0 + 1
+								}
+							}
+						},
+						voted: option
+				} : x));
+			}
+		}
+	};
 
 	return (
 		<div class="card-body poll">
@@ -44,15 +69,15 @@ export default props => {
 			</Show>
 			<Show when={!inactivePoll}>
 				<div class="d-flex flex-column poll-buttons">
-					<button class="btn btn-outline-primary">{poll.first}</button>
-					<button class="btn btn-outline-primary">{poll.second}</button>
+					<button class="btn btn-outline-primary" onClick={() => castVote("first")}>{poll.first}</button>
+					<button class="btn btn-outline-primary" onClick={() => castVote("second")}>{poll.second}</button>
 					<Show when={poll.third}>
-						<button class="btn btn-outline-primary">{poll.third}</button>
+						<button class="btn btn-outline-primary" onClick={() => castVote("third")}>{poll.third}</button>
 					</Show>
 					<Show when={poll.fourth}>
-						<button class="btn btn-outline-primary">{poll.fourth}</button>
+						<button class="btn btn-outline-primary" onClick={() => castVote("fourth")}>{poll.fourth}</button>
 					</Show>
-					<button class="btn btn-outline-primary">NOTA</button>
+					<button class="btn btn-outline-primary" onClick={() => castVote("nota")}>NOTA</button>
 				</div>
 			</Show>
 		</div>
