@@ -10,9 +10,11 @@ import { themeStore } from "../stores/theme-store";
 import { setQuipStore } from "../stores/quip-store";
 import { authStore } from "../stores/auth-store";
 
-const createPostUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/create`;
-const createQuoteUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/quote`;
-const createReplyUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/reply`;
+const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
+const createPostUrl = `${postsBaseUrl}/create`;
+const updatePostUrl = `${postsBaseUrl}/update`;
+const createQuoteUrl = `${postsBaseUrl}/quote`;
+const createReplyUrl = `${postsBaseUrl}/reply`;
 
 export default props => {
 	let currentInstance;
@@ -65,21 +67,28 @@ export default props => {
 			? `${createQuoteUrl}/${props.quotedPost._id}`
 			: parentPostId
 				? `${createReplyUrl}/${parentPostId}`
-				: createPostUrl;
+				: props.isEditing
+					? `${updatePostUrl}/${props.post._id}`
+					: createPostUrl;
 		const response = await fetch(url, {
 			method: "POST",
 			body: formData
 		});
-		if (response.status === 201) {
+		if (response.ok) {
 			const payload = await response.json();
-			const post = payload.reply || payload.post || payload.quote;
-			post.author = { handle: authStore.handle };
-			setQuipStore("quips", quips => [post, ...quips]);
+			const post = payload.post || payload.quote || payload.updated || payload.reply;
+			post.author = { _id: authStore.userId, handle: authStore.handle };
+			setQuipStore("quips", quips => {
+				if (props.isEditing) {
+					return quips.map(quip => quip._id === post._id ? post : quip);
+				}
+				return [post, ...quips];
+			});
 			resetEditor();
 			if (props.isReply) {
 				currentInstance.closest(".action-bar").querySelector(".hstack > button:last-child").click();
 			}
-			props.onCreate?.();
+			props.onSubmit?.();
 		}
 	};
 	const characterLimitExceeded = createMemo(() => charCount() < 0);
@@ -110,7 +119,7 @@ export default props => {
 	return (
 		<div ref={currentInstance} {...props} class="editor border rounded p-2 my-2 overflow-hidden" classList={{ "mx-2": props.isReply }} onClick={dismissEmojiPicker}>
 			<div class="autogrow" tabIndex={-1}>
-				<textarea ref={plainTextInput} onInput={updateEditor}></textarea>
+				<textarea ref={plainTextInput} value={props.isEditing ? props.post.content : emptyString} onInput={updateEditor}></textarea>
 			</div>
 			<Show when={hasPoll()}>
 				<div class="card mb-1" onInput={updatePoll}>
@@ -177,10 +186,14 @@ export default props => {
 				</div>
 				<button ref={emojiTrigger} class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ active: hasEmojiPicker() }} onClick={toggleEmojiMart}>&#x2026;</button>
 				<div class="char-count" classList={{ "bg-danger text-light": characterLimitExceeded() }}>{charCount()}</div>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ active: hasPoll() }} onClick={() => setHasPoll(!hasPoll())}><BiRegularPoll class="poll-icon"/></button>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" onClick={() => mediaFileInput.click()}><BsImage/></button>
+				<Show when={!props.isEditing}>
+					<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ active: hasPoll() }} onClick={() => setHasPoll(!hasPoll())}><BiRegularPoll class="poll-icon"/></button>
+					<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" onClick={() => mediaFileInput.click()}><BsImage/></button>
+				</Show>
 				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={() => makeQuip()}>Post</button>
-				<input ref={mediaFileInput} onInput={event => setMediaFile(event.target.files?.[0])} class="visually-hidden" type="file"/>
+				<Show when={!props.isEditing}>
+					<input ref={mediaFileInput} onInput={event => setMediaFile(event.target.files?.[0])} class="visually-hidden" type="file"/>
+				</Show>
 			</div>
 		</div>
 	);

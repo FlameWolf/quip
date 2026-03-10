@@ -21,7 +21,7 @@ export default props => {
 							<button type="button" class="btn-close" onClick={closeModal}></button>
 						</div>
 						<div class="modal-body">
-							<Editor isQuote={true} quotedPost={quotedPost} onCreate={closeModal}/>
+							<Editor isQuote={true} quotedPost={quotedPost} onSubmit={closeModal}/>
 							<div class="mt-3 border-top pt-3">
 								<DisplayPostMinimal post={quotedPost}/>
 							</div>

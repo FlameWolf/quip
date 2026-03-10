@@ -1,6 +1,6 @@
-import { createSignal, Show } from "solid-js";
+import { createMemo, createSignal, Show } from "solid-js";
 import { BsChatRight, BsQuote, BsStar, BsStarFill } from "solid-icons/bs";
-import { FiRepeat } from "solid-icons/fi";
+import { FiEdit3, FiRepeat } from "solid-icons/fi";
 import { authStore } from "../stores/auth-store";
 import { formatTimeAgo, toLongDateString } from "../library";
 import DisplayPoll from "./DisplayPoll";
@@ -21,10 +21,12 @@ export default props => {
 	const handle = post.author.handle;
 	const repeatedBy = post.repeatedBy;
 	const attachments = post.attachments;
+	const [isEditing, setIsEditing] = createSignal(false);
 	const [faveFlag, setFaveFlag] = createSignal(post.favourited);
 	const [quoteFlag, setQuoteFlag] = createSignal(false);
 	const [repeatFlag, setRepeatFlag] = createSignal(post.repeated);
 	const [replyFlag, setReplyFlag] = createSignal(false);
+	const allowEdit = createMemo(() => post.author._id === authStore.userId && post.__v === 0);
 	const toggleFave = event => {
 		fetch(`${faveFlag() ? unfavouriteUrl : favouriteUrl}/${postId}`).then(response => {
 			if (response.status === 200) {
@@ -74,7 +76,12 @@ export default props => {
 					</div>
 				</div>
 				<div class="card-body px-2">
-					<p class="card-text text-break" innerHTML={post.content?.replace(/\n/g, "<br/>")}></p>
+					<Show when={!isEditing()}>
+						<p class="card-text text-break" innerHTML={post.content?.replace(/\n/g, "<br/>")}></p>
+					</Show>
+					<Show when={isEditing()}>
+						<Editor post={post} isEditing={isEditing()} onSubmit={() => setIsEditing(false)}/>
+					</Show>
 					<Show when={attachments}>
 						<Show when={attachments.poll}>
 							<DisplayPoll poll={attachments.poll} isOwnPoll={post.author._id === authStore.userId}/>
@@ -94,6 +101,9 @@ export default props => {
 				</div>
 				<div class="action-bar">
 					<div class="hstack gap-2 justify-content-end mt-2">
+						<Show when={allowEdit()}>
+							<button class="btn bg-transparent border-0 py-2 px-3" onClick={() => setIsEditing(!isEditing())}><FiEdit3/></button>
+						</Show>
 						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleFave}>{faveFlag() ? <BsStarFill color="gold"/> : <BsStar/>}</button>
 						<button class="btn bg-transparent border-0 py-2 px-3" onClick={() => setQuoteFlag(true)}><BsQuote/></button>
 						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleRepeat}>{repeatFlag() ? <FiRepeat color="green" class="stroke-3"/> : <FiRepeat/>}</button>
