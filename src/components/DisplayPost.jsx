@@ -1,11 +1,12 @@
 import { createSignal, Show } from "solid-js";
-import { BsChatRight, BsStar, BsStarFill } from "solid-icons/bs";
+import { BsChatRight, BsQuote, BsStar, BsStarFill } from "solid-icons/bs";
 import { FiRepeat } from "solid-icons/fi";
 import { authStore } from "../stores/auth-store";
 import { formatTimeAgo, toLongDateString } from "../library";
 import DisplayPoll from "./DisplayPoll";
 import DisplayPostMinimal from "./DisplayPostMinimal";
 import Editor from "./Editor";
+import QuotePost from "./QuotePost";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 const favouriteUrl = `${postsBaseUrl}/favourite`;
@@ -21,6 +22,7 @@ export default props => {
 	const repeatedBy = post.repeatedBy;
 	const attachments = post.attachments;
 	const [faveFlag, setFaveFlag] = createSignal(post.favourited);
+	const [quoteFlag, setQuoteFlag] = createSignal(false);
 	const [repeatFlag, setRepeatFlag] = createSignal(post.repeated);
 	const [replyFlag, setReplyFlag] = createSignal(false);
 	const toggleFave = event => {
@@ -93,10 +95,14 @@ export default props => {
 				<div class="action-bar">
 					<div class="hstack gap-2 justify-content-end mt-2">
 						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleFave}>{faveFlag() ? <BsStarFill color="gold"/> : <BsStar/>}</button>
+						<button class="btn bg-transparent border-0 py-2 px-3" onClick={() => setQuoteFlag(true)}><BsQuote/></button>
 						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleRepeat}>{repeatFlag() ? <FiRepeat color="green" class="stroke-3"/> : <FiRepeat/>}</button>
 						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleReply}>{replyFlag() ? <BsChatRight color="blue"/> : <BsChatRight/>}</button>
 					</div>
 				</div>
+				<Show when={quoteFlag()}>
+					<QuotePost post={post} isOpen={true} onClose={() => setQuoteFlag(false)}/>
+				</Show>
 			</div>
 		</>
 	);

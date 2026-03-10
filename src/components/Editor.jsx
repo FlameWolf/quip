@@ -11,6 +11,7 @@ import { setQuipStore } from "../stores/quip-store";
 import { authStore } from "../stores/auth-store";
 
 const createPostUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/create`;
+const createQuoteUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/quote`;
 const createReplyUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/reply`;
 
 export default props => {
@@ -60,19 +61,25 @@ export default props => {
 		if (mediaFile()) {
 			formData.append("media", mediaFile());
 		}
-		const response = await fetch(parentPostId ? `${createReplyUrl}/${parentPostId}` : createPostUrl, {
+		const url = props.isQuote
+			? `${createQuoteUrl}/${props.quotedPost._id}`
+			: parentPostId
+				? `${createReplyUrl}/${parentPostId}`
+				: createPostUrl;
+		const response = await fetch(url, {
 			method: "POST",
 			body: formData
 		});
 		if (response.status === 201) {
 			const payload = await response.json();
-			const post = payload.reply || payload.post;
+			const post = payload.reply || payload.post || payload.quote;
 			post.author = { handle: authStore.handle };
 			setQuipStore("quips", quips => [post, ...quips]);
 			resetEditor();
 			if (props.isReply) {
 				currentInstance.closest(".action-bar").querySelector(".hstack > button:last-child").click();
 			}
+			props.onCreate?.();
 		}
 	};
 	const characterLimitExceeded = createMemo(() => charCount() < 0);
@@ -151,9 +158,7 @@ export default props => {
 			<Show when={mediaFile()}>
 				<div class="d-inline-block position-relative card-body pt-0 media-preview" onClick={() => setMediaFile()}>
 					<img class="img-fluid" src={URL.createObjectURL(mediaFile())}/>
-					<button class="position-absolute top-0 end-0 btn btn-danger border m-1">
-						<VsChromeClose/>
-					</button>
+					<button class="position-absolute top-0 end-0 btn btn-danger border m-1"><VsChromeClose/></button>
 				</div>
 			</Show>
 			<div class="d-flex justify-content-end pt-2 border-top">
@@ -161,9 +166,7 @@ export default props => {
 					<For each={popularEmoji}>{(emojo, index) => <div onClick={() => insertEmojo(plainTextInput, emojo, updateEditor)}>{emojo}</div>}</For>
 				</div>
 				<div ref={emojiPickerContainer} class="emoji-picker-container border rounded" classList={{ "d-none": !hasEmojiPicker() }}>
-					<button class="btn btn-danger btn-sm p-0 rounded-50">
-						<i class="bi bi-x-lg"></i>
-					</button>
+					<button class="btn btn-danger btn-sm p-0 rounded-50"><i class="bi bi-x-lg"></i></button>
 					{
 						new Picker({
 							data: emojiData,
@@ -172,21 +175,11 @@ export default props => {
 						})
 					}
 				</div>
-				<button ref={emojiTrigger} class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ active: hasEmojiPicker() }} onClick={toggleEmojiMart}>
-					&#x2026;
-				</button>
-				<div class="char-count" classList={{ "bg-danger text-light": characterLimitExceeded() }}>
-					{charCount()}
-				</div>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ active: hasPoll() }} onClick={() => setHasPoll(!hasPoll())}>
-					<BiRegularPoll class="poll-icon"/>
-				</button>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" onClick={() => mediaFileInput.click()}>
-					<BsImage/>
-				</button>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={() => makeQuip()}>
-					Post
-				</button>
+				<button ref={emojiTrigger} class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ active: hasEmojiPicker() }} onClick={toggleEmojiMart}>&#x2026;</button>
+				<div class="char-count" classList={{ "bg-danger text-light": characterLimitExceeded() }}>{charCount()}</div>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ active: hasPoll() }} onClick={() => setHasPoll(!hasPoll())}><BiRegularPoll class="poll-icon"/></button>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" onClick={() => mediaFileInput.click()}><BsImage/></button>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={() => makeQuip()}>Post</button>
 				<input ref={mediaFileInput} onInput={event => setMediaFile(event.target.files?.[0])} class="visually-hidden" type="file"/>
 			</div>
 		</div>
