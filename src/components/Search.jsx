@@ -1,6 +1,7 @@
 import { createMemo, createSignal, For, Match, onMount, Show } from "solid-js";
 import { useNavigate, useSearchParams } from "@solidjs/router";
 import { emptyString, maxItemsToFetch, trimPost } from "../library";
+import { quipStore, setQuipStore } from "../stores/quip-store";
 import DisplayPost from "./DisplayPost";
 
 /*
@@ -145,7 +146,6 @@ export default props => {
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [isUserSearch, setIsUserSearch] = createSignal(false);
-	const [searchResults, setSearchResults] = createSignal([]);
 	const [lastScore, setLastScore] = createSignal();
 	const [lastItemId, setLastItemId] = createSignal(emptyString);
 	const [hasMore, setHasMore] = createSignal(true);
@@ -212,7 +212,7 @@ export default props => {
 		if (isLoadMore) {
 			await fetchAndAppendResults();
 		} else {
-			setSearchResults([]);
+			setQuipStore("quips", []);
 			setLastItemId(emptyString);
 			setLastScore(undefined);
 			setHasMore(true);
@@ -237,7 +237,7 @@ export default props => {
 			if (itemCount < maxItemsToFetch) {
 				setHasMore(false);
 			}
-			setSearchResults([...searchResults(), ...items]);
+			setQuipStore("quips", [...quipStore.quips, ...items]);
 		} else {
 			console.error("Search request failed:", response.statusText);
 		}
@@ -254,25 +254,23 @@ export default props => {
 	return (
 		<>
 			<h2>Search Results</h2>
-			<Show when={searchResults().length === 0}>
+			<Show when={quipStore.quips.length === 0}>
 				<p>No results found. Try a different search.</p>
 			</Show>
-			<Show when={!isUserSearch() && searchResults().length > 0}>
-				<For each={searchResults()}>{(result, index) => <DisplayPost post={result}/>}</For>
+			<Show when={!isUserSearch() && quipStore.quips.length > 0}>
+				<For each={quipStore.quips}>{(result, index) => <DisplayPost post={result}/>}</For>
 			</Show>
-			<Show when={isUserSearch() && searchResults().length > 0}>
-				<For each={searchResults()}>
+			<Show when={isUserSearch() && quipStore.quips.length > 0}>
+				<For each={quipStore.quips}>
 					{result => (
-						<div class="search-result" onClick={() => navigate(`/${result.handle}`)}>
-							<h3>{result.handle}</h3>
-							<p>
-								{result.postsCount} {result.postsCount === 1 ? "post" : "posts"}
-							</p>
+						<div class="search-result">
+							<h3><a href={`/${result.handle}`}>{result.handle}</a></h3>
+							<p>{result.postsCount} {result.postsCount === 1 ? "post" : "posts"}</p>
 						</div>
 					)}
 				</For>
 			</Show>
-			<Show when={searchResults().length > 0}>
+			<Show when={quipStore.quips.length > 0}>
 				<div class="my-2">
 					<button ref={loadMoreButton} class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Results"} onClick={handleLoadMore} disabled={!hasMore()}></button>
 				</div>

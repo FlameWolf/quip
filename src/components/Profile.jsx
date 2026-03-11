@@ -3,6 +3,7 @@ import { createEffect, createSignal, For, onMount, Show } from "solid-js";
 import { BsPersonBadgeFill } from "solid-icons/bs";
 import { authStore } from "../stores/auth-store";
 import { emptyString, maxItemsToFetch } from "../library";
+import { quipStore, setQuipStore } from "../stores/quip-store";
 import DisplayPost from "./DisplayPost";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
@@ -19,7 +20,6 @@ export default props => {
 	const [followsMe, setFollowsMe] = createSignal(false);
 	const [lastPostId, setLastPostId] = createSignal(emptyString);
 	const [hasMore, setHasMore] = createSignal(true);
-	const [loadedQuips, setLoadedQuips] = createSignal([]);
 	const loadUser = async handle => {
 		const data = await (await fetch(profileUrl)).json();
 		const user = data.user;
@@ -42,7 +42,7 @@ export default props => {
 		if (postsCount < maxItemsToFetch) {
 			setHasMore(false);
 		}
-		setLoadedQuips([...loadedQuips(), ...posts]);
+		setQuipStore("quips", [...quipStore.quips, ...posts]);
 	};
 	const toggleAction = async (action, flag, setFlag) => {
 		const actionUrl = `${profileBaseUrl}/${flag ? `un${action}` : action}/${params.handle}`;
@@ -93,7 +93,7 @@ export default props => {
 				</div>
 			</div>
 			<ul class="list-group">
-				<For each={loadedQuips()}>{(quip, index) => <DisplayPost post={quip}/>}</For>
+				<For each={quipStore.quips}>{(quip, index) => <DisplayPost post={quip}/>}</For>
 			</ul>
 			<div class="my-2">
 				<button ref={loadMoreButton} class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Posts"} onClick={loadUserQuips}></button>

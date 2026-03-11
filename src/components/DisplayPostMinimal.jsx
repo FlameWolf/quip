@@ -25,7 +25,7 @@ export default props => {
 						</Show>
 						<Show when={post.attachments?.mediaFile}>
 							<div class="mt-2">
-								<img src={post.attachments.mediaFile.src} class="img-fluid rounded" />
+								<img src={post.attachments.mediaFile.src} class="img-fluid rounded"/>
 							</div>
 						</Show>
 						<Show when={post.attachments?.poll}>
