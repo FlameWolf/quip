@@ -19,9 +19,20 @@ const [showError, setShowError] = createSignal(false);
 
 render(() => {
 	const healthCheckUrl = `${import.meta.env.VITE_API_BASE_URL}/health`;
-	const fetchPromise = fetch(healthCheckUrl, {
-		signal: AbortSignal.timeout(5000)
-	});
+	const loadingPlaceholder = (
+		<>
+			<div class="row">
+				<div class="col py-3 page-container">
+					<div class="d-flex flex-column align-items-center">
+						<div class="spinner-border" role="status">
+							<span class="visually-hidden">Loading...</span>
+						</div>
+						<p class="mt-2">Checking API health...</p>
+					</div>
+				</div>
+			</div>
+		</>
+	);
 	const [healthCheckStatus] = createResource(async () => {
 		try {
 			const response = await fetch(healthCheckUrl, {
@@ -37,8 +48,11 @@ render(() => {
 			return false;
 		}
 	});
+	if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+		document.body.parentElement.setAttribute("data-bs-theme", "dark");
+	}
 	return (
-		<Suspense>
+		<Suspense fallback={loadingPlaceholder}>
 			<p class="d-none">API Health Check: {healthCheckStatus() ? "Pass" : "Fail"}.</p>
 			<Show when={showError()}>
 				<div class="row">
