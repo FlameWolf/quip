@@ -1,4 +1,4 @@
-import { createEffect, onMount, onCleanup } from "solid-js";
+import { createEffect, onMount, onCleanup, Show } from "solid-js";
 import { useLocation, useNavigate } from "@solidjs/router";
 import { lightTheme, darkTheme } from "./library";
 import { themeStore, setThemeStore } from "./stores/theme-store";
@@ -48,17 +48,15 @@ export default props => {
 	});
 	return (
 		<>
-			<nav class="navbar mb-3">
-				<div class="container">
-					<a class="navbar-brand mb-0 h1" target="_self" href="/">
-						Home
-					</a>
-					<input class="form-control w-auto" type="text" placeholder="Search..."/>
-					<button class="btn btn-outline-primary" onClick={() => location.replace("/search?q=" + encodeURIComponent(document.querySelector("input").value))}>
-						Search
-					</button>
-				</div>
-			</nav>
+			<Show when={!location.pathname.startsWith("/auth")}>
+				<nav class="navbar mb-3">
+					<div class="container">
+						<a class="navbar-brand mb-0 h1" target="_self" href="/">Home</a>
+						<input class="form-control w-auto" type="text" placeholder="Search..."/>
+						<button class="btn btn-outline-primary" onClick={() => location.replace("/search?q=" + encodeURIComponent(document.querySelector("input").value))}>Search</button>
+					</div>
+				</nav>
+			</Show>
 			<div class="row">
 				<div class="col py-3 page-container">{props.children}</div>
 			</div>
