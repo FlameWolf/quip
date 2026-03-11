@@ -23,9 +23,15 @@ render(() => {
 	return (
 		<Suspense>
 			<Show when={!healthCheckStatus()}>
-				<p>API is currently unavailable. Please try again later.</p>
+				<div class="row">
+					<div class="col py-3 page-container">
+						<div class="d-flex flex-column align-items-center">
+							<p>API is currently unavailable. Please try again after five minutes.</p>
+						</div>
+					</div>
+				</div>
 			</Show>
-			<Show when={healthCheckStatus}>
+			<Show when={healthCheckStatus()}>
 				<Router root={App}>
 					<Route path="/auth" component={Auth}>
 						<Route path="/sign-in" component={SignIn}/>
