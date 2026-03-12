@@ -72,12 +72,11 @@ render(() => {
 			<Show when={showError()}>
 				<div class="row">
 					<div class="col py-3 page-container">
-						<div class="d-flex flex-column align-items-center">
+						<div class="d-flex flex-column text-center">
 							<p>API is currently unavailable. Please try again after five minutes.</p>
-							<dl class="mt-3">
-								<dt>Why am I seeing this?</dt>
-								<dd>The API is hosted on a free Render instance. The server spins down the service after 15 minutes of inactivity. When you visit this page, a request is triggered, which would cause the service to start up &#x2014; so the API should become available within five minutes.</dd>
-							</dl>
+							<hr/>
+							<p class="fw-bold">Why am I seeing this?</p>
+							<p>The API is hosted on a free Render instance. The server spins down the service after 15 minutes of inactivity. When you visit this page, a request is triggered, which would cause the service to start up &#x2014; so the API should become available within five minutes.</p>
 						</div>
 					</div>
 				</div>
