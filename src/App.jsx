@@ -30,6 +30,14 @@ export default props => {
 		localStorage.setItem("theme", theme);
 	});
 	const updateTheme = () => setThemeStore("theme", themeStore.isLight ? darkTheme : lightTheme);
+	const doSearch = event => {
+		event.preventDefault();
+		const searchText = document.querySelector("#search-input").value;
+		if(!searchText) {
+			return;
+		}
+		location.replace("/search?q=" + encodeURIComponent(searchText));
+	};
 	onMount(() => {
 		const location = useLocation();
 		const navigate = useNavigate();
@@ -52,8 +60,10 @@ export default props => {
 				<nav class="navbar mb-3">
 					<div class="container">
 						<a class="navbar-brand mb-0 h1" target="_self" href="/">Home</a>
-						<input class="form-control w-auto" type="text" placeholder="Search..."/>
-						<button class="btn btn-outline-primary" onClick={() => location.replace("/search?q=" + encodeURIComponent(document.querySelector("input").value))}>Search</button>
+						<form class="d-flex" role="search">
+							<input id="search-input" class="form-control me-2" type="text" placeholder="Search" aria-label="Search" onKeyUp={(event) => (event.code === "Enter") && doSearch(event)}/>
+							<button class="btn btn-outline-primary" type="submit" onClick={doSearch}>Search</button>
+						</form>
 					</div>
 				</nav>
 			</Show>

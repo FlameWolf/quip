@@ -2,9 +2,10 @@ import "inter-ui/inter.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./index.css";
-import { createResource, createSignal, lazy, Show, Suspense } from "solid-js";
+import { createEffect, createMemo, createResource, createSignal, lazy, Show, Suspense } from "solid-js";
 import { render } from "solid-js/web";
 import { Router, Route } from "@solidjs/router";
+import { emptyString } from "./library";
 
 const App = lazy(() => import("./App"));
 const Auth = lazy(() => import("./components/Auth"));
@@ -15,25 +16,41 @@ const Search = lazy(() => import("./components/Search"));
 const Profile = lazy(() => import("./components/Profile"));
 const NotFound = lazy(() => import("./components/NotFound"));
 
+const healthCheckUrl = `${import.meta.env.VITE_API_BASE_URL}/health`;
 const [showError, setShowError] = createSignal(false);
+const [lastVisited, setLastVisited] = createSignal(() => {
+	const lastVisitedValue = localStorage.getItem("lastVisited");
+	return lastVisitedValue ? new Date(lastVisitedValue) : null;
+});
 
 render(() => {
-	const healthCheckUrl = `${import.meta.env.VITE_API_BASE_URL}/health`;
-	const loadingPlaceholder = (
-		<>
-			<div class="row">
-				<div class="col py-3 page-container">
-					<div class="d-flex flex-column align-items-center">
-						<div class="spinner-border" role="status">
-							<span class="visually-hidden">Loading...</span>
+	createEffect(() => {
+		localStorage.setItem("lastVisited", lastVisited()?.valueOf() || emptyString);
+	});
+	const needHealthCheck = createMemo(() => !lastVisited() || lastVisited() < new Date(Date.now() - 10 * 60 * 1000));
+	const loadingPlaceholder = () => {
+		if (!needHealthCheck()) {
+			return null;
+		}
+		return (
+			<>
+				<div class="row">
+					<div class="col py-3 page-container">
+						<div class="d-flex flex-column align-items-center">
+							<div class="spinner-border" role="status">
+								<span class="visually-hidden">Loading...</span>
+							</div>
+							<p class="mt-2">Checking API health...</p>
 						</div>
-						<p class="mt-2">Checking API health...</p>
 					</div>
 				</div>
-			</div>
-		</>
-	);
+			</>
+		);
+	};
 	const [healthCheckStatus] = createResource(async () => {
+		if (!needHealthCheck()) {
+			return true;
+		}
 		try {
 			const response = await fetch(healthCheckUrl, {
 				signal: AbortSignal.timeout(5000)
@@ -53,7 +70,7 @@ render(() => {
 	}
 	return (
 		<Suspense fallback={loadingPlaceholder}>
-			<p class="d-none">API Health Check: {healthCheckStatus() ? "Pass" : "Fail"}.</p>
+			<p class="d-none">{healthCheckStatus()}</p>
 			<Show when={showError()}>
 				<div class="row">
 					<div class="col py-3 page-container">
@@ -64,6 +81,7 @@ render(() => {
 				</div>
 			</Show>
 			<Show when={!showError()}>
+				<p class="d-none">{setLastVisited(new Date())}</p>
 				<Router root={App}>
 					<Route path="/auth" component={Auth}>
 						<Route path="/sign-in" component={SignIn}/>

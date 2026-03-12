@@ -253,6 +253,14 @@ export default props => {
 
 	return (
 		<>
+			<div class="alert alert-info">
+				<p>Use the following syntax to refine your search:</p>
+				<ul>
+					<li><code>hello world has-media:1</code> - Search for posts containing "hello world" that have media attachments.</li>
+					<li><code>users:1 ma</code> - Search for users with handles containing the string "ma".</li>
+					<li><code>langs:ml|en</code> - Search for posts written in Malayalam or English.</li>
+				</ul>
+			</div>
 			<h2>Search Results</h2>
 			<Show when={quipStore.quips.length === 0}>
 				<p>No results found. Try a different search.</p>
