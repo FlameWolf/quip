@@ -17,11 +17,9 @@ const Profile = lazy(() => import("./components/Profile"));
 const NotFound = lazy(() => import("./components/NotFound"));
 
 const healthCheckUrl = `${import.meta.env.VITE_API_BASE_URL}/health`;
+const storedLastVisit = localStorage.getItem("lastVisited");
 const [showError, setShowError] = createSignal(false);
-const [lastVisited, setLastVisited] = createSignal(() => {
-	const lastVisitedValue = localStorage.getItem("lastVisited");
-	return lastVisitedValue ? new Date(lastVisitedValue) : null;
-});
+const [lastVisited, setLastVisited] = createSignal(storedLastVisit ? new Date(Number(storedLastVisit)) : null);
 
 render(() => {
 	createEffect(() => {
@@ -56,9 +54,9 @@ render(() => {
 				signal: AbortSignal.timeout(5000)
 			});
 			if (!response.ok) {
-				setShowError(true);
-				return false;
+				throw new Error("API health check failed");
 			}
+			setLastVisited(new Date());
 			return true;
 		} catch {
 			setShowError(true);
@@ -76,12 +74,15 @@ render(() => {
 					<div class="col py-3 page-container">
 						<div class="d-flex flex-column align-items-center">
 							<p>API is currently unavailable. Please try again after five minutes.</p>
+							<dl class="mt-3">
+								<dt>Why am I seeing this?</dt>
+								<dd>The API is hosted on a free Render instance. The server spins down the service after 15 minutes of inactivity. When you visit this page, a request is triggered, which would cause the service to start up &#x2014; so the API should become available within five minutes.</dd>
+							</dl>
 						</div>
 					</div>
 				</div>
 			</Show>
 			<Show when={!showError()}>
-				<p class="d-none">{setLastVisited(new Date())}</p>
 				<Router root={App}>
 					<Route path="/auth" component={Auth}>
 						<Route path="/sign-in" component={SignIn}/>
