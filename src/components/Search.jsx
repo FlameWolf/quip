@@ -257,7 +257,7 @@ export default props => {
 				<p>Use the following syntax to refine your search:</p>
 				<ul>
 					<li><code>hello world has-media:1</code> - Search for posts containing "hello world" that have media attachments.</li>
-					<li><code>users:1 ma</code> - Search for users with handles containing the string "ma".</li>
+					<li><code>ma users:1 match:contains</code> - Search for users with handles containing the string "ma".</li>
 					<li><code>langs:ml|en</code> - Search for posts written in Malayalam or English.</li>
 				</ul>
 			</div>

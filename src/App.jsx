@@ -4,6 +4,7 @@ import { lightTheme, darkTheme } from "./library";
 import { themeStore, setThemeStore } from "./stores/theme-store";
 import { authStore, setAuthStore } from "./stores/auth-store";
 
+let searchInput;
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const authBaseUrl = `${apiBaseUrl}/auth`;
 const refreshTokenUrl = `${authBaseUrl}/refresh-token`;
@@ -30,13 +31,20 @@ export default props => {
 		localStorage.setItem("theme", theme);
 	});
 	const updateTheme = () => setThemeStore("theme", themeStore.isLight ? darkTheme : lightTheme);
+	const populateSearchInput = () => {
+		const urlParams = new URLSearchParams(location.search);
+		const searchText = urlParams.get("q");
+		if(searchText) {
+			searchInput.value = searchText;
+		}
+	}
 	const doSearch = event => {
 		event.preventDefault();
-		const searchText = document.querySelector("#search-input").value;
+		const searchText = searchInput.value;
 		if(!searchText) {
 			return;
 		}
-		location.replace("/search?q=" + encodeURIComponent(searchText));
+		location.href = "/search?q=" + encodeURIComponent(searchText);
 	};
 	onMount(() => {
 		const location = useLocation();
@@ -50,6 +58,9 @@ export default props => {
 		navigator.serviceWorker.controller?.postMessage({
 			action: import.meta.env.VITE_GET_AUTH_DATA_ACTION
 		});
+		if(location.pathname.startsWith("/search")) {
+			populateSearchInput();
+		}
 	});
 	onCleanup(() => {
 		authChannel.close();
@@ -61,7 +72,7 @@ export default props => {
 					<div class="container">
 						<a class="navbar-brand mb-0 h1" target="_self" href="/">Home</a>
 						<form class="d-flex" role="search">
-							<input id="search-input" class="form-control me-2" type="text" placeholder="Search" aria-label="Search" onKeyUp={(event) => (event.code === "Enter") && doSearch(event)}/>
+							<input ref={searchInput} class="form-control me-2" type="text" placeholder="Search" aria-label="Search" onKeyUp={(event) => (event.code === "Enter") && doSearch(event)}/>
 							<button class="btn btn-outline-primary" type="submit" onClick={doSearch}>Search</button>
 						</form>
 					</div>
