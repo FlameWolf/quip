@@ -1,6 +1,6 @@
 import { createMemo, createSignal, Show } from "solid-js";
 import { BsChatRight, BsQuote, BsStar, BsStarFill } from "solid-icons/bs";
-import { FiEdit3, FiRepeat } from "solid-icons/fi";
+import { FiEdit3, FiRepeat, FiTrash } from "solid-icons/fi";
 import { authStore } from "../stores/auth-store";
 import { formatTimeAgo, toLongDateString } from "../library";
 import DisplayPoll from "./DisplayPoll";
@@ -13,6 +13,7 @@ const favouriteUrl = `${postsBaseUrl}/favourite`;
 const unfavouriteUrl = `${postsBaseUrl}/unfavourite`;
 const repeatUrl = `${postsBaseUrl}/repeat`;
 const unrepeatUrl = `${postsBaseUrl}/unrepeat`;
+const deleteUrl = `${postsBaseUrl}/delete`;
 
 export default props => {
 	const post = props.post;
@@ -26,7 +27,10 @@ export default props => {
 	const [quoteFlag, setQuoteFlag] = createSignal(false);
 	const [repeatFlag, setRepeatFlag] = createSignal(post.repeated);
 	const [replyFlag, setReplyFlag] = createSignal(false);
-	const allowEdit = createMemo(() => post.author._id === authStore.userId && !post.attachments?.poll && post.__v === 0);
+	const [confirmDelete, setConfirmDelete] = createSignal(false);
+	const [isDeleted, setIsDeleted] = createSignal(false);
+	const isOwnPost = createMemo(() => post.author._id === authStore.userId);
+	const allowEdit = createMemo(() => isOwnPost() && !post.attachments?.poll && post.__v === 0);
 	const toggleFave = event => {
 		fetch(`${faveFlag() ? unfavouriteUrl : favouriteUrl}/${postId}`).then(response => {
 			if (response.status === 200) {
@@ -58,9 +62,19 @@ export default props => {
 		editorInstance = null;
 		sourceActionBar = null;
 	};
+	const deletePost = async () => {
+		try {
+			const response = await fetch(`${deleteUrl}/${postId}`, { method: "DELETE" });
+			if (response.status === 200) {
+				setIsDeleted(true);
+			}
+		} finally {
+			setConfirmDelete(false);
+		}
+	};
 	return (
 		<>
-			<div data-post-id={postId} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, reply: props.isReply }}>
+			<div data-post-id={postId} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, reply: props.isReply, "d-none": isDeleted() }}>
 				<div class="post-header">
 					<a class="handle" href={`/${handle}`}>{handle}</a>
 					<Show when={props.parentBlurb}>
@@ -95,7 +109,7 @@ export default props => {
 							</Show>
 						</Show>
 						<Show when={attachments.post}>
-							<div onClick={() => location.href = `post/${attachments.post._id}`} role="button">
+							<div onClick={() => (location.href = `post/${attachments.post._id}`)} role="button">
 								<DisplayPostMinimal post={attachments.post}/>
 							</div>
 						</Show>
@@ -110,12 +124,35 @@ export default props => {
 						<button class="btn bg-transparent border-0 py-2 px-3" onClick={() => setQuoteFlag(true)}><BsQuote/></button>
 						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleRepeat}>{repeatFlag() ? <FiRepeat color="green" class="stroke-3"/> : <FiRepeat/>}</button>
 						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleReply}>{replyFlag() ? <BsChatRight color="blue"/> : <BsChatRight/>}</button>
+						<Show when={isOwnPost()}>
+							<button class="btn bg-transparent border-0 py-2 px-3"><FiTrash onClick={() => setConfirmDelete(true)}/></button>
+						</Show>
 					</div>
 				</div>
 				<Show when={quoteFlag()}>
 					<QuotePost post={post} isOpen={true} onClose={() => setQuoteFlag(false)}/>
 				</Show>
 			</div>
+			<Show when={confirmDelete()}>
+				<div class="modal fade show d-block" tabindex="-1">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Confirm</h5>
+								<button type="button" class="btn-close" onClick={() => setConfirmDelete(false)}></button>
+							</div>
+							<div class="modal-body">
+								<p>Are you sure you want to delete this post?</p>
+								<DisplayPostMinimal post={post}/>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" onClick={() => setConfirmDelete(false)}>Cancel</button>
+								<button type="button" class="btn btn-danger" onClick={deletePost}>Delete</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</Show>
 		</>
 	);
 };

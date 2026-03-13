@@ -4,12 +4,11 @@ import DisplayPost from "./DisplayPost";
 
 export default props => {
 	const posts = createMemo(() => props.posts);
-	console.log(posts());
 	const renderRecursive = (post, isReply = false, parentBlurb = undefined) => {
 		const replies = createMemo(() => posts().filter(reply => reply.replyTo === post._id));
 		return (
 			<>
-				<DisplayPost post={post} hasReplies={replies().length} isReply={isReply} parentBlurb={parentBlurb} />
+				<DisplayPost post={post} hasReplies={replies().length} isReply={isReply} parentBlurb={parentBlurb}/>
 				<For each={replies()}>{(reply, index) => renderRecursive(reply, true, trimPost(post.content))}</For>
 			</>
 		);
