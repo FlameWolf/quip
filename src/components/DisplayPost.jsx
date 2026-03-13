@@ -72,7 +72,7 @@ export default props => {
 						<div>Repeated by <span class="handle">{repeatedBy.handle}</span></div>
 					</Show>
 					<div class="ms-auto">
-						<a title={toLongDateString(createdAt)}>{formatTimeAgo(createdAt)}</a>
+						<a class="link-secondary" title={toLongDateString(createdAt)} href={`post/${post._id}`}>{formatTimeAgo(createdAt)}</a>
 					</div>
 				</div>
 				<div class="card-body px-2">
@@ -95,7 +95,9 @@ export default props => {
 							</Show>
 						</Show>
 						<Show when={attachments.post}>
-							<DisplayPostMinimal post={attachments.post}/>
+							<div onClick={() => location.href = `post/${attachments.post._id}`} role="button">
+								<DisplayPostMinimal post={attachments.post}/>
+							</div>
 						</Show>
 					</Show>
 				</div>

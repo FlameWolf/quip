@@ -13,6 +13,7 @@ const SignUp = lazy(() => import("./components/SignUp"));
 const SignIn = lazy(() => import("./components/SignIn"));
 const Home = lazy(() => import("./components/Home"));
 const Search = lazy(() => import("./components/Search"));
+const Post = lazy(() => import("./components/Post"));
 const Profile = lazy(() => import("./components/Profile"));
 const NotFound = lazy(() => import("./components/NotFound"));
 
@@ -88,6 +89,7 @@ render(() => {
 						<Route path={["/", "/sign-up"]} component={SignUp}/>
 					</Route>
 					<Route path="/search" component={Search}/>
+					<Route path="/post/:postId" component={Post}/>
 					<Route path="/:handle" component={Profile}/>
 					<Route path={["/", "/home"]} component={Home}/>
 					<Route path="/*404" component={NotFound}/>
