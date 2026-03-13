@@ -276,6 +276,11 @@ body {
 	border-left-color: revert;
 }
 
+.modal {
+	background: rgba(55, 55, 55, 0.6);
+	backdrop-filter: blur(2px);
+}
+
 .position-absolute-middle {
 	position: absolute;
 	top: 50%;
