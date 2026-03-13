@@ -1,7 +1,6 @@
-import { createMemo, createSignal, For, Match, onMount, Show } from "solid-js";
+import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { useNavigate, useSearchParams } from "@solidjs/router";
-import { emptyString, maxItemsToFetch, trimPost } from "../library";
-import { quipStore, setQuipStore } from "../stores/quip-store";
+import { emptyString, maxItemsToFetch } from "../library";
 import DisplayPost from "./DisplayPost";
 
 /*
@@ -149,6 +148,7 @@ export default props => {
 	const [lastScore, setLastScore] = createSignal();
 	const [lastItemId, setLastItemId] = createSignal(emptyString);
 	const [hasMore, setHasMore] = createSignal(true);
+	const [searchResults, setSearchResults] = createSignal([]);
 
 	const searchUrl = `${import.meta.env.VITE_API_BASE_URL}/search`;
 
@@ -212,7 +212,7 @@ export default props => {
 		if (isLoadMore) {
 			await fetchAndAppendResults();
 		} else {
-			setQuipStore("quips", []);
+			setSearchResults([]);
 			setLastItemId(emptyString);
 			setLastScore(undefined);
 			setHasMore(true);
@@ -237,7 +237,7 @@ export default props => {
 			if (itemCount < maxItemsToFetch) {
 				setHasMore(false);
 			}
-			setQuipStore("quips", [...quipStore.quips, ...items]);
+			setSearchResults([...searchResults(), ...items]);
 		} else {
 			console.error("Search request failed:", response.statusText);
 		}
@@ -262,14 +262,14 @@ export default props => {
 				</ul>
 			</div>
 			<h2>Search Results</h2>
-			<Show when={quipStore.quips.length === 0}>
+			<Show when={searchResults().length === 0}>
 				<p>No results found. Try a different search.</p>
 			</Show>
-			<Show when={!isUserSearch() && quipStore.quips.length > 0}>
-				<For each={quipStore.quips}>{(result, index) => <DisplayPost post={result}/>}</For>
+			<Show when={!isUserSearch() && searchResults().length > 0}>
+				<For each={searchResults()}>{(result, index) => <DisplayPost post={result}/>}</For>
 			</Show>
-			<Show when={isUserSearch() && quipStore.quips.length > 0}>
-				<For each={quipStore.quips}>
+			<Show when={isUserSearch() && searchResults().length > 0}>
+				<For each={searchResults()}>
 					{result => (
 						<div class="search-result">
 							<h3><a href={`/${result.handle}`}>{result.handle}</a></h3>
@@ -278,7 +278,7 @@ export default props => {
 					)}
 				</For>
 			</Show>
-			<Show when={quipStore.quips.length > 0}>
+			<Show when={searchResults().length > 0}>
 				<div class="my-2">
 					<button ref={loadMoreButton} class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Results"} onClick={handleLoadMore} disabled={!hasMore()}></button>
 				</div>
