@@ -1,5 +1,5 @@
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
-import { useNavigate, useSearchParams } from "@solidjs/router";
+import { useSearchParams } from "@solidjs/router";
 import { emptyString, maxItemsToFetch } from "../library";
 import DisplayPost from "./DisplayPost";
 
@@ -142,16 +142,13 @@ Sample Result:
 
 export default props => {
 	let loadMoreButton;
-	const navigate = useNavigate();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const [isUserSearch, setIsUserSearch] = createSignal(false);
 	const [lastScore, setLastScore] = createSignal();
 	const [lastItemId, setLastItemId] = createSignal(emptyString);
 	const [hasMore, setHasMore] = createSignal(true);
 	const [searchResults, setSearchResults] = createSignal([]);
-
 	const searchUrl = `${import.meta.env.VITE_API_BASE_URL}/search`;
-
 	const parseQueryTokens = query => {
 		const tokens = {};
 		const parts = query?.q?.split(/\s+/);
@@ -170,7 +167,6 @@ export default props => {
 			tokens
 		};
 	};
-
 	const searchType = createMemo(() => {
 		const { tokens } = parseQueryTokens(searchParams);
 		if (tokens.nearby === "1") {
@@ -183,7 +179,6 @@ export default props => {
 		setIsUserSearch(false);
 		return emptyString;
 	});
-
 	const buildSearchUrl = (includeLastItem = false) => {
 		const { searchText, tokens } = parseQueryTokens(searchParams);
 		const params = new URLSearchParams();
@@ -207,7 +202,6 @@ export default props => {
 		}
 		return `${searchUrl}${searchType()}?${params.toString()}`;
 	};
-
 	const loadSearchResults = async (isLoadMore = false) => {
 		if (isLoadMore) {
 			await fetchAndAppendResults();
@@ -219,7 +213,6 @@ export default props => {
 			await fetchAndAppendResults();
 		}
 	};
-
 	const fetchAndAppendResults = async () => {
 		const url = buildSearchUrl(lastItemId() !== emptyString);
 		const response = await fetch(url);
@@ -242,15 +235,12 @@ export default props => {
 			console.error("Search request failed:", response.statusText);
 		}
 	};
-
 	const handleLoadMore = async () => {
 		await loadSearchResults(true);
 	};
-
 	onMount(async () => {
 		await loadSearchResults(false);
 	});
-
 	return (
 		<>
 			<div class="alert alert-info">
@@ -266,7 +256,7 @@ export default props => {
 				<p>No results found. Try a different search.</p>
 			</Show>
 			<Show when={!isUserSearch() && searchResults().length > 0}>
-				<For each={searchResults()}>{(result, index) => <DisplayPost post={result}/>}</For>
+				<For each={searchResults()}>{(result) => <DisplayPost post={result}/>}</For>
 			</Show>
 			<Show when={isUserSearch() && searchResults().length > 0}>
 				<For each={searchResults()}>

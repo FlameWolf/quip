@@ -10,7 +10,6 @@ export default props => {
 		setIsOpen(false);
 		props.onClose?.();
 	}
-
 	return (
 		<Show when={isOpen()}>
 			<div class="modal d-block open">

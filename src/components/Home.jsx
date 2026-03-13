@@ -1,9 +1,9 @@
-import { createMemo, createSignal, For, onMount } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import { useNavigate } from "@solidjs/router";
-import { emptyString, trimPost } from "../library";
+import { emptyString } from "../library";
 import { quipStore, setQuipStore } from "../stores/quip-store";
-import DisplayPost from "./DisplayPost";
 import Editor from "./Editor";
+import DisplayPostList from "./DisplayPostList";
 
 const postsUrl = `${import.meta.env.VITE_API_BASE_URL}/timeline`;
 
@@ -34,21 +34,10 @@ export default props => {
 	onMount(async () => {
 		await loadPosts();
 	});
-	const renderRecursive = (post, isReply = false, parentBlurb = undefined) => {
-		const replies = createMemo(() => quipStore.quips.filter(reply => reply.replyTo === post._id));
-		return (
-			<>
-				<DisplayPost post={post} hasReplies={replies().length} isReply={isReply} parentBlurb={parentBlurb}/>
-				<For each={replies()}>{(reply, index) => renderRecursive(reply, true, trimPost(post.content))}</For>
-			</>
-		);
-	};
 	return (
 		<>
 			<Editor id="post-editor" classList={{ "mb-2": true }}/>
-			<ul class="list-group">
-				<For each={quipStore.quips}>{(quip, index) => !quip.replyTo && renderRecursive(quip)}</For>
-			</ul>
+			<DisplayPostList posts={quipStore.quips}/>
 			<div class="my-2">
 				<button ref={loadMoreButton} class="btn btn-primary form-control" onClick={() => loadPosts(lastPostId())}>Load More</button>
 			</div>

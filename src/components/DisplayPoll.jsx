@@ -11,7 +11,6 @@ export default props => {
 	const thirdPercentage = createMemo(() => Math.round((votes.third / (totalVotes() || 1)) * 100, 2));
 	const fourthPercentage = createMemo(() => Math.round((votes.fourth / (totalVotes() || 1)) * 100, 2));
 	const castVoteUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/vote/${props.postId}`;
-
 	const castVote = async option => {
 		var response = await fetch(`${castVoteUrl}?option=${option}`);
 		if (response.ok) {
@@ -42,7 +41,6 @@ export default props => {
 			}
 		}
 	};
-
 	return (
 		<div class="card-body poll">
 			<Show when={inactivePoll}>

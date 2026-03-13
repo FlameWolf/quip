@@ -1,9 +1,9 @@
 import { useParams } from "@solidjs/router";
-import { createEffect, createSignal, For, onMount, Show } from "solid-js";
+import { createEffect, createSignal, onMount, Show } from "solid-js";
 import { BsPersonBadgeFill } from "solid-icons/bs";
 import { authStore } from "../stores/auth-store";
 import { emptyString, maxItemsToFetch } from "../library";
-import DisplayPost from "./DisplayPost";
+import DisplayPostList from "./DisplayPostList";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
@@ -92,9 +92,7 @@ export default props => {
 					<div class="py-2">{profileUser().postsCount} Quips</div>
 				</div>
 			</div>
-			<ul class="list-group">
-				<For each={userPosts()}>{(quip, index) => <DisplayPost post={quip}/>}</For>
-			</ul>
+			<DisplayPostList posts={userPosts()}/>
 			<div class="my-2">
 				<button ref={loadMoreButton} class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Posts"} onClick={loadUserQuips}></button>
 			</div>
