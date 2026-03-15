@@ -78,12 +78,14 @@ export default props => {
 				<div class="post-header">
 					<a class="handle" href={`/${handle}`}>{handle}</a>
 					<Show when={props.parentBlurb || props.isReply}>
-						<div>&#xA0;</div>
+						<span>&#xA0;</span>
+						<span>In reply to</span>
+						<span>&#xA0;</span>
 						<Show when={props.parentBlurb}>
-							<div innerHTML={`In reply to "${props.parentBlurb}"`}></div>
+							<em innerHTML={props.parentBlurb}/>
 						</Show>
 						<Show when={!props.parentBlurb}>
-							<div>In reply to <a class="link-secondary" href={`/post/${post.replyTo}`}>a post</a></div>
+							<a class="link-secondary" href={`/post/${post.replyTo}`}>a post</a>
 						</Show>
 					</Show>
 					<Show when={repeatedBy}>
