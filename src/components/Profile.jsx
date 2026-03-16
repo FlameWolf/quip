@@ -75,15 +75,9 @@ export default props => {
 								<Show when={followsMe()}>
 									<div class="badge bg-secondary">Follows you</div>
 								</Show>
-								<button class="btn btn-sm btn-primary" onClick={() => toggleAction("follow", followed(), setFollowed)}>
-									{followed() ? "Unflollow" : "Follow"}
-								</button>
-								<button class="btn btn-sm btn-primary" onClick={() => toggleAction("mute", muted(), setMuted)}>
-									{muted() ? "Unmute" : "Mute"}
-								</button>
-								<button class="btn btn-sm btn-danger" onClick={() => toggleAction("block", blocked(), setBlocked)}>
-									{blocked() ? "Unblock" : "Block"}
-								</button>
+								<button class="btn btn-sm btn-primary" onClick={() => toggleAction("follow", followed(), setFollowed)}>{followed() ? "Unflollow" : "Follow"}</button>
+								<button class="btn btn-sm btn-primary" onClick={() => toggleAction("mute", muted(), setMuted)}>{muted() ? "Unmute" : "Mute"}</button>
+								<button class="btn btn-sm btn-danger" onClick={() => toggleAction("block", blocked(), setBlocked)}>{blocked() ? "Unblock" : "Block"}</button>
 							</div>
 						</Show>
 					</div>
