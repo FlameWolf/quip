@@ -3,11 +3,16 @@ import { createEffect, createSignal, onMount, Show } from "solid-js";
 import { BsPersonBadgeFill } from "solid-icons/bs";
 import { authStore } from "../stores/auth-store";
 import { emptyString, maxItemsToFetch } from "../library";
+import { Dropdown } from "bootstrap";
 import DisplayPostList from "./DisplayPostList";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
 export default props => {
+	let muteButton;
+	let muteMenuToggle;
+	let blockButton;
+	let blockMenuToggle;
 	let loadMoreButton;
 	const params = useParams();
 	const profileUrl = `${profileBaseUrl}/${params.handle}`;
@@ -17,6 +22,8 @@ export default props => {
 	const [muted, setMuted] = createSignal(false);
 	const [blocked, setBlocked] = createSignal(false);
 	const [followsMe, setFollowsMe] = createSignal(false);
+	const [actionReason, setActionReason] = createSignal(emptyString);
+	const [actionTrigger, setActionTrigger] = createSignal(null);
 	const [lastPostId, setLastPostId] = createSignal(emptyString);
 	const [hasMore, setHasMore] = createSignal(true);
 	const [userPosts, setUserPosts] = createSignal([]);
@@ -45,7 +52,7 @@ export default props => {
 		setUserPosts([...userPosts(), ...posts]);
 	};
 	const toggleAction = async (action, flag, setFlag) => {
-		const actionUrl = `${profileBaseUrl}/${flag ? `un${action}` : action}/${params.handle}`;
+		const actionUrl = `${profileBaseUrl}/${flag ? `un${action}` : action}/${params.handle}${actionReason() ? `?reason=${actionReason()}` : emptyString}`;
 		const response = await fetch(actionUrl);
 		if (response.status === 200) {
 			setFlag(!flag);
@@ -59,6 +66,8 @@ export default props => {
 	onMount(async () => {
 		await loadUser();
 		await loadUserQuips();
+		new Dropdown(muteMenuToggle);
+		new Dropdown(blockMenuToggle);
 	});
 	return (
 		<>
@@ -76,8 +85,32 @@ export default props => {
 									<div class="badge bg-secondary">Follows you</div>
 								</Show>
 								<button class="btn btn-sm btn-primary" onClick={() => toggleAction("follow", followed(), setFollowed)}>{followed() ? "Unflollow" : "Follow"}</button>
-								<button class="btn btn-sm btn-primary" onClick={() => toggleAction("mute", muted(), setMuted)}>{muted() ? "Unmute" : "Mute"}</button>
-								<button class="btn btn-sm btn-danger" onClick={() => toggleAction("block", blocked(), setBlocked)}>{blocked() ? "Unblock" : "Block"}</button>
+								<div class="btn-group">
+									<button ref={muteButton} class="btn btn-sm btn-primary" onClick={() => toggleAction("mute", muted(), setMuted)}>{muted() ? "Unmute" : "Mute"}</button>
+									<div class="btn-group dropdown">
+										<button ref={muteMenuToggle} type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+											<span class="visually-hidden">Toggle Dropdown</span>
+										</button>
+										<ul class="dropdown-menu">
+											<li>
+												<a class="dropdown-item" role="button" onClick={() => setActionTrigger(muteButton)}>Specify a reason</a>
+											</li>
+										</ul>
+									</div>
+								</div>
+								<div class="btn-group">
+									<button ref={blockButton} class="btn btn-sm btn-danger" onClick={() => toggleAction("block", blocked(), setBlocked)}>{blocked() ? "Unblock" : "Block"}</button>
+									<div class="btn-group dropdown">
+										<button ref={blockMenuToggle} type="button" class="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+											<span class="visually-hidden">Toggle Dropdown</span>
+										</button>
+										<ul class="dropdown-menu">
+											<li>
+												<a class="dropdown-item" role="button" onClick={() => setActionTrigger(blockButton)}>Specify a reason</a>
+											</li>
+										</ul>
+									</div>
+								</div>
 							</div>
 						</Show>
 					</div>
@@ -86,6 +119,31 @@ export default props => {
 					<div class="py-2">{profileUser().postsCount} Quips</div>
 				</div>
 			</div>
+			<Show when={actionTrigger()}>
+				<div class="modal d-block open">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-header">
+								<p class="modal-title">Specify Reason for Action</p>
+								<button type="button" class="btn-close" onClick={() => setActionTrigger(null)}></button>
+							</div>
+							<div class="modal-body">
+								<input type="text" class="form-control" placeholder="Reason for action" value={actionReason()} onInput={e => setActionReason(e.target.value)}/>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" onClick={() => setActionTrigger(null)}>Cancel</button>
+								<button type="button" class="btn btn-primary" onClick={
+									() => {
+										actionTrigger().click();
+										setActionTrigger(null);
+										setActionReason(emptyString);
+									}
+								}>Confirm</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</Show>
 			<DisplayPostList posts={userPosts()}/>
 			<div class="my-2">
 				<button ref={loadMoreButton} class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Posts"} onClick={loadUserQuips}></button>
