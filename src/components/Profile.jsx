@@ -173,7 +173,15 @@ export default props => {
 					</div>
 				</Show>
 				<div class="card-body">
-					<div class="py-2">{profileUser().postsCount} Quips</div>
+					<div class="py-2">
+						<span class="badge text-bg-info">{profileUser().postsCount} Quips</span>
+						<Show when={isSelf()}>
+							<span>&#xA0;</span>
+							<span class="badge text-bg-info">{followingCount()} Following</span>
+							<span>&#xA0;</span>
+							<span class="badge text-bg-info">{followerCount()} Followers</span>
+						</Show>
+					</div>
 				</div>
 			</div>
 			<Show when={actionTrigger()}>
