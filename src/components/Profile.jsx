@@ -28,6 +28,8 @@ export default props => {
 	const [followerCount, setFollowerCount] = createSignal(0);
 	const [actionReason, setActionReason] = createSignal(emptyString);
 	const [actionTrigger, setActionTrigger] = createSignal(null);
+	const [showMutedReason, setShowMutedReason] = createSignal(false);
+	const [showBlockedReason, setShowBlockedReason] = createSignal(false);
 	const [lastPostId, setLastPostId] = createSignal(emptyString);
 	const [hasMore, setHasMore] = createSignal(true);
 	const [userPosts, setUserPosts] = createSignal([]);
@@ -79,8 +81,17 @@ export default props => {
 		}
 	};
 	createEffect(() => {
-		if (blocked() && followsMe()) {
+		if (blocked()) {
 			setFollowsMe(false);
+			setFollowed(false);
+		}
+	});
+	createEffect(() => {
+		if (!muted()) {
+			setShowMutedReason(false);
+		}
+		if (!blocked()) {
+			setShowBlockedReason(false);
 		}
 	});
 	onMount(async () => {
@@ -123,7 +134,7 @@ export default props => {
 									</Show>
 								</div>
 								<Show when={muted() && mutedReason()}>
-									<i class="bi bi-info-circle"></i>
+									<a class="bi bi-info-circle" role="button" onClick={() => setShowMutedReason(!showMutedReason())}></a>
 								</Show>
 								<div class="btn-group">
 									<button ref={blockButton} class="btn btn-sm btn-danger" onClick={() => toggleAction("block", blocked(), setBlocked)}>{blocked() ? "Unblock" : "Block"}</button>
@@ -141,12 +152,26 @@ export default props => {
 									</Show>
 								</div>
 								<Show when={blocked() && blockedReason()}>
-									<i class="bi bi-info-circle"></i>
+									<a class="bi bi-info-circle" role="button" onClick={() => setShowBlockedReason(!showBlockedReason())}></a>
 								</Show>
 							</div>
 						</Show>
 					</div>
 				</div>
+				<Show when={showMutedReason()}>
+					<div class="alert alert-info m-2">
+						<span>Mute reason:</span>
+						<span>&#xA0;</span>
+						<span>{mutedReason()}</span>
+					</div>
+				</Show>
+				<Show when={showBlockedReason()}>
+					<div class="alert alert-info m-2">
+						<span>Block reason:</span>
+						<span>&#xA0;</span>
+						<span>{blockedReason()}</span>
+					</div>
+				</Show>
 				<div class="card-body">
 					<div class="py-2">{profileUser().postsCount} Quips</div>
 				</div>
