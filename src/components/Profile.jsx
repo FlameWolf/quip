@@ -20,8 +20,12 @@ export default props => {
 	const [isSelf, setIsSelf] = createSignal(true);
 	const [followed, setFollowed] = createSignal(false);
 	const [muted, setMuted] = createSignal(false);
+	const [mutedReason, setMutedReason] = createSignal(emptyString);
 	const [blocked, setBlocked] = createSignal(false);
+	const [blockedReason, setBlockedReason] = createSignal(emptyString);
 	const [followsMe, setFollowsMe] = createSignal(false);
+	const [followingCount, setFollowingCount] = createSignal(0);
+	const [followerCount, setFollowerCount] = createSignal(0);
 	const [actionReason, setActionReason] = createSignal(emptyString);
 	const [actionTrigger, setActionTrigger] = createSignal(null);
 	const [lastPostId, setLastPostId] = createSignal(emptyString);
@@ -35,8 +39,12 @@ export default props => {
 			setIsSelf(user.self);
 			setFollowed(user.followedByMe);
 			setMuted(user.mutedByMe);
+			setMutedReason(user.mutedReason);
 			setBlocked(user.blockedByMe);
+			setBlockedReason(user.blockedReason);
 			setFollowsMe(user.followedMe);
+			setFollowingCount(user.following);
+			setFollowerCount(user.followers);
 		}
 	};
 	const loadUserQuips = async handle => {
@@ -56,6 +64,18 @@ export default props => {
 		const response = await fetch(actionUrl);
 		if (response.status === 200) {
 			setFlag(!flag);
+			switch (action) {
+				case "mute":
+					setMutedReason(flag ? emptyString: actionReason());
+					break;
+				case "block":
+					setBlockedReason(flag ? emptyString: actionReason());
+					break;
+				default:
+					break;
+			}
+			setActionReason(emptyString);
+			setActionTrigger(null);
 		}
 	};
 	createEffect(() => {
@@ -66,8 +86,10 @@ export default props => {
 	onMount(async () => {
 		await loadUser();
 		await loadUserQuips();
-		new Dropdown(muteMenuToggle);
-		new Dropdown(blockMenuToggle);
+		if (!isSelf()) {
+			new Dropdown(muteMenuToggle);
+			new Dropdown(blockMenuToggle);
+		}
 	});
 	return (
 		<>
@@ -87,30 +109,40 @@ export default props => {
 								<button class="btn btn-sm btn-primary" onClick={() => toggleAction("follow", followed(), setFollowed)}>{followed() ? "Unflollow" : "Follow"}</button>
 								<div class="btn-group">
 									<button ref={muteButton} class="btn btn-sm btn-primary" onClick={() => toggleAction("mute", muted(), setMuted)}>{muted() ? "Unmute" : "Mute"}</button>
-									<div class="btn-group dropdown">
-										<button ref={muteMenuToggle} type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-											<span class="visually-hidden">Toggle Dropdown</span>
-										</button>
-										<ul class="dropdown-menu">
-											<li>
-												<a class="dropdown-item" role="button" onClick={() => setActionTrigger(muteButton)}>Specify a reason</a>
-											</li>
-										</ul>
-									</div>
+									<Show when={!isSelf() && !muted()}>
+										<div class="btn-group dropdown">
+											<button ref={muteMenuToggle} type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+												<span class="visually-hidden">Toggle Dropdown</span>
+											</button>
+											<ul class="dropdown-menu">
+												<li>
+													<a class="dropdown-item" role="button" onClick={() => setActionTrigger(muteButton)}>Specify a reason</a>
+												</li>
+											</ul>
+										</div>
+									</Show>
 								</div>
+								<Show when={muted() && mutedReason()}>
+									<i class="bi bi-info-circle"></i>
+								</Show>
 								<div class="btn-group">
 									<button ref={blockButton} class="btn btn-sm btn-danger" onClick={() => toggleAction("block", blocked(), setBlocked)}>{blocked() ? "Unblock" : "Block"}</button>
-									<div class="btn-group dropdown">
-										<button ref={blockMenuToggle} type="button" class="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-											<span class="visually-hidden">Toggle Dropdown</span>
-										</button>
-										<ul class="dropdown-menu">
-											<li>
-												<a class="dropdown-item" role="button" onClick={() => setActionTrigger(blockButton)}>Specify a reason</a>
-											</li>
-										</ul>
-									</div>
+									<Show when={!isSelf() && !blocked()}>
+										<div class="btn-group dropdown">
+											<button ref={blockMenuToggle} type="button" class="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+												<span class="visually-hidden">Toggle Dropdown</span>
+											</button>
+											<ul class="dropdown-menu">
+												<li>
+													<a class="dropdown-item" role="button" onClick={() => setActionTrigger(blockButton)}>Specify a reason</a>
+												</li>
+											</ul>
+										</div>
+									</Show>
 								</div>
+								<Show when={blocked() && blockedReason()}>
+									<i class="bi bi-info-circle"></i>
+								</Show>
 							</div>
 						</Show>
 					</div>
@@ -124,7 +156,7 @@ export default props => {
 					<div class="modal-dialog modal-dialog-centered">
 						<div class="modal-content">
 							<div class="modal-header">
-								<p class="modal-title">Specify Reason for Action</p>
+								<p class="modal-title">Specify reason</p>
 								<button type="button" class="btn-close" onClick={() => setActionTrigger(null)}></button>
 							</div>
 							<div class="modal-body">
@@ -132,13 +164,7 @@ export default props => {
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-secondary" onClick={() => setActionTrigger(null)}>Cancel</button>
-								<button type="button" class="btn btn-primary" onClick={
-									() => {
-										actionTrigger().click();
-										setActionTrigger(null);
-										setActionReason(emptyString);
-									}
-								}>Confirm</button>
+								<button type="button" class="btn btn-primary" onClick={() => actionTrigger().click()}>Confirm</button>
 							</div>
 						</div>
 					</div>
