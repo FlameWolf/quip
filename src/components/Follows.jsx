@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, onMount, For, Show, Suspense } from "solid-js";
+import { createEffect, createMemo, createSignal, onMount, For, Show } from "solid-js";
 import { authStore } from "../stores/auth-store";
 import { emptyString, maxItemsToFetch } from "../library";
 
@@ -40,37 +40,35 @@ export default props => {
 		}
 	};
 	createEffect(async () => {
-		await fetchFollows();
+		if(isAuthenticated()) {
+			await fetchFollows();
+		}
 	});
 	onMount(async () => {
 		await fetchFollows();
 	});
 	return (
-		<>
-			<Show when={follows().length}>
-				<ul class="list-group">
-					<For each={follows()}>
-						{follow => (
-							<li class="list-group-item">
-								<h3><a href={`/${follow.handle}`}>{follow.handle}</a></h3>
-								<div class="d-flex gap-2">
-									{follow.protected && <div class="badge text-bg-info">Protected</div>}
-									{follow.deactivated && <div class="badge text-bg-info">Deactivated</div>}
-									{(follow.followedByMe && pathToUse === "followers") && <div class="badge text-bg-info">Followed by you</div>}
-									{(follow.followedMe && pathToUse === "following") && <div class="badge text-bg-info">Followed you</div>}
-									{follow.mutedByMe && <div class="badge text-bg-info">Muted by you</div>}
-								</div>
-								<p>{follow.postsCount} {follow.postsCount === 1 ? "post" : "posts"}</p>
-							</li>
-						)}
-					</For>
-				</ul>
-			</Show>
-			<Show when={follows().length > 0}>
-				<div class="my-2">
-					<button class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Results"} onClick={fetchFollows} disabled={!hasMore()}></button>
-				</div>
-			</Show>
-		</>
+		<Show when={follows().length}>
+			<ul class="list-group">
+				<For each={follows()}>
+					{follow => (
+						<li class="list-group-item">
+							<h3><a href={`/${follow.handle}`}>{follow.handle}</a></h3>
+							<div class="d-flex gap-2">
+								{follow.protected && <div class="badge text-bg-info">Protected</div>}
+								{follow.deactivated && <div class="badge text-bg-info">Deactivated</div>}
+								{(follow.followedByMe && pathToUse === "followers") && <div class="badge text-bg-info">Followed by you</div>}
+								{(follow.followedMe && pathToUse === "following") && <div class="badge text-bg-info">Followed you</div>}
+								{follow.mutedByMe && <div class="badge text-bg-info">Muted by you</div>}
+							</div>
+							<p>{follow.postsCount} {follow.postsCount === 1 ? "post" : "posts"}</p>
+						</li>
+					)}
+				</For>
+			</ul>
+			<div class="my-2">
+				<button class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Results"} onClick={fetchFollows} disabled={!hasMore()}></button>
+			</div>
+		</Show>
 	);
 };

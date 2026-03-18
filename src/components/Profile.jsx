@@ -173,14 +173,14 @@ export default props => {
 					</div>
 				</Show>
 				<div class="card-body">
-					<div class="py-2">
-						<span class="badge text-bg-info">{profileUser().postsCount} Quips</span>
+					<div class="d-flex gap-2">
+						<div class="badge text-bg-info">{profileUser().postsCount} Quips</div>
 						<Show when={isSelf()}>
-							<span>&#xA0;</span>
 							<a class="badge text-bg-info" href={`${location.pathname}/following`}>{followingCount()} Following</a>
-							<span>&#xA0;</span>
 							<a class="badge text-bg-info" href={`${location.pathname}/followers`}>{followerCount()} Followers</a>
+							<a class="badge text-bg-info" href={`${location.pathname}/favourites`}>Favourites</a>
 						</Show>
+						<a class="badge text-bg-info" href={`${location.pathname}/mentions`}>Mentions</a>
 					</div>
 				</div>
 			</div>
