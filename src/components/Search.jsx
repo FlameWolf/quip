@@ -269,28 +269,30 @@ export default props => {
 				<For each={searchResults()}>{(result) => <DisplayPost post={result}/>}</For>
 			</Show>
 			<Show when={isUserSearch() && searchResults().length > 0}>
-				<For each={searchResults()}>
-					{result => (
-						<div class="search-result">
-							<h3><a href={`/${result.handle}`}>{result.handle}</a></h3>
-							<div class="d-flex gap-2">
-								{result.protected && <div class="badge text-bg-info">Protected</div>}
-								{result.deactivated && <div class="badge text-bg-info">Deactivated</div>}
-								{result.self && <div class="badge text-bg-info">This is you</div>}
-								{result.following > 0 && <div class="badge text-bg-info">Following: {result.following}</div>}
-								{result.followers > 0 && <div class="badge text-bg-info">Followers: {result.followers}</div>}
-								{result.blockedByMe && <div class="badge text-bg-info">Blocked by you</div>}
-								{result.blockedMe && <div class="badge text-bg-info">Blocked you</div>}
-								{result.requestedToFollowByMe && <div class="badge text-bg-info">Follow requested by you</div>}
-								{result.requestedToFollowMe && <div class="badge text-bg-info">Follow requested you</div>}
-								{result.followedByMe && <div class="badge text-bg-info">Followed by you</div>}
-								{result.followedMe && <div class="badge text-bg-info">Followed you</div>}
-								{result.mutedByMe && <div class="badge text-bg-info">Muted by you</div>}
-							</div>
-							<p>{result.postsCount} {result.postsCount === 1 ? "post" : "posts"}</p>
-						</div>
-					)}
-				</For>
+				<ul class="list-group">
+					<For each={searchResults()}>
+						{result => (
+							<li class="list-group-item">
+								<h3><a href={`/${result.handle}`}>{result.handle}</a></h3>
+								<div class="d-flex gap-2">
+									{result.protected && <div class="badge text-bg-info">Protected</div>}
+									{result.deactivated && <div class="badge text-bg-info">Deactivated</div>}
+									{result.self && <div class="badge text-bg-info">This is you</div>}
+									{result.following > 0 && <div class="badge text-bg-info">Following: {result.following}</div>}
+									{result.followers > 0 && <div class="badge text-bg-info">Followers: {result.followers}</div>}
+									{result.blockedByMe && <div class="badge text-bg-info">Blocked by you</div>}
+									{result.blockedMe && <div class="badge text-bg-info">Blocked you</div>}
+									{result.requestedToFollowByMe && <div class="badge text-bg-info">Follow requested by you</div>}
+									{result.requestedToFollowMe && <div class="badge text-bg-info">Follow requested you</div>}
+									{result.followedByMe && <div class="badge text-bg-info">Followed by you</div>}
+									{result.followedMe && <div class="badge text-bg-info">Followed you</div>}
+									{result.mutedByMe && <div class="badge text-bg-info">Muted by you</div>}
+								</div>
+								<p>{result.postsCount} {result.postsCount === 1 ? "post" : "posts"}</p>
+							</li>
+						)}
+					</For>
+				</ul>
 			</Show>
 			<Show when={searchResults().length > 0}>
 				<div class="my-2">
