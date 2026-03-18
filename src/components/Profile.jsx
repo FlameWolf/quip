@@ -1,4 +1,4 @@
-import { useParams } from "@solidjs/router";
+import { useParams, A } from "@solidjs/router";
 import { createEffect, createSignal, onMount, Show } from "solid-js";
 import { BsPersonBadgeFill } from "solid-icons/bs";
 import { authStore } from "../stores/auth-store";
@@ -176,11 +176,11 @@ export default props => {
 					<div class="d-flex gap-2">
 						<div class="badge text-bg-info">{profileUser().postsCount} Quips</div>
 						<Show when={isSelf()}>
-							<a class="badge text-bg-info" href={`${location.pathname}/following`}>{followingCount()} Following</a>
-							<a class="badge text-bg-info" href={`${location.pathname}/followers`}>{followerCount()} Followers</a>
-							<a class="badge text-bg-info" href={`${location.pathname}/favourites`}>Favourites</a>
+							<A class="badge text-bg-info" href="following">{followingCount()} Following</A>
+							<A class="badge text-bg-info" href="followers">{followerCount()} Followers</A>
+							<A class="badge text-bg-info" href="favourites">Favourites</A>
 						</Show>
-						<a class="badge text-bg-info" href={`${location.pathname}/mentions`}>Mentions</a>
+						<A class="badge text-bg-info" href="mentions">Mentions</A>
 					</div>
 				</div>
 			</div>
