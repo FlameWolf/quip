@@ -177,9 +177,9 @@ export default props => {
 						<span class="badge text-bg-info">{profileUser().postsCount} Quips</span>
 						<Show when={isSelf()}>
 							<span>&#xA0;</span>
-							<span class="badge text-bg-info">{followingCount()} Following</span>
+							<a class="badge text-bg-info" href={`${location.pathname}/following`}>{followingCount()} Following</a>
 							<span>&#xA0;</span>
-							<span class="badge text-bg-info">{followerCount()} Followers</span>
+							<a class="badge text-bg-info" href={`${location.pathname}/followers`}>{followerCount()} Followers</a>
 						</Show>
 					</div>
 				</div>
