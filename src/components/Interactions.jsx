@@ -1,16 +1,14 @@
-import { createEffect, createMemo, createSignal, onMount, Show } from "solid-js";
-import { authStore } from "../stores/auth-store";
+import { useParams, useLocation } from "@solidjs/router";
+import { createSignal, onMount, Show } from "solid-js";
 import { emptyString, maxItemsToFetch } from "../library";
 import DisplayPostList from "./DisplayPostList";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
-// const favouritesUrl = `${profileBaseUrl}/favourites`;
-// const votesUrl = `${profileBaseUrl}/votes`;
-// const bookmarksUrl = `${profileBaseUrl}/bookmarks`;
-// const mentionsUrl = `${profileBaseUrl}/mentions`;
 
 export default props => {
-	const { [1]: handleToUse, [2]: pathToUse } = location.pathname.split("/");
+	const params = useParams();
+	const location = useLocation();
+	const { [2]: pathToUse } = location.pathname.split("/");
 	const lastInteractionIdKey = (() => {
 		switch (pathToUse) {
 			case "favourites":
@@ -28,12 +26,11 @@ export default props => {
 	const [interactions, setInteractions] = createSignal([]);
 	const [lastInteractionId, setLastInteractionId] = createSignal(emptyString);
 	const [hasMore, setHasMore] = createSignal(true);
-	const isAuthenticated = createMemo(() => authStore.userId && authStore.handle);
 	const fetchInteractions = async () => {
-		if (pathToUse !== "mentions" && !(isAuthenticated() && hasMore())) {
+		if (pathToUse !== "mentions" && !hasMore()) {
 			return;
 		}
-		const response = await fetch(`${profileBaseUrl}/${handleToUse}/${pathToUse}${lastInteractionId() ? `?${lastInteractionIdKey}=${lastInteractionId()}` : emptyString}`);
+		const response = await fetch(`${profileBaseUrl}/${params.handle}/${pathToUse}${lastInteractionId() ? `?${lastInteractionIdKey}=${lastInteractionId()}` : emptyString}`);
 		if (response.ok) {
 			const data = (await response.json())?.[pathToUse];
 			const fetchedCount = data?.length ?? 0;
@@ -61,11 +58,6 @@ export default props => {
 			console.error("Failed to fetch interactions:", response.statusText);
 		}
 	};
-	createEffect(async () => {
-		if (pathToUse !== "mentions" && isAuthenticated()) {
-			await fetchInteractions();
-		}
-	});
 	onMount(async () => {
 		await fetchInteractions();
 	});

@@ -1,11 +1,13 @@
-import { createEffect, createMemo, createSignal, onMount, For, Show } from "solid-js";
-import { authStore } from "../stores/auth-store";
+import { useParams, useLocation } from "@solidjs/router";
+import { createSignal, onMount, For, Show } from "solid-js";
 import { emptyString, maxItemsToFetch } from "../library";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
 export default props => {
-	const pathToUse = location.pathname.split("/")?.[2];
+	const params = useParams();
+	const location = useLocation();
+	const { [2]: pathToUse } = location.pathname.split("/");
 	const userKey = (() => {
 		switch (pathToUse) {
 			case "following":
@@ -19,12 +21,11 @@ export default props => {
 	const [follows, setFollows] = createSignal([]);
 	const [lastFollowId, setLastFollowId] = createSignal(emptyString);
 	const [hasMore, setHasMore] = createSignal(true);
-	const isAuthenticated = createMemo(() => authStore.userId && authStore.handle);
 	const fetchFollows = async () => {
-		if (!(isAuthenticated() && hasMore())) {
+		if (!hasMore()) {
 			return;
 		}
-		const response = await fetch(`${profileBaseUrl}/${authStore.handle}/${pathToUse}${lastFollowId() ? `?lastFollowId=${lastFollowId()}` : emptyString}`);
+		const response = await fetch(`${profileBaseUrl}/${params.handle}/${pathToUse}${lastFollowId() ? `?lastFollowId=${lastFollowId()}` : emptyString}`);
 		if (response.ok) {
 			const data = (await response.json())?.[pathToUse];
 			const fetchedCount = data?.length ?? 0;
@@ -39,11 +40,6 @@ export default props => {
 			console.error("Failed to fetch follows:", response.statusText);
 		}
 	};
-	createEffect(async () => {
-		if(isAuthenticated()) {
-			await fetchFollows();
-		}
-	});
 	onMount(async () => {
 		await fetchFollows();
 	});

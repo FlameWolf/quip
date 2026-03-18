@@ -2,9 +2,8 @@ import { useParams, A } from "@solidjs/router";
 import { createEffect, createSignal, onMount, Show } from "solid-js";
 import { BsPersonBadgeFill } from "solid-icons/bs";
 import { authStore } from "../stores/auth-store";
-import { emptyString, maxItemsToFetch } from "../library";
+import { emptyString } from "../library";
 import { Dropdown } from "bootstrap";
-import DisplayPostList from "./DisplayPostList";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
@@ -13,7 +12,6 @@ export default props => {
 	let muteMenuToggle;
 	let blockButton;
 	let blockMenuToggle;
-	let loadMoreButton;
 	const params = useParams();
 	const profileUrl = `${profileBaseUrl}/${params.handle}`;
 	const [profileUser, setProfileUser] = createSignal(emptyString);
@@ -30,10 +28,7 @@ export default props => {
 	const [actionTrigger, setActionTrigger] = createSignal(null);
 	const [showMutedReason, setShowMutedReason] = createSignal(false);
 	const [showBlockedReason, setShowBlockedReason] = createSignal(false);
-	const [lastPostId, setLastPostId] = createSignal(emptyString);
-	const [hasMore, setHasMore] = createSignal(true);
-	const [userPosts, setUserPosts] = createSignal([]);
-	const loadUser = async handle => {
+	const loadUser = async () => {
 		const data = await (await fetch(profileUrl)).json();
 		const user = data.user;
 		setProfileUser(user);
@@ -48,18 +43,6 @@ export default props => {
 			setFollowingCount(user.following);
 			setFollowerCount(user.followers);
 		}
-	};
-	const loadUserQuips = async handle => {
-		const data = await (await fetch(`${profileUrl}/posts?includeRepeats=true&includeReplies=true&lastPostId=${lastPostId()}`)).json();
-		const posts = data.posts;
-		const postsCount = posts.length;
-		if (postsCount) {
-			setLastPostId(posts[postsCount - 1]._id);
-		}
-		if (postsCount < maxItemsToFetch) {
-			setHasMore(false);
-		}
-		setUserPosts([...userPosts(), ...posts]);
 	};
 	const toggleAction = async (action, flag, setFlag) => {
 		const actionUrl = `${profileBaseUrl}/${flag ? `un${action}` : action}/${params.handle}${actionReason() ? `?reason=${actionReason()}` : emptyString}`;
@@ -96,7 +79,6 @@ export default props => {
 	});
 	onMount(async () => {
 		await loadUser();
-		await loadUserQuips();
 		if (!isSelf()) {
 			new Dropdown(muteMenuToggle);
 			new Dropdown(blockMenuToggle);
@@ -174,7 +156,7 @@ export default props => {
 				</Show>
 				<div class="card-body">
 					<div class="d-flex gap-2">
-						<div class="badge text-bg-info">{profileUser().postsCount} Quips</div>
+						<A class="badge text-bg-info" href="posts">{profileUser().postsCount} Quips</A>
 						<Show when={isSelf()}>
 							<A class="badge text-bg-info" href="following">{followingCount()} Following</A>
 							<A class="badge text-bg-info" href="followers">{followerCount()} Followers</A>
@@ -203,10 +185,7 @@ export default props => {
 					</div>
 				</div>
 			</Show>
-			<DisplayPostList posts={userPosts()}/>
-			<div class="my-2">
-				<button ref={loadMoreButton} class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Posts"} onClick={loadUserQuips}></button>
-			</div>
+			<section>{props.children}</section>
 		</>
 	);
 };

@@ -15,6 +15,7 @@ const Home = lazy(() => import("./components/Home"));
 const Search = lazy(() => import("./components/Search"));
 const Post = lazy(() => import("./components/Post"));
 const Profile = lazy(() => import("./components/Profile"));
+const Quips = lazy(() => import("./components/Quips"));
 const Interactions = lazy(() => import("./components/Interactions"));
 const Follows = lazy(() => import("./components/Follows"));
 const NotFound = lazy(() => import("./components/NotFound"));
@@ -92,12 +93,12 @@ render(() => {
 					</Route>
 					<Route path="/search" component={Search}/>
 					<Route path="/post/:postId" component={Post}/>
-					<Route path="/:handle">
+					<Route path="/:handle" component={Profile}>
 						<Route path="/following" component={Follows}/>
 						<Route path="/followers" component={Follows}/>
 						<Route path="/favourites" component={Interactions}/>
 						<Route path="/mentions" component={Interactions}/>
-						<Route path="/" component={Profile}/>
+						<Route path={["/", "/posts"]} component={Quips}/>
 					</Route>
 					<Route path={["/", "/home"]} component={Home}/>
 					<Route path="/*404" component={NotFound}/>
