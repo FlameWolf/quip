@@ -155,7 +155,7 @@ export default props => {
 					</div>
 				</Show>
 				<div class="card-body">
-					<div class="d-flex gap-2">
+					<div class="d-flex flex-wrap gap-2">
 						<A class="badge text-bg-info" href="posts">{profileUser().postsCount} Quips</A>
 						<Show when={isSelf()}>
 							<A class="badge text-bg-info" href="following">{followingCount()} Following</A>

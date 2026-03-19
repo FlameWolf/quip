@@ -123,7 +123,7 @@ export default props => {
 					</Show>
 				</div>
 				<div class="action-bar">
-					<div class="hstack gap-2 justify-content-end mt-2">
+					<div class="d-flex flex-wrap gap-2 justify-content-end mt-2">
 						<Show when={allowEdit()}>
 							<button class="btn bg-transparent border-0 py-2 px-3" onClick={() => setIsEditing(!isEditing())}><FiEdit3 classList={{ "text-primary": isEditing() }}/></button>
 						</Show>
