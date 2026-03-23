@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "@solidjs/router";
+import { useParams, useLocation, A } from "@solidjs/router";
 import { createSignal, onMount, For, Show } from "solid-js";
 import { emptyString, maxItemsToFetch } from "../library";
 
@@ -49,7 +49,7 @@ export default props => {
 				<For each={follows()}>
 					{follow => (
 						<li class="list-group-item">
-							<h3><a href={`/${follow.handle}`}>{follow.handle}</a></h3>
+							<h3><A href={`/${follow.handle}`}>{follow.handle}</A></h3>
 							<div class="d-flex gap-2">
 								{follow.protected && <div class="badge text-bg-info">Protected</div>}
 								{follow.deactivated && <div class="badge text-bg-info">Deactivated</div>}

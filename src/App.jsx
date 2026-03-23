@@ -1,5 +1,5 @@
 import { createEffect, onMount, onCleanup, Show } from "solid-js";
-import { useLocation, useNavigate } from "@solidjs/router";
+import { useLocation, useNavigate, A } from "@solidjs/router";
 import { lightTheme, darkTheme } from "./library";
 import { themeStore, setThemeStore } from "./stores/theme-store";
 import { authStore, setAuthStore } from "./stores/auth-store";
@@ -70,7 +70,7 @@ export default props => {
 			<Show when={!location.pathname.startsWith("/auth")}>
 				<nav class="navbar mb-3">
 					<div class="container">
-						<a class="navbar-brand mb-0 h1" target="_self" href="/">Home</a>
+						<A class="navbar-brand mb-0 h1" href="/">Home</A>
 						<form class="d-flex" role="search">
 							<input ref={searchInput} class="form-control me-2" type="text" placeholder="Search" aria-label="Search" onKeyUp={(event) => (event.code === "Enter") && doSearch(event)}/>
 							<button class="btn btn-outline-primary" type="submit" onClick={doSearch}>Search</button>

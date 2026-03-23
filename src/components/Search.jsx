@@ -1,5 +1,5 @@
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
-import { useSearchParams } from "@solidjs/router";
+import { useSearchParams, A } from "@solidjs/router";
 import { emptyString, maxItemsToFetch } from "../library";
 import DisplayPost from "./DisplayPost";
 
@@ -273,7 +273,7 @@ export default props => {
 					<For each={searchResults()}>
 						{result => (
 							<li class="list-group-item">
-								<h3><a href={`/${result.handle}`}>{result.handle}</a></h3>
+								<h3><A href={`/${result.handle}`}>{result.handle}</A></h3>
 								<div class="d-flex gap-2">
 									{result.protected && <div class="badge text-bg-info">Protected</div>}
 									{result.deactivated && <div class="badge text-bg-info">Deactivated</div>}

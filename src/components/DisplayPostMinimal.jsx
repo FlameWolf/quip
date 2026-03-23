@@ -1,4 +1,5 @@
 import { Show } from "solid-js";
+import { A } from "@solidjs/router";
 import { formatTimeAgo, toLongDateString } from "../library";
 
 export default props => {
@@ -9,7 +10,7 @@ export default props => {
 		<>
 			<div data-post-id={post._id} class="card border px-2" classList={{ reply: props.isReply }}>
 				<div class="post-header">
-					<a class="handle" href={`/${handle}`}>{handle}</a>
+					<A class="handle" href={`/${handle}`}>{handle}</A>
 					<Show when={props.parentBlurb}>
 						<div>&#xA0;</div>
 						<div innerHTML={`Replied to "${props.parentBlurb}"`}></div>

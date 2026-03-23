@@ -1,4 +1,5 @@
 import { createMemo, createSignal, Show } from "solid-js";
+import { A } from "@solidjs/router";
 import { BsChatRight, BsQuote, BsStar, BsStarFill } from "solid-icons/bs";
 import { FiEdit3, FiRepeat, FiTrash } from "solid-icons/fi";
 import { authStore } from "../stores/auth-store";
@@ -76,7 +77,7 @@ export default props => {
 		<>
 			<div data-post-id={postId} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, reply: props.isReply, "d-none": isDeleted() }}>
 				<div class="post-header">
-					<a class="handle" href={`/${handle}`}>{handle}</a>
+					<A class="handle" href={`/${handle}`}>{handle}</A>
 					<Show when={props.parentBlurb || props.isReply}>
 						<span>&#xA0;</span>
 						<span>In reply to</span>
@@ -85,7 +86,7 @@ export default props => {
 							<em innerHTML={props.parentBlurb}/>
 						</Show>
 						<Show when={!props.parentBlurb}>
-							<a class="link-secondary" href={`/post/${post.replyTo}`}>a post</a>
+							<A class="link-secondary" href={`/post/${post.replyTo}`}>a post</A>
 						</Show>
 					</Show>
 					<Show when={repeatedBy}>
@@ -93,7 +94,7 @@ export default props => {
 						<div>Repeated by <span class="handle">{repeatedBy.handle}</span></div>
 					</Show>
 					<div class="ms-auto">
-						<a class="link-secondary" title={toLongDateString(createdAt)} href={`/post/${post._id}`}>{formatTimeAgo(createdAt)}</a>
+						<A class="link-secondary" title={toLongDateString(createdAt)} href={`/post/${post._id}`}>{formatTimeAgo(createdAt)}</A>
 					</div>
 				</div>
 				<div class="card-body px-2">
