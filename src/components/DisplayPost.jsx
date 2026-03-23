@@ -47,21 +47,7 @@ export default props => {
 		});
 	};
 	const toggleReply = event => {
-		let sourceActionBar = event.target.closest(".action-bar");
-		let editorInstance = document.getElementById("reply-editor") || <Editor id="reply-editor" isReply={true} classList={{ "mx-2": true, "mb-2": true }}/>;
-		let editorParent = editorInstance.parentElement;
-		const isAttachedToCurrent = editorParent === sourceActionBar;
-		if (isAttachedToCurrent) {
-			sourceActionBar.removeChild(editorInstance);
-		} else {
-			editorParent?.querySelector(".hstack > button:last-child").click();
-			editorInstance.dataset["parentPostId"] = postId;
-			sourceActionBar.appendChild(editorInstance);
-		}
-		setReplyFlag(!isAttachedToCurrent);
-		editorParent = null;
-		editorInstance = null;
-		sourceActionBar = null;
+		setReplyFlag(!replyFlag());
 	};
 	const deletePost = async () => {
 		try {
@@ -134,6 +120,9 @@ export default props => {
 						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleReply}>{replyFlag() ? <BsChatRight color="blue"/> : <BsChatRight/>}</button>
 						<Show when={isOwnPost()}>
 							<button class="btn bg-transparent border-0 py-2 px-3"><FiTrash onClick={() => setConfirmDelete(true)}/></button>
+						</Show>
+						<Show when={replyFlag()}>
+							<Editor isReply={true} parentPostId={postId} classList={{ "mx-2": true, "mb-2": true }} onSubmit={toggleReply}/>
 						</Show>
 					</div>
 				</div>

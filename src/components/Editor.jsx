@@ -46,7 +46,7 @@ export default props => {
 		updateEditor();
 	};
 	const makeQuip = async () => {
-		const parentPostId = currentInstance.dataset.parentPostId;
+		const parentPostId = props.parentPostId;
 		const formData = new FormData();
 		formData.append("content", plainTextInput.value.trim());
 		if (hasPoll()) {
@@ -85,15 +85,15 @@ export default props => {
 				return [post, ...quips];
 			});
 			resetEditor();
-			if (props.isReply) {
-				currentInstance.closest(".action-bar").querySelector(".hstack > button:last-child").click();
-			}
 			props.onSubmit?.();
 		}
 	};
 	const characterLimitExceeded = createMemo(() => charCount() < 0);
 	const dismissEmojiPicker = event => {
 		const sender = event.target;
+		if(!sender) {
+			return;
+		}
 		if (sender !== emojiTrigger && sender.getRootNode?.()?.host?.tagName !== "EM-EMOJI-PICKER") {
 			setHasEmojiPicker(false);
 		}
@@ -117,7 +117,7 @@ export default props => {
 		});
 	});
 	return (
-		<div ref={currentInstance} {...props} class="editor border rounded p-2 my-2 overflow-hidden" classList={{ "mx-2": props.isReply }} onClick={dismissEmojiPicker}>
+		<div ref={currentInstance} {...props} class="editor border rounded p-2 my-2 overflow-hidden" classList={{ "mx-2": props.isReply }}>
 			<Show when={props.isEditing}>
 				<div class="alert alert-warning position-relative">
 					<span>You can edit a post only once. Editing a post will:</span>
@@ -190,6 +190,7 @@ export default props => {
 						new Picker({
 							data: emojiData,
 							theme: themeStore.theme,
+							onClickOutside: dismissEmojiPicker,
 							onEmojiSelect: event => insertEmojo(plainTextInput, event.native, updateEditor)
 						})
 					}
