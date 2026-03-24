@@ -1,5 +1,5 @@
 import { useParams } from "@solidjs/router";
-import { createSignal, onMount } from "solid-js";
+import { createMemo, createSignal, onMount } from "solid-js";
 import { emptyString, maxItemsToFetch } from "../library";
 import DisplayPostList from "./DisplayPostList";
 
@@ -8,12 +8,12 @@ const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 export default props => {
 	let loadMoreButton;
 	const params = useParams();
-	const profileUrl = `${profileBaseUrl}/${params.handle}`;
+	const profileUrl = createMemo(() => `${profileBaseUrl}/${params.handle}`);
 	const [lastPostId, setLastPostId] = createSignal(emptyString);
 	const [hasMore, setHasMore] = createSignal(true);
 	const [userPosts, setUserPosts] = createSignal([]);
 	const loadUserQuips = async () => {
-		const data = await (await fetch(`${profileUrl}/posts?includeRepeats=true&includeReplies=true&lastPostId=${lastPostId()}`)).json();
+		const data = await (await fetch(`${profileUrl()}/posts?includeRepeats=true&includeReplies=true&lastPostId=${lastPostId()}`)).json();
 		const posts = data.posts;
 		const postsCount = posts.length;
 		if (postsCount) {

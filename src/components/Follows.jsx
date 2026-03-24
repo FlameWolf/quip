@@ -1,5 +1,5 @@
 import { useParams, useLocation, A } from "@solidjs/router";
-import { createSignal, onMount, For, Show } from "solid-js";
+import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { emptyString, maxItemsToFetch } from "../library";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
@@ -7,6 +7,7 @@ const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 export default props => {
 	const params = useParams();
 	const location = useLocation();
+	const profileUrl = createMemo(() => `${profileBaseUrl}/${params.handle}`);
 	const { [2]: pathToUse } = location.pathname.split("/");
 	const userKey = (() => {
 		switch (pathToUse) {
@@ -25,7 +26,7 @@ export default props => {
 		if (!hasMore()) {
 			return;
 		}
-		const response = await fetch(`${profileBaseUrl}/${params.handle}/${pathToUse}${lastFollowId() ? `?lastFollowId=${lastFollowId()}` : emptyString}`);
+		const response = await fetch(`${profileUrl()}/${pathToUse}${lastFollowId() ? `?lastFollowId=${lastFollowId()}` : emptyString}`);
 		if (response.ok) {
 			const data = (await response.json())?.[pathToUse];
 			const fetchedCount = data?.length ?? 0;

@@ -15,7 +15,7 @@ export default props => {
 	const params = useParams();
 	const profileUrl = createMemo(() => `${profileBaseUrl}/${params.handle}`);
 	const [profileUser, setProfileUser] = createSignal(emptyString);
-	const [isSelf, setIsSelf] = createSignal(true);
+	const [isSelf, setIsSelf] = createSignal(false);
 	const [followed, setFollowed] = createSignal(false);
 	const [muted, setMuted] = createSignal(false);
 	const [mutedReason, setMutedReason] = createSignal(emptyString);
@@ -78,7 +78,9 @@ export default props => {
 		}
 	});
 	createEffect(async () => {
-		await loadUser();
+		if(profileUrl()) {
+			await loadUser();
+		}
 		if (!isSelf()) {
 			new Dropdown(muteMenuToggle);
 			new Dropdown(blockMenuToggle);
