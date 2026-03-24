@@ -71,6 +71,9 @@ const getEnv = async () => {
 };
 
 const setAuthData = async value => {
+	if (!authData.authToken && env.authCacheName) {
+		await getAuthData();
+	}
 	Object.assign(authData, value);
 	const authCache = await caches.open(env.authCacheName);
 	await authCache.put(
@@ -161,6 +164,10 @@ const dispatch = async ({ action, payload }) => {
 	);
 	authChannel.close();
 };
+
+self.addEventListener("install", () => self.skipWaiting());
+
+self.addEventListener("activate", event => event.waitUntil(self.clients.claim()));
 
 self.addEventListener("message", async event => await dispatch(event.data));
 

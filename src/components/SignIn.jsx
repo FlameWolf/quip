@@ -54,9 +54,7 @@ export default props => {
 				action: import.meta.env.VITE_SET_AUTH_DATA_ACTION,
 				payload: { handle }
 			});
-			setTimeout(() => {
-				navigate("/home", { resolve: false });
-			}, 250);
+			navigate("/home", { resolve: false });
 		} else if (response.status >= 400) {
 			setSignInError(await response.text());
 		}
