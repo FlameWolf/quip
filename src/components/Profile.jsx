@@ -99,7 +99,7 @@ export default props => {
 								<Show when={followsMe()}>
 									<div class="badge bg-secondary">Follows you</div>
 								</Show>
-								<button class="btn btn-sm btn-primary" onClick={() => toggleAction("follow", followed(), setFollowed)}>{followed() ? "Unflollow" : "Follow"}</button>
+								<button class="btn btn-sm btn-primary" onClick={() => toggleAction("follow", followed(), setFollowed)}>{followed() ? "Unfollow" : "Follow"}</button>
 								<div class="btn-group">
 									<button ref={muteButton} class="btn btn-sm btn-primary" onClick={() => toggleAction("mute", muted(), setMuted)}>{muted() ? "Unmute" : "Mute"}</button>
 									<Show when={!isSelf() && !muted()}>
