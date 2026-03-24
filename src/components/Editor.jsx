@@ -180,7 +180,7 @@ export default props => {
 					<button class="position-absolute top-0 end-0 btn btn-danger border m-1"><VsChromeClose/></button>
 				</div>
 			</Show>
-			<div class="d-flex justify-content-end pt-2 border-top">
+			<div class="d-flex gap-2 justify-content-end pt-2 border-top">
 				<div class="emoji-bar">
 					<For each={popularEmoji}>{(emojo, index) => <div onClick={() => insertEmojo(plainTextInput, emojo, updateEditor)}>{emojo}</div>}</For>
 				</div>
@@ -195,13 +195,13 @@ export default props => {
 						})
 					}
 				</div>
-				<button ref={emojiTrigger} class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ active: hasEmojiPicker() }} onClick={toggleEmojiMart}>&#x2026;</button>
+				<button ref={emojiTrigger} class="btn btn-secondary btn-sm px-3 rounded-pill" classList={{ active: hasEmojiPicker() }} onClick={toggleEmojiMart}>&#x2026;</button>
 				<div class="char-count" classList={{ "bg-danger text-light": characterLimitExceeded() }}>{charCount()}</div>
 				<Show when={!props.isEditing}>
-					<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" classList={{ active: hasPoll() }} onClick={() => setHasPoll(!hasPoll())}><BiRegularPoll class="poll-icon"/></button>
-					<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" onClick={() => mediaFileInput.click()}><BsImage/></button>
+					<button class="btn btn-secondary btn-sm px-3 rounded-pill" classList={{ active: hasPoll() }} onClick={() => setHasPoll(!hasPoll())}><BiRegularPoll class="poll-icon"/></button>
+					<button class="btn btn-secondary btn-sm px-3 rounded-pill" onClick={() => mediaFileInput.click()}><BsImage/></button>
 				</Show>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill ms-2" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={() => makeQuip()}>Post</button>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={() => makeQuip()}>Post</button>
 				<Show when={!props.isEditing}>
 					<input ref={mediaFileInput} onInput={event => setMediaFile(event.target.files?.[0])} class="visually-hidden" type="file"/>
 				</Show>
