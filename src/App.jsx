@@ -9,6 +9,7 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const authBaseUrl = `${apiBaseUrl}/auth`;
 const refreshTokenUrl = `${authBaseUrl}/refresh-token`;
 const authChannelName = import.meta.env.VITE_AUTH_CHANNEL_NAME;
+
 navigator.serviceWorker.controller?.postMessage({
 	action: "init",
 	payload: {
@@ -23,8 +24,11 @@ navigator.serviceWorker.controller?.postMessage({
 });
 
 export default props => {
+	const location = useLocation();
+	const navigate = useNavigate();
 	const authChannel = new BroadcastChannel(authChannelName);
 	const protectedRoutes = ["/", "/home"];
+	const { [1]: basePath } = location.pathname.split("/");
 	createEffect(() => {
 		const theme = themeStore.theme;
 		document.body.parentElement.setAttribute("data-bs-theme", theme);
@@ -41,14 +45,12 @@ export default props => {
 	const doSearch = event => {
 		event.preventDefault();
 		const searchText = searchInput.value;
-		if(!searchText) {
+		if (!searchText) {
 			return;
 		}
-		location.href = "/search?q=" + encodeURIComponent(searchText);
+		navigate(`/search?q=${encodeURIComponent(searchText)}`);
 	};
 	onMount(() => {
-		const location = useLocation();
-		const navigate = useNavigate();
 		authChannel.addEventListener("message", event => {
 			setAuthStore(event.data);
 			if (protectedRoutes.indexOf(location.pathname) > -1 && !authStore.token) {
@@ -58,7 +60,7 @@ export default props => {
 		navigator.serviceWorker.controller?.postMessage({
 			action: import.meta.env.VITE_GET_AUTH_DATA_ACTION
 		});
-		if(location.pathname.startsWith("/search")) {
+		if (basePath === "search") {
 			populateSearchInput();
 		}
 	});
@@ -67,7 +69,7 @@ export default props => {
 	});
 	return (
 		<>
-			<Show when={!location.pathname.startsWith("/auth")}>
+			<Show when={basePath !== "auth"}>
 				<nav class="navbar mb-3">
 					<div class="container">
 						<A class="navbar-brand mb-0 h1" href="/">Home</A>

@@ -1,5 +1,5 @@
 import { createMemo, createSignal, Show } from "solid-js";
-import { A } from "@solidjs/router";
+import { useNavigate, A } from "@solidjs/router";
 import { BsChatRight, BsQuote, BsStar, BsStarFill } from "solid-icons/bs";
 import { FiEdit3, FiRepeat, FiTrash } from "solid-icons/fi";
 import { authStore } from "../stores/auth-store";
@@ -23,6 +23,7 @@ export default props => {
 	const handle = post.author.handle;
 	const repeatedBy = post.repeatedBy;
 	const attachments = post.attachments;
+	const navigate = useNavigate();
 	const [isEditing, setIsEditing] = createSignal(false);
 	const [faveFlag, setFaveFlag] = createSignal(post.favourited);
 	const [quoteFlag, setQuoteFlag] = createSignal(false);
@@ -103,7 +104,7 @@ export default props => {
 							</Show>
 						</Show>
 						<Show when={attachments.post}>
-							<div onClick={() => (location.href = `post/${attachments.post._id}`)} role="button">
+							<div onClick={() => navigate(`post/${attachments.post._id}`)} role="button">
 								<DisplayPostMinimal post={attachments.post}/>
 							</div>
 						</Show>

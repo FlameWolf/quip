@@ -1,5 +1,5 @@
 import { useParams, A } from "@solidjs/router";
-import { createEffect, createSignal, onMount, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, Show } from "solid-js";
 import { BsPersonBadgeFill } from "solid-icons/bs";
 import { authStore } from "../stores/auth-store";
 import { emptyString } from "../library";
@@ -13,7 +13,7 @@ export default props => {
 	let blockButton;
 	let blockMenuToggle;
 	const params = useParams();
-	const profileUrl = `${profileBaseUrl}/${params.handle}`;
+	const profileUrl = createMemo(() => `${profileBaseUrl}/${params.handle}`);
 	const [profileUser, setProfileUser] = createSignal(emptyString);
 	const [isSelf, setIsSelf] = createSignal(true);
 	const [followed, setFollowed] = createSignal(false);
@@ -29,7 +29,7 @@ export default props => {
 	const [showMutedReason, setShowMutedReason] = createSignal(false);
 	const [showBlockedReason, setShowBlockedReason] = createSignal(false);
 	const loadUser = async () => {
-		const data = await (await fetch(profileUrl)).json();
+		const data = await (await fetch(profileUrl())).json();
 		const user = data.user;
 		setProfileUser(user);
 		if (authStore.userId) {
@@ -77,7 +77,7 @@ export default props => {
 			setShowBlockedReason(false);
 		}
 	});
-	onMount(async () => {
+	createEffect(async () => {
 		await loadUser();
 		if (!isSelf()) {
 			new Dropdown(muteMenuToggle);
