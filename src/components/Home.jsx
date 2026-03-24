@@ -9,8 +9,8 @@ const postsUrl = `${import.meta.env.VITE_API_BASE_URL}/timeline`;
 
 export default props => {
 	let loadMoreButton;
-	const [lastPostId, setLastPostId] = createSignal(emptyString);
 	const navigate = useNavigate();
+	const [lastPostId, setLastPostId] = createSignal(emptyString);
 	const loadPosts = async (lastPostId = undefined) => {
 		const response = await fetch(lastPostId ? `${postsUrl}?lastPostId=${lastPostId}` : postsUrl);
 		switch (response.status) {
