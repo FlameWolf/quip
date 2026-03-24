@@ -50,10 +50,6 @@ export default props => {
 		});
 		if (response.status === 200) {
 			setSignInError(undefined);
-			navigator.serviceWorker.controller?.postMessage({
-				action: import.meta.env.VITE_SET_AUTH_DATA_ACTION,
-				payload: { handle }
-			});
 			navigate("/home", { resolve: false });
 		} else if (response.status >= 400) {
 			setSignInError(await response.text());
