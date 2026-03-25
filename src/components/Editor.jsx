@@ -71,7 +71,7 @@ export default props => {
 					? `${updatePostUrl}/${props.post._id}`
 					: createPostUrl;
 		const response = await fetch(url, {
-			method: "POST",
+			method: props.isEditing ? "PATCH" : "POST",
 			body: formData
 		});
 		if (response.ok) {
