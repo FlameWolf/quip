@@ -4,7 +4,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "./index.css";
 import { createEffect, createMemo, createResource, createSignal, lazy, Show, Suspense } from "solid-js";
 import { render } from "solid-js/web";
-import { Router, Route } from "@solidjs/router";
+import { Navigate, Router, Route } from "@solidjs/router";
 import { emptyString } from "./library";
 
 const App = lazy(() => import("./App"));
@@ -89,7 +89,8 @@ render(() => {
 				<Router root={App}>
 					<Route path="/auth" component={Auth}>
 						<Route path="/sign-in" component={SignIn}/>
-						<Route path={["/", "/sign-up"]} component={SignUp}/>
+						<Route path="/sign-up" component={SignUp}/>
+						<Route path="/" component={() => <Navigate href="sign-up"/>}/>
 					</Route>
 					<Route path="/search" component={Search}/>
 					<Route path="/post/:postId" component={Post}/>
@@ -98,7 +99,8 @@ render(() => {
 						<Route path="/followers" component={Follows}/>
 						<Route path="/favourites" component={Interactions}/>
 						<Route path="/mentions" component={Interactions}/>
-						<Route path={["/", "/posts"]} component={Quips}/>
+						<Route path="/posts" component={Quips}/>
+						<Route path="/" component={() => <Navigate href="posts"/>}/>
 					</Route>
 					<Route path={["/", "/home"]} component={Home}/>
 					<Route path="/*404" component={NotFound}/>

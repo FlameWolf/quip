@@ -158,13 +158,13 @@ export default props => {
 				</Show>
 				<div class="card-body">
 					<div class="d-flex flex-wrap gap-2">
-						<A class="badge text-bg-info" href="posts">{profileUser().postsCount} Quips</A>
+						<A class="badge text-bg-info" activeClass="text-decoration-none" href="posts">{profileUser().postsCount} Quips</A>
 						<Show when={isSelf()}>
-							<A class="badge text-bg-info" href="following">{followingCount()} Following</A>
-							<A class="badge text-bg-info" href="followers">{followerCount()} Followers</A>
-							<A class="badge text-bg-info" href="favourites">Favourites</A>
+							<A class="badge text-bg-info" activeClass="text-decoration-none" href="following">{followingCount()} Following</A>
+							<A class="badge text-bg-info" activeClass="text-decoration-none" href="followers">{followerCount()} Followers</A>
+							<A class="badge text-bg-info" activeClass="text-decoration-none" href="favourites">Favourites</A>
 						</Show>
-						<A class="badge text-bg-info" href="mentions">Mentions</A>
+						<A class="badge text-bg-info" activeClass="text-decoration-none" href="mentions">Mentions</A>
 					</div>
 				</div>
 			</div>
