@@ -192,7 +192,7 @@ body {
 	line-height: 1.5rem;
 	overflow-wrap: break-word;
 	max-height: 16rem;
-	padding: 0 1rem;
+	padding: 0 0.5rem;
 	outline: none;
 	border: none;
 	border-radius: var(--bs-border-radius);
