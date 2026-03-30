@@ -3,7 +3,10 @@ import { useLocation, useNavigate, A } from "@solidjs/router";
 import { lightTheme, darkTheme } from "./library";
 import { themeStore, setThemeStore } from "./stores/theme-store";
 import { authStore, setAuthStore } from "./stores/auth-store";
+import { Dropdown } from "bootstrap";
+import favIcon from "./assets/favicon.svg";
 
+let imgMenu;
 let searchInput;
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const authBaseUrl = `${apiBaseUrl}/auth`;
@@ -50,6 +53,13 @@ export default props => {
 		}
 		navigate(`/search?q=${encodeURIComponent(searchText)}`);
 	};
+	createEffect(() => {
+		if (themeStore.isDark) {
+			imgMenu.style.setProperty("filter", "invert(1)");
+			return;
+		}
+		imgMenu.style.removeProperty("filter");
+	});
 	onMount(() => {
 		authChannel.addEventListener("message", event => {
 			setAuthStore(event.data);
@@ -60,6 +70,7 @@ export default props => {
 		navigator.serviceWorker.controller?.postMessage({
 			action: import.meta.env.VITE_GET_AUTH_DATA_ACTION
 		});
+		new Dropdown(imgMenu);
 		if (basePath === "search") {
 			populateSearchInput();
 		}
@@ -72,9 +83,25 @@ export default props => {
 			<Show when={basePath !== "auth"}>
 				<nav class="navbar mb-3">
 					<div class="container">
-						<A class="navbar-brand mb-0 h1" href="/">Home</A>
+						<div class="d-flex gap-4 me-auto">
+							<div class="dropdown">
+								<img ref={imgMenu} src={favIcon} class="img-menu dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"/>
+								<ul class="dropdown-menu">
+									<li>
+										<A class="dropdown-item" href={`/${authStore.handle}`}>Profile</A>
+									</li>
+									<li>
+										<hr class="dropdown-divider"/>
+									</li>
+									<li>
+										<A class="dropdown-item disabled" href="javascript: void(0)">Settings</A>
+									</li>
+								</ul>
+							</div>
+							<A class="navbar-brand mb-0 h1" href="/">Home</A>
+						</div>
 						<form class="d-flex" role="search">
-							<input ref={searchInput} class="form-control me-2" type="text" placeholder="Search" aria-label="Search" onKeyUp={(event) => (event.code === "Enter") && doSearch(event)}/>
+							<input ref={searchInput} class="form-control me-2" type="text" placeholder="Search" aria-label="Search" onKeyUp={event => event.code === "Enter" && doSearch(event)}/>
 							<button class="btn btn-outline-primary" type="submit" onClick={doSearch}>Search</button>
 						</form>
 					</div>

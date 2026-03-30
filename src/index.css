@@ -76,6 +76,10 @@ body {
 	animation: movex 6s ease-in-out infinite alternate, spin 5s infinite;
 }
 
+.img-menu {
+	height: 2rem;
+}
+
 .post-header {
 	display: flex;
 	color: var(--bs-secondary);
