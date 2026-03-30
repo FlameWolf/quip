@@ -22,7 +22,7 @@ export default props => {
 				<div class="card-body px-2 pb-2">
 					<p class="card-text">
 						<Show when={post.content}>
-							<span>{post.content.replace(/\n/g, "<br/>")}</span>
+							<span innerHTML={post.content.replace(/\n/g, "<br/>")}/>
 						</Show>
 						<Show when={post.attachments?.mediaFile}>
 							<div class="mt-2">

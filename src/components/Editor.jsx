@@ -115,6 +115,9 @@ export default props => {
 		setTimeout(() => {
 			editorLineHeight = parseInt(getComputedStyle(plainTextInput).lineHeight);
 		});
+		if (props.isEditing) {
+			updateEditor();
+		}
 	});
 	return (
 		<div ref={currentInstance} {...props} class="editor border rounded p-2 my-2 overflow-hidden" classList={{ "mx-2": props.isReply }}>
