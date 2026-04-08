@@ -1,6 +1,6 @@
-import { createEffect, onMount, onCleanup, Show } from "solid-js";
+import { createEffect, createMemo, onMount, onCleanup, Show } from "solid-js";
 import { useLocation, useNavigate, A } from "@solidjs/router";
-import { lightTheme, darkTheme } from "./library";
+import { lightTheme, darkTheme, emptyString } from "./library";
 import { themeStore, setThemeStore } from "./stores/theme-store";
 import { authStore, setAuthStore } from "./stores/auth-store";
 import { Dropdown } from "bootstrap";
@@ -31,20 +31,37 @@ export default props => {
 	const navigate = useNavigate();
 	const authChannel = new BroadcastChannel(authChannelName);
 	const protectedRoutes = ["/", "/home"];
-	const { [1]: basePath } = location.pathname.split("/");
+	const basePath = createMemo(() => location.pathname.split("/")?.at(1) || emptyString);
 	createEffect(() => {
 		const theme = themeStore.theme;
 		document.body.parentElement.setAttribute("data-bs-theme", theme);
 		localStorage.setItem("theme", theme);
 	});
 	const updateTheme = () => setThemeStore("theme", themeStore.isLight ? darkTheme : lightTheme);
+	const signOut = () => {
+		setAuthStore({
+			userId: emptyString,
+			handle: emptyString,
+			token: emptyString,
+			refreshToken: emptyString,
+			createdAt: emptyString,
+			expiresIn: emptyString
+		});
+		navigator.serviceWorker.controller?.postMessage({
+			action: import.meta.env.VITE_SET_AUTH_DATA_ACTION,
+			payload: { ...authStore }
+		});
+		setTimeout(() => {
+			navigate("/auth", { resolve: false });
+		}, 250);
+	};
 	const populateSearchInput = () => {
 		const urlParams = new URLSearchParams(location.search);
 		const searchText = urlParams.get("q");
-		if(searchText) {
+		if (searchText) {
 			searchInput.value = searchText;
 		}
-	}
+	};
 	const doSearch = event => {
 		event.preventDefault();
 		const searchText = searchInput.value;
@@ -54,11 +71,13 @@ export default props => {
 		navigate(`/search?q=${encodeURIComponent(searchText)}`);
 	};
 	createEffect(() => {
-		if (themeStore.isDark) {
-			imgMenu.style.setProperty("filter", "invert(1)");
-			return;
+		if (imgMenu) {
+			if (themeStore.isDark) {
+				imgMenu.style.setProperty("filter", "invert(0.8)");
+				return;
+			}
+			imgMenu.style.removeProperty("filter");
 		}
-		imgMenu.style.removeProperty("filter");
 	});
 	onMount(() => {
 		authChannel.addEventListener("message", event => {
@@ -70,8 +89,10 @@ export default props => {
 		navigator.serviceWorker.controller?.postMessage({
 			action: import.meta.env.VITE_GET_AUTH_DATA_ACTION
 		});
-		new Dropdown(imgMenu);
-		if (basePath === "search") {
+		if (imgMenu) {
+			new Dropdown(imgMenu);
+		}
+		if (basePath() === "search") {
 			populateSearchInput();
 		}
 	});
@@ -80,7 +101,7 @@ export default props => {
 	});
 	return (
 		<>
-			<Show when={basePath !== "auth"}>
+			<Show when={basePath() !== "auth"}>
 				<nav class="navbar mb-3">
 					<div class="container">
 						<div class="d-flex gap-4 me-auto">
@@ -95,6 +116,12 @@ export default props => {
 									</li>
 									<li>
 										<A class="dropdown-item disabled" href="javascript: void(0)">Settings</A>
+									</li>
+									<li>
+										<hr class="dropdown-divider"/>
+									</li>
+									<li>
+										<a class="dropdown-item" onClick={signOut} role="button">Sign out</a>
 									</li>
 								</ul>
 							</div>
