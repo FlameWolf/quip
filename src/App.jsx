@@ -4,7 +4,7 @@ import { lightTheme, darkTheme, emptyString } from "./library";
 import { themeStore, setThemeStore } from "./stores/theme-store";
 import { authStore, setAuthStore } from "./stores/auth-store";
 import { Dropdown } from "bootstrap";
-import favIcon from "./assets/favicon.svg";
+import { VsMenu } from "solid-icons/vs";
 
 let imgMenu;
 let searchInput;
@@ -106,7 +106,9 @@ export default props => {
 					<div class="container">
 						<div class="d-flex gap-4 me-auto">
 							<div class="dropdown">
-								<img ref={imgMenu} src={favIcon} class="img-menu dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"/>
+								<button class="btn btn-outline-secondary" data-bs-toggle="dropdown" aria-expanded="false">
+									<VsMenu/>
+								</button>
 								<ul class="dropdown-menu">
 									<li>
 										<A class="dropdown-item" href={`/${authStore.handle}`}>Profile</A>

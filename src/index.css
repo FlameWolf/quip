@@ -76,10 +76,6 @@ body {
 	animation: movex 6s ease-in-out infinite alternate, spin 5s infinite;
 }
 
-.img-menu {
-	height: 2rem;
-}
-
 .post-header {
 	display: flex;
 	color: var(--bs-secondary);
@@ -267,10 +263,6 @@ body {
 	border-radius: 50rem;
 	margin-left: 0.25rem;
 	margin-right: 0.25rem;
-}
-
-.poll-icon {
-	filter: invert(100);
 }
 
 .has-reply {
