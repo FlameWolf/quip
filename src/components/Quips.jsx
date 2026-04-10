@@ -22,7 +22,7 @@ export default props => {
 		if (postsCount < maxItemsToFetch) {
 			setHasMore(false);
 		}
-		setUserPosts([...userPosts(), ...posts]);
+		setUserPosts(userPosts().concat(posts));
 	};
 	onMount(async () => {
 		await loadUserQuips();

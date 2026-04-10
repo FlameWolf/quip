@@ -151,7 +151,7 @@ export default props => {
 									<select name="days" class="form-select">
 										<option>0</option>
 										<option selected="true">1</option>
-										<For each={[...Array(5).keys()]}>{(day, index) => <option>{day + 2}</option>}</For>
+										<For each={Array.from(Array(5).keys())}>{(day, index) => <option>{day + 2}</option>}</For>
 									</select>
 								</div>
 							</div>
@@ -160,7 +160,7 @@ export default props => {
 									<p>Hours</p>
 									<select name="hours" class="form-select">
 										<option>0</option>
-										<For each={[...Array(23).keys()]}>{(hour, index) => <option>{hour + 1}</option>}</For>
+										<For each={Array.from(Array(23).keys())}>{(hour, index) => <option>{hour + 1}</option>}</For>
 									</select>
 								</div>
 							</div>
@@ -169,7 +169,7 @@ export default props => {
 									<p>Minutes</p>
 									<select name="minutes" class="form-select">
 										<option>0</option>
-										<For each={[...Array(59).keys()]}>{(minute, index) => <option>{minute + 1}</option>}</For>
+										<For each={Array.from(Array(59).keys())}>{(minute, index) => <option>{minute + 1}</option>}</For>
 									</select>
 								</div>
 							</div>

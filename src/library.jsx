@@ -22,7 +22,7 @@ export const getCookie = name => {
 };
 
 export const removeDescendantAttributes = elem => {
-	[...elem.querySelectorAll("*")].forEach(node => [...node.attributes].forEach(attrib => node.removeAttribute(attrib.name)));
+	Array.from(elem.querySelectorAll("*")).forEach(node => Array.from(node.attributes).forEach(attrib => node.removeAttribute(attrib.name)));
 };
 
 export const removeFormatting = elem => {
@@ -68,10 +68,15 @@ export const insertEmojo = (elem, emojo, callback = null) => {
 
 const segmenter = new Intl.Segmenter();
 
-export const getGraphemeClusterCount = text => [...segmenter.segment(text)].length;
+export const getGraphemeClusterCount = text => Array.from(segmenter.segment(text)).length;
 
 export const trimPost = text => {
-	return text && text.length > 20 ? `${text.substring(0, 20)}&#x2026;` : text;
+	return text && getGraphemeClusterCount(text) > 20
+		? `${Array.from(segmenter.segment(text))
+				.slice(0, 20)
+				.map(x => x.segment)
+				.join(emptyString)}&#x2026;`
+		: text;
 };
 
 export const toShortDateString = input =>

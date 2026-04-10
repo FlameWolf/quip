@@ -240,7 +240,7 @@ export default props => {
 			if (itemCount < maxItemsToFetch) {
 				setHasMore(false);
 			}
-			setSearchResults([...searchResults(), ...items]);
+			setSearchResults(searchResults().concat(items));
 		} else {
 			console.error("Search request failed:", response.statusText);
 		}

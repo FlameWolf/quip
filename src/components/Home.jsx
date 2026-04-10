@@ -17,7 +17,7 @@ export default props => {
 			case 200:
 				const posts = (await response.json()).posts;
 				if (posts.length) {
-					setQuipStore("quips", quips => [...quips, ...posts]);
+					setQuipStore("quips", quips => quips.concat(posts));
 					setLastPostId(posts.at(-1)._id);
 					return;
 				}

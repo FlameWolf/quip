@@ -34,7 +34,7 @@ export default props => {
 				setHasMore(false);
 			}
 			if (fetchedCount > 0) {
-				setFollows([...follows(), ...data.map(x => x[userKey])]);
+				setFollows(follows().concat(data.map(x => x[userKey])));
 				setLastFollowId(data[fetchedCount - 1]._id);
 			}
 		} else {
