@@ -5,12 +5,16 @@ import { produce } from "solid-js/store";
 export default props => {
 	const poll = createMemo(() => props.poll);
 	const votes = createMemo(() => poll().votes);
+	const firstOptionVotes = createMemo(() => votes().first ?? 0);
+	const secondOptionVotes = createMemo(() => votes().second ?? 0);
+	const thirdOptionVotes = createMemo(() => votes().third ?? 0);
+	const fourthOptionVotes = createMemo(() => votes().fourth ?? 0);
+	const [totalVotes, setTotalVotes] = createSignal(firstOptionVotes() + secondOptionVotes() + thirdOptionVotes() + fourthOptionVotes());
+	const firstPercentage = createMemo(() => Math.round((firstOptionVotes() / (totalVotes() || 1)) * 100, 2));
+	const secondPercentage = createMemo(() => Math.round((secondOptionVotes() / (totalVotes() || 1)) * 100, 2));
+	const thirdPercentage = createMemo(() => Math.round((thirdOptionVotes() / (totalVotes() || 1)) * 100, 2));
+	const fourthPercentage = createMemo(() => Math.round((fourthOptionVotes() / (totalVotes() || 1)) * 100, 2));
 	const inactivePoll = createMemo(() => props.isOwnPoll || poll().expired || props.voted);
-	const [totalVotes, setTotalVotes] = createSignal(votes().first + votes().second + votes().third || 0 + votes().fourth || 0);
-	const firstPercentage = createMemo(() => Math.round((votes().first / (totalVotes() || 1)) * 100, 2));
-	const secondPercentage = createMemo(() => Math.round((votes().second / (totalVotes() || 1)) * 100, 2));
-	const thirdPercentage = createMemo(() => Math.round((votes().third / (totalVotes() || 1)) * 100, 2));
-	const fourthPercentage = createMemo(() => Math.round((votes().fourth / (totalVotes() || 1)) * 100, 2));
 	const castVoteUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/vote/${props.postId}`;
 	const castVote = async option => {
 		var response = await fetch(`${castVoteUrl}?option=${option}`);
