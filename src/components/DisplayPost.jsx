@@ -81,7 +81,7 @@ export default props => {
 						<div>Repeated by <span class="handle">{repeatedBy.handle}</span></div>
 					</Show>
 					<div class="ms-auto">
-						<A class="link-secondary" title={toLongDateString(createdAt)} href={`/post/${post._id}`}>{formatTimeAgo(createdAt)}</A>
+						<A class="link-secondary" title={toLongDateString(createdAt)} href={`/post/${post._id}`} target="_self">{formatTimeAgo(createdAt)}</A>
 					</div>
 				</div>
 				<div class="card-body px-2">

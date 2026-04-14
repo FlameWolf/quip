@@ -27,36 +27,38 @@ export default props => {
 	const fetchParentPost = async () => {
 		const response = await fetch(`${postsBaseUrl}/${postId()}/parent`);
 		if (response.ok) {
-			setParentPost((await response.json()).parent);
+			setParentPost(response.ok ? (await response.json()).parent : null);
 		}
 	};
 	const loadReplies = async () => {
 		const response = await fetch(`${postsBaseUrl}/${postId()}/replies${lastReplyId() ? `?lastReplyId=${lastReplyId()}` : ""}`);
-		if (response.ok) {
-			const loadedReplies = (await response.json()).replies;
-			setPostReplies(postReplies().concat(loadedReplies));
-			if (loadedReplies.length === maxItemsToFetch) {
-				setHasMore(true);
-				setLastReplyId(loadedReplies.at(-1)._id);
-			} else {
-				setHasMore(false);
-			}
+		if (!response.ok) {
+			setHasMore(false);
+			return;
+		}
+		const loadedReplies = (await response.json()).replies;
+		setPostReplies(postReplies().concat(loadedReplies));
+		if (loadedReplies.length === maxItemsToFetch) {
+			setHasMore(true);
+			setLastReplyId(loadedReplies.at(-1)._id);
+		} else {
+			setHasMore(false);
 		}
 	};
-	createEffect(async () => {
-		if (postId()) {
-			await fetchPost();
-			await fetchParentPost();
-			await loadReplies();
-		}
-	});
-	onCleanup(() => {
+	onMount(async () => {
 		setPost(null);
 		setParentPost(null);
 		setPostReplies([]);
 		setLastReplyId(null);
 		setHasMore(false);
 		setHasError(false);
+	});
+	createEffect(async () => {
+		if (postId()) {
+			await fetchPost();
+			await fetchParentPost();
+			await loadReplies();
+		}
 	});
 	return (
 		<>
