@@ -1,4 +1,4 @@
-import { createSignal, onMount } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { emptyString } from "../library";
 import { quipStore, setQuipStore } from "../stores/quip-store";
@@ -32,15 +32,18 @@ export default props => {
 		}
 	};
 	onMount(async () => {
+		setQuipStore("quips", []);
 		await loadPosts();
 	});
 	return (
 		<>
 			<Editor id="post-editor" classList={{ "mb-2": true }}/>
 			<DisplayPostList posts={quipStore.quips}/>
-			<div class="my-2">
-				<button ref={loadMoreButton} class="btn btn-primary form-control" onClick={() => loadPosts(lastPostId())}>Load More</button>
-			</div>
+			<Show when={quipStore.quips.length}>
+				<div class="my-2">
+					<button ref={loadMoreButton} class="btn btn-primary form-control" onClick={() => loadPosts(lastPostId())}>Load More</button>
+				</div>
+			</Show>
 		</>
 	);
 };

@@ -30,9 +30,11 @@ export default props => {
 	return (
 		<>
 			<DisplayPostList posts={userPosts()}/>
-			<div class="my-2">
-				<button ref={loadMoreButton} class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Posts"} onClick={loadUserQuips}></button>
-			</div>
+			<Show when={userPosts().length}>
+				<div class="my-2">
+					<button ref={loadMoreButton} class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Posts"} onClick={loadUserQuips}></button>
+				</div>
+			</Show>
 		</>
 	);
 };

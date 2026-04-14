@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createResource, createSignal, Show, Suspense } from "solid-js";
+import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from "solid-js";
 import DisplayPost from "./DisplayPost";
 import DisplayPostList from "./DisplayPostList";
 import { useParams } from "@solidjs/router";
@@ -10,54 +10,77 @@ export default props => {
 	let loadMoreButton;
 	const params = useParams();
 	const postId = createMemo(() => params.postId);
+	const [post, setPost] = createSignal();
+	const [parentPost, setParentPost] = createSignal();
 	const [postReplies, setPostReplies] = createSignal([]);
-	const [hasMore, setHasMore] = createSignal(false);
 	const [lastReplyId, setLastReplyId] = createSignal();
-	const [post] = createResource(async () => {
+	const [hasMore, setHasMore] = createSignal(false);
+	const [hasError, setHasError] = createSignal();
+	const fetchPost = async () => {
 		const response = await fetch(`${postsBaseUrl}/${postId()}`);
-		if (!response.ok) {
-			throw new Error("Failed to load post");
+		const success = response.ok;
+		if (success) {
+			setPost((await response.json()).post);
 		}
-		return (await response.json()).post;
-	});
-	const [parentPost] = createResource(async () => {
+		setHasError(!success);
+	};
+	const fetchParentPost = async () => {
 		const response = await fetch(`${postsBaseUrl}/${postId()}/parent`);
-		if (!response.ok) {
-			return null;
-		}
-		return (await response.json()).parent;
-	});
-	const loadReplies = async () => {
-		const response = await fetch(`${postsBaseUrl}/${postId()}/replies${lastReplyId() ? `?lastReplyId=${lastReplyId()}` : ""}`);
-		if (!response.ok) {
-			return [];
-		}
-		const loadedReplies = (await response.json()).replies;
-		setPostReplies(postReplies().concat(loadedReplies));
-		if (loadedReplies.length === maxItemsToFetch) {
-			setHasMore(true);
-			setLastReplyId(loadedReplies.at(-1)._id);
-		} else {
-			setHasMore(false);
+		if (response.ok) {
+			setParentPost((await response.json()).parent);
 		}
 	};
-	createEffect(() => {
-		if (post()) {
-			setPostReplies([]);
-			setHasMore(false);
-			setLastReplyId(null);
-			loadReplies();
+	const loadReplies = async () => {
+		const response = await fetch(`${postsBaseUrl}/${postId()}/replies${lastReplyId() ? `?lastReplyId=${lastReplyId()}` : ""}`);
+		if (response.ok) {
+			const loadedReplies = (await response.json()).replies;
+			setPostReplies(postReplies().concat(loadedReplies));
+			if (loadedReplies.length === maxItemsToFetch) {
+				setHasMore(true);
+				setLastReplyId(loadedReplies.at(-1)._id);
+			} else {
+				setHasMore(false);
+			}
+		}
+	};
+	createEffect(async () => {
+		if (postId()) {
+			await fetchPost();
+			await fetchParentPost();
+			await loadReplies();
 		}
 	});
+	onCleanup(() => {
+		setPost(null);
+		setParentPost(null);
+		setPostReplies([]);
+		setLastReplyId(null);
+		setHasMore(false);
+		setHasError(false);
+	});
 	return (
-		<Suspense fallback={<p>Loading post...</p>}>
+		<>
 			<Show when={parentPost()}>
 				<div class="mb-4">
 					<h5>In reply to:</h5>
 					<DisplayPost post={parentPost()}/>
 				</div>
 			</Show>
-			<Show when={post()} fallback={<p>Post not found.</p>}>
+			<Show when={!post()}>
+				<Show when={!hasError()}>
+					<div class="text-center mt-4">
+						<div class="spinner-border" role="status">
+							<span class="visually-hidden">Loading...</span>
+						</div>
+					</div>
+				</Show>
+				<Show when={hasError()}>
+					<div class="alert alert-info mt-4" role="alert">
+						<span>Failed to load post.</span>
+					</div>
+				</Show>
+			</Show>
+			<Show when={post()}>
 				<div class="fs-5">
 					<DisplayPost post={post()}/>
 				</div>
@@ -73,6 +96,6 @@ export default props => {
 					</div>
 				</Show>
 			</Show>
-		</Suspense>
+		</>
 	);
 };
