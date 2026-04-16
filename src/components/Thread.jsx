@@ -1,20 +1,19 @@
 import { createEffect, createMemo, createSignal, onMount, Show } from "solid-js";
 import DisplayPost from "./DisplayPost";
 import DisplayPostList from "./DisplayPostList";
-import { useNavigate, useParams } from "@solidjs/router";
-import { emptyString, maxItemsToFetch } from "../library";
+import { useParams } from "@solidjs/router";
+import { maxItemsToFetch } from "../library";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 
 export default props => {
 	let loadMoreButton;
 	const params = useParams();
-	const navigate = useNavigate();
 	const postId = createMemo(() => params.postId);
 	const [post, setPost] = createSignal();
 	const [parentPost, setParentPost] = createSignal();
 	const [postReplies, setPostReplies] = createSignal([]);
-	const [lastReplyId, setLastReplyId] = createSignal();
+	const [lastReplyId, setLastReplyId] = createSignal(postId());
 	const [hasMore, setHasMore] = createSignal(false);
 	const [hasError, setHasError] = createSignal();
 	const fetchPost = async () => {
@@ -32,7 +31,7 @@ export default props => {
 		}
 	};
 	const loadReplies = async () => {
-		const response = await fetch(`${postsBaseUrl}/${postId()}/replies${lastReplyId() ? `?lastReplyId=${lastReplyId()}` : emptyString}`);
+		const response = await fetch(`${postsBaseUrl}/${lastReplyId()}/thread`);
 		if (!response.ok) {
 			setHasMore(false);
 			return;
@@ -50,7 +49,6 @@ export default props => {
 		setPost(null);
 		setParentPost(null);
 		setPostReplies([]);
-		setLastReplyId(null);
 		setHasMore(false);
 		setHasError(false);
 	});
@@ -84,16 +82,13 @@ export default props => {
 				</Show>
 			</Show>
 			<Show when={post()}>
-				<div class="d-flex justify-content-end">
-					<button class="btn btn-primary" onClick={() => navigate(`/thread/${postId()}`)}>Thread View</button>
-				</div>
 				<div class="fs-5">
 					<DisplayPost post={post()}/>
 				</div>
 			</Show>
 			<Show when={postReplies()?.length}>
 				<div class="mt-4">
-					<h5>Replies:</h5>
+					<h5>Thread:</h5>
 					<DisplayPostList posts={postReplies()}/>
 				</div>
 				<Show when={hasMore()}>

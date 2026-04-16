@@ -204,7 +204,7 @@ export default props => {
 			const lastItemIdParamName = isUserSearch() ? "lastUserId" : "lastPostId";
 			params.append(lastItemIdParamName, lastItemId());
 			if (!isUserSearch() && lastScore()) {
-				const sortBy = tokens["sort-by"] || "";
+				const sortBy = tokens["sort-by"] || emptyString;
 				if (!sortBy || sortBy === "match" || sortBy === "popular") {
 					params.append("lastScore", lastScore());
 				}

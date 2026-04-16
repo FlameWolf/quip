@@ -14,6 +14,7 @@ const SignIn = lazy(() => import("./components/SignIn"));
 const Home = lazy(() => import("./components/Home"));
 const Search = lazy(() => import("./components/Search"));
 const Post = lazy(() => import("./components/Post"));
+const Thread = lazy(() => import("./components/Thread"));
 const Profile = lazy(() => import("./components/Profile"));
 const Quips = lazy(() => import("./components/Quips"));
 const Interactions = lazy(() => import("./components/Interactions"));
@@ -94,6 +95,7 @@ render(() => {
 					</Route>
 					<Route path="/search" component={Search}/>
 					<Route path="/post/:postId" component={Post}/>
+					<Route path="/thread/:postId" component={Thread}/>
 					<Route path="/:handle" component={Profile}>
 						<Route path="/following" component={Follows}/>
 						<Route path="/followers" component={Follows}/>
