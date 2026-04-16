@@ -110,21 +110,28 @@ export default props => {
 									<VsMenu/>
 								</button>
 								<ul class="dropdown-menu">
-									<li>
-										<A class="dropdown-item" href={`/${authStore.handle}`}>Profile</A>
-									</li>
-									<li>
-										<hr class="dropdown-divider"/>
-									</li>
-									<li>
-										<A class="dropdown-item disabled" href="javascript: void(0)">Settings</A>
-									</li>
-									<li>
-										<hr class="dropdown-divider"/>
-									</li>
-									<li>
-										<a class="dropdown-item" onClick={signOut} role="button">Sign out</a>
-									</li>
+									<Show when={authStore.userId}>
+										<li>
+											<A class="dropdown-item" href={`/${authStore.handle}`}>Profile</A>
+										</li>
+										<li>
+											<hr class="dropdown-divider"/>
+										</li>
+										<li>
+											<A class="dropdown-item disabled" href="javascript: void(0)">Settings</A>
+										</li>
+										<li>
+											<hr class="dropdown-divider"/>
+										</li>
+										<li>
+											<a class="dropdown-item" onClick={signOut} role="button">Sign out</a>
+										</li>
+									</Show>
+									<Show when={!authStore.userId}>
+										<li>
+											<A class="dropdown-item" href="/auth">Sign up</A>
+										</li>
+									</Show>
 								</ul>
 							</div>
 							<A class="navbar-brand mb-0 h1" href="/">Home</A>
