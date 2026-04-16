@@ -1,12 +1,16 @@
-import { createEffect, createMemo, createSignal, onMount, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from "solid-js";
 import DisplayPost from "./DisplayPost";
 import DisplayPostList from "./DisplayPostList";
 import { useNavigate, useParams } from "@solidjs/router";
 import { emptyString, maxItemsToFetch } from "../library";
+import { TbOutlineJumpRope } from "solid-icons/tb";
+import { Tooltip } from "bootstrap";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 
 export default props => {
+	let threadViewbutton;
+	let threadViewTooltip;
 	let loadMoreButton;
 	const params = useParams();
 	const navigate = useNavigate();
@@ -61,6 +65,19 @@ export default props => {
 			await loadReplies();
 		}
 	});
+	createEffect(() => {
+		if (post()) {
+			threadViewTooltip = new Tooltip(threadViewbutton, {
+				trigger: "hover",
+				title: "Thread View"
+			});
+		}
+	});
+	onCleanup(() => {
+		if (threadViewTooltip) {
+			threadViewTooltip.dispose();
+		}
+	});
 	return (
 		<>
 			<Show when={parentPost()}>
@@ -85,7 +102,9 @@ export default props => {
 			</Show>
 			<Show when={post()}>
 				<div class="d-flex justify-content-end">
-					<button class="btn btn-primary" onClick={() => navigate(`/thread/${postId()}`)}>Thread View</button>
+					<button ref={threadViewbutton} class="btn btn-primary" onClick={() => navigate(`/thread/${postId()}`)} aria-label="Thread View">
+						<TbOutlineJumpRope/>
+					</button>
 				</div>
 				<div class="fs-5">
 					<DisplayPost post={post()}/>
