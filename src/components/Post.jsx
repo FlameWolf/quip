@@ -112,7 +112,7 @@ export default props => {
 			</Show>
 			<Show when={post()}>
 				<div class="d-flex justify-content-end">
-					<button ref={threadViewbutton} class="btn btn-primary" onClick={() => navigate(`/thread/${postId()}`)} aria-label="Thread View">
+					<button ref={threadViewbutton} class="btn btn-outline-primary" onClick={() => navigate(`/thread/${postId()}`)} aria-label="Thread View">
 						<TbOutlineJumpRope/>
 					</button>
 				</div>
