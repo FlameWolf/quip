@@ -4,13 +4,12 @@ import { lightTheme, darkTheme, emptyString } from "./library";
 import { themeStore, setThemeStore } from "./stores/theme-store";
 import { authStore, setAuthStore } from "./stores/auth-store";
 import { errorStore, setErrorStore } from "./stores/error-store";
-import { Alert, Dropdown } from "bootstrap";
+import { Dropdown } from "bootstrap";
 import { VsMenu } from "solid-icons/vs";
 
 let imgMenu;
 let searchInput;
 let errorAlert;
-let alertInstance;
 let alertTimeout;
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const authBaseUrl = `${apiBaseUrl}/auth`;
@@ -74,6 +73,10 @@ export default props => {
 		}
 		navigate(`/search?q=${encodeURIComponent(searchText)}`);
 	};
+	const dismissAlert = () => {
+		clearTimeout(alertTimeout);
+		setErrorStore({ message: emptyString });
+	};
 	createEffect(() => {
 		if (imgMenu) {
 			if (themeStore.isDark) {
@@ -99,19 +102,15 @@ export default props => {
 		if (basePath() === "search") {
 			populateSearchInput();
 		}
-		alertInstance = new Alert(errorAlert);
 	});
 	createEffect(() => {
 		if (errorStore.message) {
-			alertTimeout = setTimeout(() => {
-				setErrorStore({ message: emptyString });
-			}, 5000);
+			alertTimeout = setTimeout(dismissAlert, 5000);
 		}
 	});
 	onCleanup(() => {
 		authChannel.close();
-		alertInstance?.dispose();
-		clearTimeout(alertTimeout);
+		dismissAlert();
 	});
 	return (
 		<>
@@ -161,9 +160,9 @@ export default props => {
 				<div class="col py-3 page-container">{props.children}</div>
 			</div>
 			<Show when={errorStore.message}>
-				<div ref={errorAlert} class="alert alert-warning alert-dismissible position-absolute top-0 start-50 translate-middle mt-5" role="alert">
+				<div ref={errorAlert} class="alert alert-warning position-absolute top-0 start-50 translate-middle mt-5" role="alert">
 					<span innerHTML={errorStore.message}></span>
-					<button type="button" class="btn-close" data-bs-dismiss="alert" onClick={() => clearTimeout(alertTimeout)} aria-label="Close"></button>
+					<button type="button" class="btn-close ms-4" onClick={() => dismissAlert()} aria-label="Close"></button>
 				</div>
 			</Show>
 			<button class="bg-secondary text-light btn-theme-toggle p-0 border-0 rounded-50 mt-1 me-1" tabIndex={1} onClick={updateTheme}>
