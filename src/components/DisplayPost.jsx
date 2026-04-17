@@ -128,14 +128,14 @@ export default props => {
 				<div class="action-bar">
 					<div class="d-flex flex-wrap gap-2 justify-content-end mt-2">
 						<Show when={allowEdit()}>
-							<button class="btn bg-transparent border-0 py-2 px-3" onClick={() => setIsEditing(!isEditing())}><FiEdit3 classList={{ "text-primary": isEditing() }}/></button>
+							<button class="btn bg-transparent border-0 py-2 px-3" onClick={() => setIsEditing(!isEditing())}><FiEdit3 classList={{ "text-primary": isEditing() }} title="Edit"/></button>
 						</Show>
-						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleFave}>{faveFlag() ? <BsStarFill color="gold"/> : <BsStar/>}</button>
-						<button class="btn bg-transparent border-0 py-2 px-3" onClick={() => setQuoteFlag(true)}><BsQuote/></button>
-						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleRepeat}>{repeatFlag() ? <FiRepeat color="green" class="stroke-3"/> : <FiRepeat/>}</button>
-						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleReply}>{replyFlag() ? <BsChatRight color="blue"/> : <BsChatRight/>}</button>
+						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleFave} title={faveFlag() ? "Unfavourite" : "Favourite"}>{faveFlag() ? <BsStarFill color="gold"/> : <BsStar/>}</button>
+						<button class="btn bg-transparent border-0 py-2 px-3" onClick={() => setQuoteFlag(true)} title="Quote"><BsQuote/></button>
+						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleRepeat} title={repeatFlag() ? "Unrepeat" : "Repeat"}>{repeatFlag() ? <FiRepeat color="green" class="stroke-3"/> : <FiRepeat/>}</button>
+						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleReply} title="Reply">{replyFlag() ? <BsChatRight color="blue"/> : <BsChatRight/>}</button>
 						<Show when={isOwnPost()}>
-							<button class="btn bg-transparent border-0 py-2 px-3"><FiTrash onClick={() => setConfirmDelete(true)}/></button>
+							<button class="btn bg-transparent border-0 py-2 px-3" title="Delete"><FiTrash onClick={() => setConfirmDelete(true)}/></button>
 						</Show>
 						<Show when={replyFlag()}>
 							<Editor isReply={true} parentPostId={postId} classList={{ "mx-2": true, "mb-2": true }} onSubmit={toggleReply}/>

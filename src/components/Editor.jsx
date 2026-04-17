@@ -138,19 +138,19 @@ export default props => {
 						<li>Remove all faves and repeats</li>
 						<li>Orphan all quotes and replies except those from the post author</li>
 					</ul>
-					<button class="btn btn-primary position-absolute top-0 end-0 mt-2 me-2" onClick={() => props.onSubmit?.()}>Close Editor</button>
+					<button class="btn-close position-absolute top-0 end-0 mt-2 me-2" onClick={() => props.onSubmit?.()} title="Cancel Editing"></button>
 				</div>
 			</Show>
 			<div class="autogrow" tabIndex={-1}>
-				<textarea ref={plainTextInput} value={props.isEditing ? props.post.content : emptyString} onInput={updateEditor}></textarea>
+				<textarea ref={plainTextInput} value={props.isEditing ? props.post.content : emptyString} onInput={updateEditor} title="Editor"></textarea>
 			</div>
 			<Show when={hasPoll()}>
 				<div class="card mb-1" onInput={updatePoll}>
 					<div class="card-body px-2">
-						<input class="form-control my-1" name="first" type="text" placeholder="Option 1"/>
-						<input class="form-control my-1" name="second" type="text" placeholder="Option 2"/>
-						<input class="form-control my-1" name="third" type="text" placeholder="Option 3 (Optional)"/>
-						<input class="form-control my-1" name="fourth" type="text" placeholder="Option 4 (Optional)"/>
+						<input class="form-control my-1" name="first" type="text" placeholder="Option 1" title="Poll Option 1"/>
+						<input class="form-control my-1" name="second" type="text" placeholder="Option 2" title="Poll Option 2"/>
+						<input class="form-control my-1" name="third" type="text" placeholder="Option 3 (Optional)" title="Poll Option 3 (Optional)"/>
+						<input class="form-control my-1" name="fourth" type="text" placeholder="Option 4 (Optional)" title="Poll Option 4 (Optional)"/>
 					</div>
 					<div class="card-footer">
 						<p>Duration</p>
@@ -158,7 +158,7 @@ export default props => {
 							<div class="col-4">
 								<div class="border rounded p-2">
 									<p>Days</p>
-									<select name="days" class="form-select">
+									<select name="days" class="form-select" title="Days">
 										<option>0</option>
 										<option selected="true">1</option>
 										<For each={Array.from(Array(5).keys())}>{(day, index) => <option>{day + 2}</option>}</For>
@@ -168,7 +168,7 @@ export default props => {
 							<div class="col-4">
 								<div class="border rounded p-2">
 									<p>Hours</p>
-									<select name="hours" class="form-select">
+									<select name="hours" class="form-select" title="Hours">
 										<option>0</option>
 										<For each={Array.from(Array(23).keys())}>{(hour, index) => <option>{hour + 1}</option>}</For>
 									</select>
@@ -177,7 +177,7 @@ export default props => {
 							<div class="col-4">
 								<div class="border rounded p-2">
 									<p>Minutes</p>
-									<select name="minutes" class="form-select">
+									<select name="minutes" class="form-select" title="Minutes">
 										<option>0</option>
 										<For each={Array.from(Array(59).keys())}>{(minute, index) => <option>{minute + 1}</option>}</For>
 									</select>
@@ -188,9 +188,9 @@ export default props => {
 				</div>
 			</Show>
 			<Show when={mediaFile()}>
-				<div class="d-inline-block position-relative card-body pt-0 media-preview" onClick={() => setMediaFile()}>
+				<div class="d-inline-block position-relative card-body pt-0 media-preview">
 					<img class="img-fluid" src={URL.createObjectURL(mediaFile())}/>
-					<button class="position-absolute top-0 end-0 btn btn-danger border m-1"><VsChromeClose/></button>
+					<button class="position-absolute top-0 end-0 btn btn-danger border m-1" onClick={() => setMediaFile()} title="Remove Media"><VsChromeClose/></button>
 				</div>
 			</Show>
 			<div class="d-flex gap-2 justify-content-end pt-2 border-top">
@@ -208,13 +208,13 @@ export default props => {
 						})
 					}
 				</div>
-				<button ref={emojiTrigger} class="btn btn-secondary btn-sm px-3 rounded-pill" classList={{ active: hasEmojiPicker() }} onClick={toggleEmojiMart}>&#x2026;</button>
-				<div class="char-count" classList={{ "bg-danger text-light": characterLimitExceeded() }}>{charCount()}</div>
+				<button ref={emojiTrigger} class="btn btn-secondary btn-sm px-3 rounded-pill" classList={{ active: hasEmojiPicker() }} onClick={toggleEmojiMart} title="Add Emoji">&#x2026;</button>
+				<div class="char-count" classList={{ "bg-danger text-light": characterLimitExceeded() }} title="Character Count">{charCount()}</div>
 				<Show when={!props.isEditing}>
-					<button class="btn btn-secondary btn-sm px-3 rounded-pill" classList={{ active: hasPoll() }} onClick={() => setHasPoll(!hasPoll())}><BiRegularPoll class="poll-icon"/></button>
-					<button class="btn btn-secondary btn-sm px-3 rounded-pill" onClick={() => mediaFileInput.click()}><BsImage/></button>
+					<button class="btn btn-secondary btn-sm px-3 rounded-pill" classList={{ active: hasPoll() }} onClick={() => setHasPoll(!hasPoll())} title="Poll"><BiRegularPoll class="poll-icon"/></button>
+					<button class="btn btn-secondary btn-sm px-3 rounded-pill" onClick={() => mediaFileInput.click()} title="Media"><BsImage/></button>
 				</Show>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={() => makeQuip()}>Post</button>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={() => makeQuip()} title="Post">Post</button>
 				<Show when={!props.isEditing}>
 					<input ref={mediaFileInput} onInput={event => setMediaFile(event.target.files?.[0])} class="visually-hidden" type="file"/>
 				</Show>
