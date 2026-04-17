@@ -21,9 +21,11 @@ export default props => {
 		try {
 			const response = await fetch(`${postsBaseUrl}/${postId()}`);
 			if (!response.ok) {
+				setHasError(true);
 				setErrorStore("message", await getErrorMessage(response));
 				return;
 			}
+			setHasError(false);
 			setPost((await response.json()).post);
 		} catch (err) {
 			setErrorStore("message", err.message);
@@ -32,10 +34,6 @@ export default props => {
 	const fetchParentPost = async () => {
 		try {
 			const response = await fetch(`${postsBaseUrl}/${postId()}/parent`);
-			if (!response.ok) {
-				setErrorStore("message", await getErrorMessage(response));
-				return;
-			}
 			setParentPost(response.ok ? (await response.json()).parent : null);
 		} catch (err) {
 			setErrorStore("message", err.message);

@@ -2,7 +2,7 @@ import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from
 import DisplayPost from "./DisplayPost";
 import DisplayPostList from "./DisplayPostList";
 import { useNavigate, useParams } from "@solidjs/router";
-import { errorStore, setErrorStore } from "../stores/error-store";
+import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
 import { TbOutlineJumpRope } from "solid-icons/tb";
 import { Tooltip } from "bootstrap";
@@ -21,13 +21,16 @@ export default props => {
 	const [postReplies, setPostReplies] = createSignal([]);
 	const [lastReplyId, setLastReplyId] = createSignal();
 	const [hasMore, setHasMore] = createSignal(false);
+	const [hasError, setHasError] = createSignal(false);
 	const fetchPost = async () => {
 		try {
 			const response = await fetch(`${postsBaseUrl}/${postId()}`);
 			if (!response.ok) {
+				setHasError(true);
 				setErrorStore("message", await getErrorMessage(response));
 				return;
 			}
+			setHasError(false);
 			setPost((await response.json()).post);
 		} catch (err) {
 			setErrorStore("message", err.message);
@@ -36,10 +39,6 @@ export default props => {
 	const fetchParentPost = async () => {
 		try {
 			const response = await fetch(`${postsBaseUrl}/${postId()}/parent`);
-			if (!response.ok) {
-				setErrorStore("message", await getErrorMessage(response));
-				return;
-			}
 			setParentPost(response.ok ? (await response.json()).parent : null);
 		} catch (err) {
 			setErrorStore("message", err.message);
@@ -98,14 +97,14 @@ export default props => {
 				</div>
 			</Show>
 			<Show when={!post()}>
-				<Show when={!errorStore.message}>
+				<Show when={!hasError()}>
 					<div class="text-center mt-4">
 						<div class="spinner-border" role="status">
 							<span class="visually-hidden">Loading...</span>
 						</div>
 					</div>
 				</Show>
-				<Show when={errorStore.message}>
+				<Show when={hasError()}>
 					<div class="alert alert-info mt-4" role="alert">
 						<span>Failed to load post.</span>
 					</div>
