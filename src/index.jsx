@@ -23,7 +23,6 @@ const NotFound = lazy(() => import("./components/NotFound"));
 
 const healthCheckUrl = `${import.meta.env.VITE_API_BASE_URL}/health`;
 const storedLastVisit = localStorage.getItem("lastVisited");
-const [showError, setShowError] = createSignal(false);
 const [lastVisited, setLastVisited] = createSignal(storedLastVisit ? new Date(Number(storedLastVisit)) : null);
 
 render(() => {
@@ -64,7 +63,6 @@ render(() => {
 			setLastVisited(new Date());
 			return true;
 		} catch {
-			setShowError(true);
 			return false;
 		}
 	});
@@ -73,8 +71,7 @@ render(() => {
 	}
 	return (
 		<Suspense fallback={loadingPlaceholder}>
-			<p class="d-none">{healthCheckStatus()}</p>
-			<Show when={showError()}>
+			<Show when={!healthCheckStatus()}>
 				<div class="row">
 					<div class="col py-3 page-container">
 						<div class="d-flex flex-column text-center">
@@ -86,7 +83,7 @@ render(() => {
 					</div>
 				</div>
 			</Show>
-			<Show when={!showError()}>
+			<Show when={healthCheckStatus()}>
 				<Router root={App}>
 					<Route path="/auth" component={Auth}>
 						<Route path="/sign-in" component={SignIn}/>
