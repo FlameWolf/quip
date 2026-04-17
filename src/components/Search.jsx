@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For, onMount, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js";
 import { useSearchParams, A } from "@solidjs/router";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
@@ -213,8 +213,8 @@ export default props => {
 		}
 		return `${searchUrl}${searchType()}?${params.toString()}`;
 	};
-	const loadSearchResults = async (isLoadMore = false) => {
-		if (isLoadMore) {
+	const loadSearchResults = async (loadMore = false) => {
+		if (loadMore) {
 			await fetchAndAppendResults();
 		} else {
 			setSearchResults([]);
@@ -253,9 +253,14 @@ export default props => {
 	const handleLoadMore = async () => {
 		await loadSearchResults(true);
 	};
-	onMount(async () => {
-		await loadSearchResults(false);
-	});
+	createEffect(
+		on(
+			() => searchParams["q"],
+			async () => {
+				await loadSearchResults(false);
+			}
+		)
+	);
 	return (
 		<>
 			<div class="alert alert-info">

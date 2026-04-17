@@ -1,5 +1,5 @@
 import { createEffect, createMemo, onMount, onCleanup, Show } from "solid-js";
-import { useLocation, useNavigate, A } from "@solidjs/router";
+import { useLocation, useNavigate, A, useSearchParams } from "@solidjs/router";
 import { lightTheme, darkTheme, emptyString } from "./library";
 import { themeStore, setThemeStore } from "./stores/theme-store";
 import { authStore, setAuthStore } from "./stores/auth-store";
@@ -31,6 +31,7 @@ navigator.serviceWorker.controller?.postMessage({
 
 export default props => {
 	const location = useLocation();
+	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const authChannel = new BroadcastChannel(authChannelName);
 	const protectedRoutes = ["/", "/home"];
@@ -59,19 +60,19 @@ export default props => {
 		}, 250);
 	};
 	const populateSearchInput = () => {
-		const urlParams = new URLSearchParams(location.search);
-		const searchText = urlParams.get("q");
+		const searchText = searchParams["q"];
 		if (searchText) {
 			searchInput.value = searchText;
 		}
 	};
-	const doSearch = event => {
-		event.preventDefault();
+	const doSearch = () => {
 		const searchText = searchInput.value;
 		if (!searchText) {
 			return;
 		}
-		navigate(`/search?q=${encodeURIComponent(searchText)}`);
+		navigate(`/search?q=${encodeURIComponent(searchText)}`, {
+			resolve: false
+		});
 	};
 	const dismissAlert = () => {
 		clearTimeout(alertTimeout);
@@ -149,10 +150,10 @@ export default props => {
 							</div>
 							<A class="navbar-brand mb-0 h1" href="/">Home</A>
 						</div>
-						<form class="d-flex" role="search">
-							<input ref={searchInput} class="form-control me-2" type="text" placeholder="Search" aria-label="Search" onKeyUp={event => event.code === "Enter" && doSearch(event)}/>
-							<button class="btn btn-outline-primary" type="submit" onClick={doSearch}>Search</button>
-						</form>
+						<div class="d-flex" role="search">
+							<input ref={searchInput} class="form-control me-2" type="text" placeholder="Search" onKeyUp={event => event.code === "Enter" && doSearch()} aria-label="Search"/>
+							<button class="btn btn-outline-primary" onClick={doSearch}>Search</button>
+						</div>
 					</div>
 				</nav>
 			</Show>
@@ -162,7 +163,7 @@ export default props => {
 			<Show when={errorStore.message}>
 				<div ref={errorAlert} class="alert alert-warning position-absolute top-0 start-50 translate-middle mt-5" role="alert">
 					<span innerHTML={errorStore.message}></span>
-					<button type="button" class="btn-close ms-4" onClick={() => dismissAlert()} aria-label="Close"></button>
+					<button type="button" class="btn-close ms-4" onClick={dismissAlert} aria-label="Close"></button>
 				</div>
 			</Show>
 			<button class="bg-secondary text-light btn-theme-toggle p-0 border-0 rounded-50 mt-1 me-1" tabIndex={1} onClick={updateTheme}>
