@@ -1,6 +1,7 @@
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { useSearchParams, A } from "@solidjs/router";
-import { emptyString, maxItemsToFetch } from "../library";
+import { setErrorStore } from "../stores/error-store";
+import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
 import DisplayPost from "./DisplayPost";
 
 /*
@@ -224,9 +225,13 @@ export default props => {
 		}
 	};
 	const fetchAndAppendResults = async () => {
-		const url = buildSearchUrl(lastItemId() !== emptyString);
-		const response = await fetch(url);
-		if (response.ok) {
+		try {
+			const url = buildSearchUrl(lastItemId() !== emptyString);
+			const response = await fetch(url);
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
+			}
 			const data = await response.json();
 			const items = isUserSearch() ? data.users : data.posts;
 			const itemCount = items.length;
@@ -241,8 +246,8 @@ export default props => {
 				setHasMore(false);
 			}
 			setSearchResults(searchResults().concat(items));
-		} else {
-			console.error("Search request failed:", response.statusText);
+		} catch (err) {
+			setErrorStore("message", err.message);
 		}
 	};
 	const handleLoadMore = async () => {

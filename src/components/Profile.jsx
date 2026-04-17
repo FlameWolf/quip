@@ -2,7 +2,8 @@ import { useParams, A } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, Show } from "solid-js";
 import { BsPersonBadgeFill } from "solid-icons/bs";
 import { authStore } from "../stores/auth-store";
-import { emptyString } from "../library";
+import { setErrorStore } from "../stores/error-store";
+import { emptyString, getErrorMessage } from "../library";
 import { Dropdown } from "bootstrap";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
@@ -29,38 +30,52 @@ export default props => {
 	const [showMutedReason, setShowMutedReason] = createSignal(false);
 	const [showBlockedReason, setShowBlockedReason] = createSignal(false);
 	const loadUser = async () => {
-		const data = await (await fetch(profileUrl())).json();
-		const user = data.user;
-		setProfileUser(user);
-		if (authStore.userId) {
-			setIsSelf(user.self);
-			setFollowed(user.followedByMe);
-			setMuted(user.mutedByMe);
-			setMutedReason(user.mutedReason);
-			setBlocked(user.blockedByMe);
-			setBlockedReason(user.blockedReason);
-			setFollowsMe(user.followedMe);
-			setFollowingCount(user.following);
-			setFollowerCount(user.followers);
+		try {
+			const response = await fetch(profileUrl());
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
+			}
+			const user = (await response.json()).user;
+			setProfileUser(user);
+			if (authStore.userId) {
+				setIsSelf(user.self);
+				setFollowed(user.followedByMe);
+				setMuted(user.mutedByMe);
+				setMutedReason(user.mutedReason);
+				setBlocked(user.blockedByMe);
+				setBlockedReason(user.blockedReason);
+				setFollowsMe(user.followedMe);
+				setFollowingCount(user.following);
+				setFollowerCount(user.followers);
+			}
+		} catch (err) {
+			setErrorStore("message", err.message);
 		}
 	};
 	const toggleAction = async (action, flag, setFlag) => {
 		const actionUrl = `${profileBaseUrl}/${flag ? `un${action}` : action}/${params.handle}${actionReason() ? `?reason=${actionReason()}` : emptyString}`;
-		const response = await fetch(actionUrl);
-		if (response.status === 200) {
+		try {
+			const response = await fetch(actionUrl);
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
+			}
 			setFlag(!flag);
 			switch (action) {
 				case "mute":
-					setMutedReason(flag ? emptyString: actionReason());
+					setMutedReason(flag ? emptyString : actionReason());
 					break;
 				case "block":
-					setBlockedReason(flag ? emptyString: actionReason());
+					setBlockedReason(flag ? emptyString : actionReason());
 					break;
 				default:
 					break;
 			}
 			setActionReason(emptyString);
 			setActionTrigger(null);
+		} catch (err) {
+			setErrorStore("message", err.message);
 		}
 	};
 	createEffect(() => {

@@ -1,6 +1,7 @@
 import { useParams, useLocation, A } from "@solidjs/router";
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
-import { emptyString, maxItemsToFetch } from "../library";
+import { setErrorStore } from "../stores/error-store";
+import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
@@ -26,8 +27,12 @@ export default props => {
 		if (!hasMore()) {
 			return;
 		}
-		const response = await fetch(`${profileUrl()}/${pathToUse}${lastFollowId() ? `?lastFollowId=${lastFollowId()}` : emptyString}`);
-		if (response.ok) {
+		try {
+			const response = await fetch(`${profileUrl()}/${pathToUse}${lastFollowId() ? `?lastFollowId=${lastFollowId()}` : emptyString}`);
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
+			}
 			const data = (await response.json())?.[pathToUse];
 			const fetchedCount = data?.length ?? 0;
 			if (fetchedCount < maxItemsToFetch) {
@@ -37,8 +42,8 @@ export default props => {
 				setFollows(follows().concat(data.map(x => x[userKey])));
 				setLastFollowId(data[fetchedCount - 1]._id);
 			}
-		} else {
-			console.error("Failed to fetch follows:", response.statusText);
+		} catch (err) {
+			setErrorStore("message", err.messsage);
 		}
 	};
 	onMount(async () => {

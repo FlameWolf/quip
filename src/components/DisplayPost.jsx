@@ -3,7 +3,8 @@ import { useNavigate, A } from "@solidjs/router";
 import { BsChatRight, BsQuote, BsStar, BsStarFill } from "solid-icons/bs";
 import { FiEdit3, FiRepeat, FiTrash } from "solid-icons/fi";
 import { authStore } from "../stores/auth-store";
-import { formatTimeAgo, toLongDateString } from "../library";
+import { setErrorStore } from "../stores/error-store";
+import { formatTimeAgo, getErrorMessage, toLongDateString } from "../library";
 import DisplayPoll from "./DisplayPoll";
 import DisplayPostMinimal from "./DisplayPostMinimal";
 import Editor from "./Editor";
@@ -33,19 +34,29 @@ export default props => {
 	const [isDeleted, setIsDeleted] = createSignal(false);
 	const isOwnPost = createMemo(() => post.author._id === authStore.userId);
 	const allowEdit = createMemo(() => isOwnPost() && !post.attachments?.poll && post.__v === 0);
-	const toggleFave = event => {
-		fetch(`${faveFlag() ? unfavouriteUrl : favouriteUrl}/${postId}`).then(response => {
-			if (response.status === 200) {
-				setFaveFlag(value => !value);
+	const toggleFave = async event => {
+		try {
+			const response = await fetch(`${faveFlag() ? unfavouriteUrl : favouriteUrl}/${postId}`);
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
 			}
-		});
+			setFaveFlag(value => !value);
+		} catch (err) {
+			setErrorStore("message", err.message);
+		}
 	};
-	const toggleRepeat = event => {
-		fetch(`${repeatFlag() ? unrepeatUrl : repeatUrl}/${postId}`).then(response => {
-			if (response.status === 200 || response.status === 201) {
-				setRepeatFlag(value => !value);
+	const toggleRepeat = async event => {
+		try {
+			const response = await fetch(`${repeatFlag() ? unrepeatUrl : repeatUrl}/${postId}`);
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
 			}
-		});
+			setRepeatFlag(value => !value);
+		} catch (err) {
+			setErrorStore("message", err.message);
+		}
 	};
 	const toggleReply = event => {
 		setReplyFlag(!replyFlag());
@@ -53,9 +64,13 @@ export default props => {
 	const deletePost = async () => {
 		try {
 			const response = await fetch(`${deleteUrl}/${postId}`, { method: "DELETE" });
-			if (response.status === 200) {
-				setIsDeleted(true);
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
 			}
+			setIsDeleted(true);
+		} catch (err) {
+			setErrorStore("message", err.message);
 		} finally {
 			setConfirmDelete(false);
 		}

@@ -1,6 +1,8 @@
 import { createMemo, createSignal, Show } from "solid-js";
-import { quipStore, setQuipStore } from "../stores/quip-store";
 import { produce } from "solid-js/store";
+import { quipStore, setQuipStore } from "../stores/quip-store";
+import { setErrorStore } from "../stores/error-store";
+import { getErrorMessage } from "../library";
 
 export default props => {
 	const poll = createMemo(() => props.poll);
@@ -17,8 +19,12 @@ export default props => {
 	const inactivePoll = createMemo(() => props.isOwnPoll || poll().expired || props.voted);
 	const castVoteUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/vote/${props.postId}`;
 	const castVote = async option => {
-		var response = await fetch(`${castVoteUrl}?option=${option}`);
-		if (response.ok) {
+		try {
+			var response = await fetch(`${castVoteUrl}?option=${option}`);
+			if(!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
+			}
 			setTotalVotes(totalVotes() + 1);
 			setQuipStore(
 				"quips",
@@ -29,6 +35,8 @@ export default props => {
 					quip.voted = option;
 				})
 			);
+		} catch (err) {
+			setErrorStore("message", err.message);
 		}
 	};
 	return (

@@ -2,7 +2,8 @@ import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from
 import DisplayPost from "./DisplayPost";
 import DisplayPostList from "./DisplayPostList";
 import { useNavigate, useParams } from "@solidjs/router";
-import { emptyString, maxItemsToFetch } from "../library";
+import { errorStore, setErrorStore } from "../stores/error-store";
+import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
 import { TbOutlineJumpRope } from "solid-icons/tb";
 import { Tooltip } from "bootstrap";
 
@@ -20,34 +21,47 @@ export default props => {
 	const [postReplies, setPostReplies] = createSignal([]);
 	const [lastReplyId, setLastReplyId] = createSignal();
 	const [hasMore, setHasMore] = createSignal(false);
-	const [hasError, setHasError] = createSignal();
 	const fetchPost = async () => {
-		const response = await fetch(`${postsBaseUrl}/${postId()}`);
-		const success = response.ok;
-		if (success) {
+		try {
+			const response = await fetch(`${postsBaseUrl}/${postId()}`);
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
+			}
 			setPost((await response.json()).post);
+		} catch (err) {
+			setErrorStore("message", err.message);
 		}
-		setHasError(!success);
 	};
 	const fetchParentPost = async () => {
-		const response = await fetch(`${postsBaseUrl}/${postId()}/parent`);
-		if (response.ok) {
+		try {
+			const response = await fetch(`${postsBaseUrl}/${postId()}/parent`);
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
+			}
 			setParentPost(response.ok ? (await response.json()).parent : null);
+		} catch (err) {
+			setErrorStore("message", err.message);
 		}
 	};
 	const loadReplies = async () => {
-		const response = await fetch(`${postsBaseUrl}/${postId()}/replies${lastReplyId() ? `?lastReplyId=${lastReplyId()}` : emptyString}`);
-		if (!response.ok) {
-			setHasMore(false);
-			return;
-		}
-		const loadedReplies = (await response.json()).replies;
-		setPostReplies(postReplies().concat(loadedReplies));
-		if (loadedReplies.length === maxItemsToFetch) {
-			setHasMore(true);
-			setLastReplyId(loadedReplies.at(-1)._id);
-		} else {
-			setHasMore(false);
+		try {
+			const response = await fetch(`${postsBaseUrl}/${postId()}/replies${lastReplyId() ? `?lastReplyId=${lastReplyId()}` : emptyString}`);
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
+			}
+			const loadedReplies = (await response.json()).replies;
+			setPostReplies(postReplies().concat(loadedReplies));
+			if (loadedReplies.length === maxItemsToFetch) {
+				setHasMore(true);
+				setLastReplyId(loadedReplies.at(-1)._id);
+			} else {
+				setHasMore(false);
+			}
+		} catch (err) {
+			setErrorStore("message", err.message);
 		}
 	};
 	onMount(async () => {
@@ -56,7 +70,6 @@ export default props => {
 		setPostReplies([]);
 		setLastReplyId(null);
 		setHasMore(false);
-		setHasError(false);
 	});
 	createEffect(async () => {
 		if (postId()) {
@@ -74,9 +87,7 @@ export default props => {
 		}
 	});
 	onCleanup(() => {
-		if (threadViewTooltip) {
-			threadViewTooltip.dispose();
-		}
+		threadViewTooltip?.dispose();
 	});
 	return (
 		<>
@@ -87,14 +98,14 @@ export default props => {
 				</div>
 			</Show>
 			<Show when={!post()}>
-				<Show when={!hasError()}>
+				<Show when={!errorStore.message}>
 					<div class="text-center mt-4">
 						<div class="spinner-border" role="status">
 							<span class="visually-hidden">Loading...</span>
 						</div>
 					</div>
 				</Show>
-				<Show when={hasError()}>
+				<Show when={errorStore.message}>
 					<div class="alert alert-info mt-4" role="alert">
 						<span>Failed to load post.</span>
 					</div>

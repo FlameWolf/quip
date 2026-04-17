@@ -2,13 +2,14 @@ import { createSignal, createMemo, onMount, Show, For } from "solid-js";
 import emojiData from "@emoji-mart/data";
 import { Picker } from "emoji-mart";
 import { computePosition, autoUpdate, offset, autoPlacement } from "@floating-ui/dom";
-import { emptyString, getGraphemeClusterCount, insertEmojo, maxContentLength, popularEmoji } from "../library";
+import { emptyString, getErrorMessage, getGraphemeClusterCount, insertEmojo, maxContentLength, popularEmoji } from "../library";
 import { BsImage } from "solid-icons/bs";
 import { BiRegularPoll } from "solid-icons/bi";
 import { VsChromeClose } from "solid-icons/vs";
 import { themeStore } from "../stores/theme-store";
 import { setQuipStore } from "../stores/quip-store";
 import { authStore } from "../stores/auth-store";
+import { setErrorStore } from "../stores/error-store";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 const createPostUrl = `${postsBaseUrl}/create`;
@@ -70,20 +71,30 @@ export default props => {
 				: props.isEditing
 					? `${updatePostUrl}/${props.post._id}`
 					: createPostUrl;
-		const response = await fetch(url, {
-			method: props.isEditing ? "PATCH" : "POST",
-			body: formData
-		});
-		if (response.ok) {
+		try {
+			const response = await fetch(url, {
+				method: props.isEditing ? "PATCH" : "POST",
+				body: formData
+			});
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
+			}
+			if (props.isEditing && response.status === 304) {
+				return;
+			}
 			const payload = await response.json();
 			const post = payload.post || payload.quote || payload.updated || payload.reply;
 			post.author = { _id: authStore.userId, handle: authStore.handle };
 			setQuipStore("quips", quips => {
 				if (props.isEditing) {
-					return quips.map(quip => quip._id === post._id ? post : quip);
+					return quips.map(quip => (quip._id === post._id ? post : quip));
 				}
-				return [post, ...quips];
+				return [post].concat(quips);
 			});
+		} catch (err) {
+			setErrorStore("message", err.message);
+		} finally {
 			resetEditor();
 			props.onSubmit?.();
 		}
@@ -99,14 +110,13 @@ export default props => {
 		}
 	};
 	const toggleEmojiMart = () => {
-		autoUpdate(emojiTrigger, emojiPickerContainer, () => {
-			computePosition(emojiTrigger, emojiPickerContainer, {
+		autoUpdate(emojiTrigger, emojiPickerContainer, async () => {
+			const { x, y } = await computePosition(emojiTrigger, emojiPickerContainer, {
 				middleware: [offset(4), autoPlacement()]
-			}).then(({ x, y }) => {
-				Object.assign(emojiPickerContainer.style, {
-					left: `${x}px`,
-					top: `${y}px`
-				});
+			});
+			Object.assign(emojiPickerContainer.style, {
+				left: `${x}px`,
+				top: `${y}px`
 			});
 		});
 		setHasEmojiPicker(!hasEmojiPicker());

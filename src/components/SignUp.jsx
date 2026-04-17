@@ -3,7 +3,8 @@ import { Popover } from "bootstrap";
 import { useNavigate } from "@solidjs/router";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
-import { handleRegExp, passwordRegExp } from "../library";
+import { setErrorStore } from "../stores/error-store";
+import { getErrorMessage, handleRegExp, passwordRegExp } from "../library";
 
 const signUpUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/sign-up`;
 
@@ -19,7 +20,6 @@ export default props => {
 	const [showConfirmPassword, setShowConfirmPassword] = createSignal(false);
 	const [formValidity, setFormValidity] = createSignal(false);
 	const [formHasValue, setFormHasValue] = createSignal(false);
-	const [signUpError, setSignUpError] = createSignal();
 	const navigate = useNavigate();
 	const updateFormValidity = event => {
 		const username = usernameInput.value;
@@ -51,18 +51,21 @@ export default props => {
 	const submitForm = async event => {
 		const handle = usernameInput.value;
 		const password = passwordInput.value;
-		const response = await fetch(signUpUrl, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({ handle, password })
-		});
-		if (response.status === 201) {
-			setSignUpError(undefined);
+		try {
+			const response = await fetch(signUpUrl, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({ handle, password })
+			});
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
+			}
 			navigate("/home", { resolve: false });
-		} else if (response.status >= 400) {
-			setSignUpError(await response.text());
+		} catch (err) {
+			setErrorStore("message", err.message);
 		}
 	};
 	onMount(() => {
@@ -84,12 +87,6 @@ export default props => {
 	});
 	return (
 		<form ref={signUpForm} onInput={updateFormValidity}>
-			<Show when={signUpError()}>
-				<div class="alert alert-danger alert-dismissible">
-					<span>{signUpError()}</span>
-					<button class="btn-close" type="button" onClick={() => setSignUpError(undefined)}></button>
-				</div>
-			</Show>
 			<div class="d-flex mb-2">
 				<label>Username</label>
 				<a ref={usernameInfoToggle} class="ms-auto clickable" tabIndex={-1}><AiOutlineInfoCircle/></a>

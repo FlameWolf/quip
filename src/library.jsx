@@ -125,3 +125,8 @@ export const formatTimeAgo = input => {
 	}
 	return hours >= 24 ? toShortDateString(dateValue) : `${timeFragments.join(", ")} ago`;
 };
+
+export const getErrorMessage = async response => {
+	const isJson = response.headers.get("Content-Type")?.startsWith("application/json");
+	return (isJson ? (await response.json()).message : await response.text()) || "An error occurred. Please try later.";
+};

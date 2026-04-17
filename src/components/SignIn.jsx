@@ -1,8 +1,10 @@
-import { createSignal, onMount, Show } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import { Popover } from "bootstrap";
 import { useNavigate } from "@solidjs/router";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
+import { setErrorStore } from "../stores/error-store";
+import { getErrorMessage } from "../library";
 
 const signInUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/sign-in`;
 
@@ -15,7 +17,6 @@ export default props => {
 	const [showPassword, setShowPassword] = createSignal(false);
 	const [formValidity, setFormValidity] = createSignal(false);
 	const [formHasValue, setFormHasValue] = createSignal(false);
-	const [signInError, setSignInError] = createSignal();
 	const navigate = useNavigate();
 	const updateFormValidity = event => {
 		const username = usernameInput.value;
@@ -41,18 +42,21 @@ export default props => {
 	const submitForm = async event => {
 		const handle = usernameInput.value;
 		const password = passwordInput.value;
-		const response = await fetch(signInUrl, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({ handle, password })
-		});
-		if (response.status === 200) {
-			setSignInError(undefined);
+		try {
+			const response = await fetch(signInUrl, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({ handle, password })
+			});
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
+			}
 			navigate("/home", { resolve: false });
-		} else if (response.status >= 400) {
-			setSignInError(await response.text());
+		} catch (err) {
+			setErrorStore("message", err.message);
 		}
 	};
 	onMount(() => {
@@ -69,12 +73,6 @@ export default props => {
 	});
 	return (
 		<form ref={signInForm} onInput={updateFormValidity}>
-			<Show when={signInError()}>
-				<div class="alert alert-danger alert-dismissible">
-					<span>{signInError()}</span>
-					<button class="btn-close" type="button" onClick={() => setSignInError(undefined)}></button>
-				</div>
-			</Show>
 			<div class="d-flex mb-2">
 				<label>Username</label>
 				<a ref={usernameInfoToggle} class="ms-auto clickable" tabIndex={-1}><AiOutlineInfoCircle/></a>

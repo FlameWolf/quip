@@ -3,11 +3,15 @@ import { useLocation, useNavigate, A } from "@solidjs/router";
 import { lightTheme, darkTheme, emptyString } from "./library";
 import { themeStore, setThemeStore } from "./stores/theme-store";
 import { authStore, setAuthStore } from "./stores/auth-store";
-import { Dropdown } from "bootstrap";
+import { errorStore, setErrorStore } from "./stores/error-store";
+import { Alert, Dropdown } from "bootstrap";
 import { VsMenu } from "solid-icons/vs";
 
 let imgMenu;
 let searchInput;
+let errorAlert;
+let alertInstance;
+let alertTimeout;
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const authBaseUrl = `${apiBaseUrl}/auth`;
 const refreshTokenUrl = `${authBaseUrl}/refresh-token`;
@@ -95,9 +99,19 @@ export default props => {
 		if (basePath() === "search") {
 			populateSearchInput();
 		}
+		alertInstance = new Alert(errorAlert);
+	});
+	createEffect(() => {
+		if (errorStore.message) {
+			alertTimeout = setTimeout(() => {
+				setErrorStore({ message: emptyString });
+			}, 5000);
+		}
 	});
 	onCleanup(() => {
 		authChannel.close();
+		alertInstance?.dispose();
+		clearTimeout(alertTimeout);
 	});
 	return (
 		<>
@@ -146,6 +160,12 @@ export default props => {
 			<div class="row">
 				<div class="col py-3 page-container">{props.children}</div>
 			</div>
+			<Show when={errorStore.message}>
+				<div ref={errorAlert} class="alert alert-warning alert-dismissible position-absolute top-0 start-50 translate-middle mt-5" role="alert">
+					<span innerHTML={errorStore.message}></span>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" onClick={() => clearTimeout(alertTimeout)} aria-label="Close"></button>
+				</div>
+			</Show>
 			<button class="bg-secondary text-light btn-theme-toggle p-0 border-0 rounded-50 mt-1 me-1" tabIndex={1} onClick={updateTheme}>
 				<i class="bi" classList={{ "bi-moon-fill": themeStore.isLight, "bi-sun-fill": themeStore.isDark }}></i>
 			</button>

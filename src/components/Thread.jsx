@@ -2,7 +2,8 @@ import { createEffect, createMemo, createSignal, onMount, Show } from "solid-js"
 import DisplayPost from "./DisplayPost";
 import DisplayPostList from "./DisplayPostList";
 import { useParams } from "@solidjs/router";
-import { maxItemsToFetch } from "../library";
+import { setErrorStore } from "../stores/error-store";
+import { getErrorMessage, maxItemsToFetch } from "../library";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 
@@ -17,32 +18,46 @@ export default props => {
 	const [hasMore, setHasMore] = createSignal(false);
 	const [hasError, setHasError] = createSignal();
 	const fetchPost = async () => {
-		const response = await fetch(`${postsBaseUrl}/${postId()}`);
-		const success = response.ok;
-		if (success) {
+		try {
+			const response = await fetch(`${postsBaseUrl}/${postId()}`);
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
+			}
 			setPost((await response.json()).post);
+		} catch (err) {
+			setErrorStore("message", err.message);
 		}
-		setHasError(!success);
 	};
 	const fetchParentPost = async () => {
-		const response = await fetch(`${postsBaseUrl}/${postId()}/parent`);
-		if (response.ok) {
+		try {
+			const response = await fetch(`${postsBaseUrl}/${postId()}/parent`);
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
+			}
 			setParentPost(response.ok ? (await response.json()).parent : null);
+		} catch (err) {
+			setErrorStore("message", err.message);
 		}
 	};
 	const loadReplies = async () => {
-		const response = await fetch(`${postsBaseUrl}/${lastReplyId()}/thread`);
-		if (!response.ok) {
-			setHasMore(false);
-			return;
-		}
-		const loadedReplies = (await response.json()).replies;
-		setPostReplies(postReplies().concat(loadedReplies));
-		if (loadedReplies.length === maxItemsToFetch) {
-			setHasMore(true);
-			setLastReplyId(loadedReplies.at(-1)._id);
-		} else {
-			setHasMore(false);
+		try {
+			const response = await fetch(`${postsBaseUrl}/${lastReplyId()}/thread`);
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return;
+			}
+			const loadedReplies = (await response.json()).replies;
+			setPostReplies(postReplies().concat(loadedReplies));
+			if (loadedReplies.length === maxItemsToFetch) {
+				setHasMore(true);
+				setLastReplyId(loadedReplies.at(-1)._id);
+			} else {
+				setHasMore(false);
+			}
+		} catch (err) {
+			setErrorStore("message", err.message);
 		}
 	};
 	onMount(async () => {
