@@ -76,11 +76,11 @@ export default props => {
 				method: props.isEditing ? "PATCH" : "POST",
 				body: formData
 			});
-			if (!response.ok) {
-				setErrorStore("message", await getErrorMessage(response));
+			if (props.isEditing && response.status === 304) {
 				return;
 			}
-			if (props.isEditing && response.status === 304) {
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
 				return;
 			}
 			const payload = await response.json();
