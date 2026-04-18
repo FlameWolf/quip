@@ -128,5 +128,9 @@ export const formatTimeAgo = input => {
 
 export const getErrorMessage = async response => {
 	const isJson = response.headers.get("Content-Type")?.startsWith("application/json");
-	return (isJson ? (await response.json()).message : await response.text()) || "An error occurred. Please try later.";
+	const errorMessage = isJson ? (await response.json()).message : await response.text();
+	if (!errorMessage && response.status === 401) {
+		return "You need to be signed in to perform this action.";
+	}
+	return errorMessage || "An error occurred. Please try later.";
 };
