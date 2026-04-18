@@ -161,9 +161,9 @@ export default props => {
 				<div class="col py-3 page-container">{props.children}</div>
 			</div>
 			<Show when={errorStore.message}>
-				<div ref={errorAlert} class="alert alert-warning position-fixed top-0 start-50 translate-middle-x mt-5" role="alert">
-					<span innerHTML={errorStore.message}></span>
-					<button type="button" class="btn-close ms-4" onClick={dismissAlert} aria-label="Close"></button>
+				<div ref={errorAlert} class="alert alert-warning position-fixed top-0 start-50 translate-middle-x mt-2" role="alert">
+					<div class="me-4" innerHTML={errorStore.message}></div>
+					<button type="button" class="btn-close position-absolute top-50 end-0 translate-middle-y me-2" onClick={dismissAlert} aria-label="Close"></button>
 				</div>
 			</Show>
 			<button class="bg-secondary text-light btn-theme-toggle p-0 border-0 rounded-50 mt-1 me-1" tabIndex={1} onClick={updateTheme}>
