@@ -126,9 +126,6 @@ export default props => {
 								<ul class="dropdown-menu">
 									<Show when={authStore.userId}>
 										<li>
-											<a class="dropdown-item disabled">Top Posts</a>
-										</li>
-										<li>
 											<A class="dropdown-item" href={`/${authStore.handle}`}>Profile</A>
 										</li>
 										<li>
@@ -149,6 +146,13 @@ export default props => {
 								</ul>
 							</div>
 							<A class="navbar-brand mb-0 h1" href="/">Home</A>
+						</div>
+						<div class="d-flex me-auto">
+							<ul class="navbar-nav">
+								<li class="nav-item">
+									<a class="nav-link" role="button">Top Posts</a>
+								</li>
+							</ul>
 						</div>
 						<div class="d-flex" role="search">
 							<input ref={searchInput} class="form-control me-2" type="text" placeholder="Search" onKeyUp={event => event.code === "Enter" && doSearch()} aria-label="Search"/>
