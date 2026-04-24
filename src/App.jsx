@@ -117,8 +117,8 @@ export default props => {
 		<>
 			<Show when={basePath() !== "auth"}>
 				<nav class="navbar mb-3">
-					<div class="container">
-						<div class="d-flex gap-4 me-auto">
+					<div class="container gap-2">
+						<div class="d-flex gap-4">
 							<div class="dropdown">
 								<button class="btn btn-outline-secondary" data-bs-toggle="dropdown" aria-expanded="false">
 									<VsMenu/>
@@ -126,10 +126,10 @@ export default props => {
 								<ul class="dropdown-menu">
 									<Show when={authStore.userId}>
 										<li>
-											<A class="dropdown-item" href={`/${authStore.handle}`}>Profile</A>
+											<a class="dropdown-item disabled">Top Posts</a>
 										</li>
 										<li>
-											<hr class="dropdown-divider"/>
+											<A class="dropdown-item" href={`/${authStore.handle}`}>Profile</A>
 										</li>
 										<li>
 											<A class="dropdown-item disabled" href="javascript: void(0)">Settings</A>
