@@ -4,6 +4,7 @@ import DisplayPost from "./DisplayPost";
 
 export default props => {
 	const posts = createMemo(() => props.posts || []);
+	const topLevelPosts = createMemo(() => posts().filter(post => !post.replyTo || !posts().some(parent => parent._id === post.replyTo)));
 	const getPostBlurb = post => {
 		let blurb = trimPost(post.content);
 		if (!blurb) {
@@ -35,7 +36,7 @@ export default props => {
 			</Show>
 			<Show when={posts()?.length}>
 				<ul class="list-group">
-					<For each={posts()}>{(post, index) => (!post.replyTo || !posts().some(parent => parent._id === post.replyTo)) && renderRecursive(post)}</For>
+					<For each={topLevelPosts()}>{(post, index) => renderRecursive(post)}</For>
 				</ul>
 			</Show>
 		</>
