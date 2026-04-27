@@ -12,6 +12,7 @@ const Auth = lazy(() => import("./components/Auth"));
 const SignUp = lazy(() => import("./components/SignUp"));
 const SignIn = lazy(() => import("./components/SignIn"));
 const Home = lazy(() => import("./components/Home"));
+const TopmostAll = lazy(() => import("./components/TopmostAll"));
 const Search = lazy(() => import("./components/Search"));
 const Post = lazy(() => import("./components/Post"));
 const Thread = lazy(() => import("./components/Thread"));
@@ -90,6 +91,7 @@ render(() => {
 						<Route path="/sign-up" component={SignUp}/>
 						<Route path="/" component={() => <Navigate href="sign-up"/>}/>
 					</Route>
+					<Route path="/top" component={TopmostAll}/>
 					<Route path="/search" component={Search}/>
 					<Route path="/post/:postId" component={Post}/>
 					<Route path="/thread/:postId" component={Thread}/>

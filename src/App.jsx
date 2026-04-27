@@ -150,7 +150,7 @@ export default props => {
 						<div class="d-flex me-auto">
 							<ul class="navbar-nav">
 								<li class="nav-item">
-									<a class="nav-link" role="button">Top Posts</a>
+									<A class="nav-link" href="/top">Top Posts</A>
 								</li>
 							</ul>
 						</div>
