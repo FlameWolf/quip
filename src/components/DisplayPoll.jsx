@@ -20,7 +20,7 @@ export default props => {
 	const castVoteUrl = `${import.meta.env.VITE_API_BASE_URL}/posts/vote/${props.postId}`;
 	const castVote = async option => {
 		try {
-			var response = await fetch(`${castVoteUrl}?option=${option}`);
+			const response = await fetch(`${castVoteUrl}?option=${option}`);
 			if(!response.ok) {
 				setErrorStore("message", await getErrorMessage(response));
 				return;
