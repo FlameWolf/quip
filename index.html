@@ -4,17 +4,36 @@
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<meta name="theme-color" content="#000000"/>
-		<base target="_self"/>
 		<link rel="icon" type="image/svg+xml" href="/src/assets/favicon.svg" sizes="any"/>
+		<link rel="manifest" href="manifest.json"/>
+		<script>
+			if ("serviceWorker" in navigator) {
+				navigator.serviceWorker
+					.register("/pwa-worker.js", {
+						scope: "/",
+						type: "module"
+					})
+					.catch(error => {
+						console.log(error);
+					});
+			}
+		</script>
 		<title>Quip</title>
 	</head>
 	<body>
 		<noscript>JavaScript should be enabled to run this app.</noscript>
 		<div id="root" class="container-fluid"></div>
 		<script type="application/javascript">
-			/*<![CDATA[*/
-			navigator.serviceWorker.register("/auth-worker.js", { scope: "/", type: "module" }).catch(error => console.log({ error }));
-			/*]]>*/
+			if ("serviceWorker" in navigator) {
+				navigator.serviceWorker
+					.register("/auth-worker.js", {
+						scope: "/",
+						type: "module"
+					})
+					.catch(error => {
+						console.log(error);
+					});
+			}
 		</script>
 		<script type="module" src="/src/index.jsx"></script>
 	</body>

@@ -1,0 +1,19 @@
+{
+	"name": "Quip",
+	"short_name": "Quip",
+	"start_url": "https://quip-web-app.web.app",
+	"display": "standalone",
+	"description": "A microblogging application",
+	"lang": "en",
+	"dir": "auto",
+	"theme_color": "#000000",
+	"background_color": "#000000",
+	"orientation": "any",
+	"icons": [{}],
+	"screenshots": [{}],
+	"related_applications": [{}],
+	"prefer_related_applications": false,
+	"shortcuts": [{}],
+	"protocol_handlers": [{}],
+	"display_override": []
+}
