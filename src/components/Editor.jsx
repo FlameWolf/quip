@@ -1,7 +1,7 @@
 import { createSignal, createMemo, onMount, Show, For } from "solid-js";
 import emojiData from "@emoji-mart/data";
 import { Picker } from "emoji-mart";
-import { computePosition, autoUpdate, offset, autoPlacement } from "@floating-ui/dom";
+import { computePosition, autoUpdate, offset, flip, shift } from "@floating-ui/dom";
 import { emptyString, getErrorMessage, getGraphemeClusterCount, insertEmojo, maxContentLength, popularEmoji } from "../library";
 import { BsImage } from "solid-icons/bs";
 import { BiRegularPoll } from "solid-icons/bi";
@@ -112,7 +112,7 @@ export default props => {
 	const toggleEmojiMart = () => {
 		const cleanup = autoUpdate(emojiTrigger, emojiPickerContainer, async () => {
 			const { x, y } = await computePosition(emojiTrigger, emojiPickerContainer, {
-				middleware: [offset(4), autoPlacement()]
+				middleware: [offset(4), flip(), shift()]
 			});
 			Object.assign(emojiPickerContainer.style, {
 				left: `${x}px`,
