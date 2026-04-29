@@ -83,10 +83,11 @@ export const trimPost = text => {
 };
 
 export const convertToLink = (token, linkType) => {
+	if (linkType === "url") {
+		return `<a href="${token}">${token}</a>`;
+	}
 	return token.replace(/[@#]/, emptyString).replace(/(\b[\p{L}\p{M}]+\b)/u, value => {
 		switch (linkType) {
-			case "url":
-				return `<a href="${value}">${value}</a>`;
 			case "mention":
 				return `<a href="/${value}">@${value}</a>`;
 			case "hashtag":
