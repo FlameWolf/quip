@@ -14,6 +14,7 @@ import SignIn from "./components/SignIn";
 import Home from "./components/Home";
 import TopmostAll from "./components/TopmostAll";
 import Search from "./components/Search";
+import Hashtag from "./components/Hashtag";
 import Post from "./components/Post";
 import Thread from "./components/Thread";
 import Profile from "./components/Profile";
@@ -93,6 +94,7 @@ render(() => {
 					</Route>
 					<Route path="/top" component={TopmostAll}/>
 					<Route path="/search" component={Search}/>
+					<Route path="/hashtag/:tagName" component={Hashtag}/>
 					<Route path="/post/:postId" component={Post}/>
 					<Route path="/thread/:postId" component={Thread}/>
 					<Route path="/:handle" component={Profile}>

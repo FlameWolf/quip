@@ -119,7 +119,7 @@ export default props => {
 							</Show>
 						</Show>
 						<Show when={attachments.post}>
-							<div onClick={() => navigate(`post/${attachments.post._id}`)} role="button">
+							<div onClick={() => navigate(`post/${attachments.post._id}`, { resolve: false })} role="button">
 								<DisplayPostMinimal post={attachments.post}/>
 							</div>
 						</Show>
