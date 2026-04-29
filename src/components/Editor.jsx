@@ -110,7 +110,7 @@ export default props => {
 		}
 	};
 	const toggleEmojiMart = () => {
-		autoUpdate(emojiTrigger, emojiPickerContainer, async () => {
+		const cleanup = autoUpdate(emojiTrigger, emojiPickerContainer, async () => {
 			const { x, y } = await computePosition(emojiTrigger, emojiPickerContainer, {
 				middleware: [offset(4), autoPlacement()]
 			});
@@ -120,6 +120,9 @@ export default props => {
 			});
 		});
 		setHasEmojiPicker(!hasEmojiPicker());
+		if (!hasEmojiPicker()) {
+			cleanup();
+		}
 	};
 	onMount(() => {
 		setTimeout(() => {
