@@ -4,7 +4,7 @@ import { BsChatRight, BsQuote, BsStar, BsStarFill } from "solid-icons/bs";
 import { FiEdit3, FiRepeat, FiTrash } from "solid-icons/fi";
 import { authStore } from "../stores/auth-store";
 import { setErrorStore } from "../stores/error-store";
-import { formatTimeAgo, getErrorMessage, toLongDateString } from "../library";
+import { formatTimeAgo, getErrorMessage, parseContent, toLongDateString } from "../library";
 import DisplayPoll from "./DisplayPoll";
 import DisplayPostMinimal from "./DisplayPostMinimal";
 import Editor from "./Editor";
@@ -101,7 +101,7 @@ export default props => {
 				</div>
 				<div class="card-body px-2">
 					<Show when={!isEditing()}>
-						<p class="card-text text-break" innerHTML={post.content?.replace(/\n/g, "<br/>")}></p>
+						<p class="card-text text-break" innerHTML={parseContent(post.content)}></p>
 					</Show>
 					<Show when={isEditing()}>
 						<Editor post={post} isEditing={isEditing()} onSubmit={() => setIsEditing(false)}/>

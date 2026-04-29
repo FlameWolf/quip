@@ -1,6 +1,6 @@
 import { Show } from "solid-js";
 import { A } from "@solidjs/router";
-import { formatTimeAgo, toLongDateString } from "../library";
+import { formatTimeAgo, parseContent, toLongDateString } from "../library";
 
 export default props => {
 	const post = props.post;
@@ -22,7 +22,7 @@ export default props => {
 				<div class="card-body px-2 pb-2">
 					<p class="card-text">
 						<Show when={post.content}>
-							<span innerHTML={post.content.replace(/\n/g, "<br/>")}/>
+							<span innerHTML={parseContent(post.content)}/>
 						</Show>
 						<Show when={post.attachments?.mediaFile}>
 							<div class="mt-2">

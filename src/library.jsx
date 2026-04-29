@@ -1,13 +1,18 @@
 import { position } from "caret-pos";
 import * as nodeEmoji from "node-emoji";
 
+const segmenter = new Intl.Segmenter();
+
 export const emptyString = "";
 export const lightTheme = "light";
 export const darkTheme = "dark";
+export const urlPattern = "(https?|ftp)://[^\\s/$.?#].[^\\s]*";
 export const handleRegExp = /^[A-Za-z][\w]{3,31}$/;
 export const passwordRegExp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
-export const invalidHandles = ["auth", "home", "search", "user", "users", "post", "posts", "quip", "quips", "favourite", "favourites", "unfavourite", "repeat", "repeats", "unrepeat", "reply", "replies", "profile", "profiles", "setting", "settings", "follow", "followed", "follows", "following", "follower", "followers", "unfollow", "mute", "muted", "unmute", "block", "blocked", "unblock", "filter", "filters", "list", "lists", "bookmark", "bookmarks", "unbookmark", "hashtag", "hashtags", "notification", "notifications", "message", "messages", "account", "accounts", "security", "privacy", "admin"];
+export const urlRegExp = new RegExp(`^${urlPattern}$`);
+export const tokenRegExp = new RegExp(`${urlPattern}|\\S+|\\s+`, "gmu");
 export const contentLengthRegExp = /\p{L}\p{M}?|\S|\s/gu;
+export const invalidHandles = ["auth", "home", "search", "user", "users", "post", "posts", "quip", "quips", "favourite", "favourites", "unfavourite", "repeat", "repeats", "unrepeat", "reply", "replies", "profile", "profiles", "setting", "settings", "follow", "followed", "follows", "following", "follower", "followers", "unfollow", "mute", "muted", "unmute", "block", "blocked", "unblock", "filter", "filters", "list", "lists", "bookmark", "bookmarks", "unbookmark", "hashtag", "hashtags", "notification", "notifications", "message", "messages", "account", "accounts", "security", "privacy", "admin"];
 export const maxContentLength = 256;
 export const maxItemsToFetch = 20;
 export const popularEmoji = [nodeEmoji.get(":joy:"), nodeEmoji.get(":heart:"), nodeEmoji.get(":sob:"), nodeEmoji.get(":heart_eyes:"), nodeEmoji.get(":blush:"), nodeEmoji.get(":two_hearts:"), nodeEmoji.get(":kissing_heart:"), nodeEmoji.get(":pensive:"), nodeEmoji.get(":unamused:"), nodeEmoji.get(":weary:"), nodeEmoji.get(":grin:"), nodeEmoji.get(":relaxed:"), nodeEmoji.get(":pray:"), nodeEmoji.get(":ok_hand:"), nodeEmoji.get(":wink:"), nodeEmoji.get(":+1:"), nodeEmoji.get(":smirk:"), nodeEmoji.get(":sweat_smile:"), nodeEmoji.get(":fire:"), nodeEmoji.get(":relieved:"), nodeEmoji.get(":broken_heart:"), nodeEmoji.get(":sunglasses:"), nodeEmoji.get(":cry:"), nodeEmoji.get(":flushed:"), nodeEmoji.get(":sparkling_heart:"), nodeEmoji.get(":see_no_evil:"), nodeEmoji.get(":smiling_imp:"), nodeEmoji.get(":scream:"), nodeEmoji.get(":revolving_hearts:"), nodeEmoji.get(":sleepy:"), nodeEmoji.get(":confused:")];
@@ -66,8 +71,6 @@ export const insertEmojo = (elem, emojo, callback = null) => {
 	callback?.();
 };
 
-const segmenter = new Intl.Segmenter();
-
 export const getGraphemeClusterCount = text => Array.from(segmenter.segment(text)).length;
 
 export const trimPost = text => {
@@ -78,6 +81,39 @@ export const trimPost = text => {
 				.join(emptyString)}&#x2026;`
 		: text;
 };
+
+export const convertToLink = (token, linkType) => {
+	return token.replace(/[@#]/, emptyString).replace(/(\b.+\b)/, value => {
+		switch (linkType) {
+			case "url":
+				return `<a href="${value}">${value}</a>`;
+			case "mention":
+				return `<a href="\\${value}">@${value}</a>`;
+			case "hashtag":
+				return `<a href="\\hashtag\\${value}">#${value}</a>`;
+			default:
+				return value;
+		}
+	});
+};
+
+export const parseContent = text =>
+	text
+		?.match(tokenRegExp)
+		?.map(token => {
+			if (urlRegExp.test(token)) {
+				return convertToLink(token, "url");
+			}
+			if (token[0] === "@") {
+				return convertToLink(token, "mention");
+			}
+			if (token[0] === "#") {
+				return convertToLink(token, "hashtag");
+			}
+			return token;
+		})
+		.join(emptyString)
+		.replace(/\n/g, "<br/>") ?? text;
 
 export const toShortDateString = input =>
 	new Intl.DateTimeFormat("default", {
