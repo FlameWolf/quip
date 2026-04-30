@@ -1,7 +1,9 @@
 import { position } from "caret-pos";
 import * as nodeEmoji from "node-emoji";
 
+const epsilon = 1000;
 const segmenter = new Intl.Segmenter();
+const formatPlural = (value, unit) => `${value} ${unit}${value === 1 ? emptyString : "s"}`;
 
 export const emptyString = "";
 export const lightTheme = "light";
@@ -143,12 +145,14 @@ export const toLongDateString = input =>
 		formatMatcher: "basic"
 	}).format(input.constructor === Date ? input : new Date(input));
 
-const formatPlural = (value, unit) => `${value} ${unit}${value > 1 ? "s" : emptyString}`;
-
 export const formatTimeAgo = input => {
 	const dateValue = input.constructor === Date ? input : new Date(input);
 	const timeFragments = [];
-	const seconds = (new Date() - dateValue) / 1000;
+	const milliseconds = new Date() - dateValue;
+	if (milliseconds < epsilon) {
+		return "Just now";
+	}
+	const seconds = milliseconds / 1000;
 	const minutes = seconds / 60;
 	const hours = minutes / 60;
 	if (seconds > 0 && seconds < 60) {
