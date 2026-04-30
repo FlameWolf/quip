@@ -30,6 +30,7 @@ export default props => {
 	const [hasPoll, setHasPoll] = createSignal(false);
 	const [poll, setPoll] = createSignal({});
 	const [mediaFile, setMediaFile] = createSignal();
+	const [mediaDescription, setMediaDescription] = createSignal(emptyString);
 	const updateEditor = () => {
 		const text = plainTextInput.value;
 		plainTextInput.parentNode.setAttribute("data-replicated-value", text);
@@ -40,8 +41,12 @@ export default props => {
 		const sender = event.target;
 		setPoll({ ...poll(), [sender.name]: sender.value });
 	};
-	const resetEditor = () => {
+	const resetMedia = () => {
+		setMediaDescription(emptyString);
 		setMediaFile();
+	};
+	const resetEditor = () => {
+		resetMedia();
 		setHasPoll(false);
 		plainTextInput.value = emptyString;
 		updateEditor();
@@ -63,6 +68,9 @@ export default props => {
 		}
 		if (mediaFile()) {
 			formData.append("media", mediaFile());
+			if (mediaDescription()) {
+				formData.append("media-description", mediaDescription());
+			}
 		}
 		const url = props.isQuote
 			? `${createQuoteUrl}/${props.quotedPost._id}`
@@ -191,9 +199,14 @@ export default props => {
 				</div>
 			</Show>
 			<Show when={mediaFile()}>
-				<div class="d-inline-block position-relative card-body pt-0 media-preview">
-					<img class="img-fluid" src={URL.createObjectURL(mediaFile())}/>
-					<button class="position-absolute top-0 end-0 btn btn-danger border m-1" onClick={() => setMediaFile()} title="Remove Media"><VsChromeClose/></button>
+				<div class="d-flex flex-column gap-2 p-2 border rounded mb-2">
+					<div class="d-flex gap-2 align-items-center">
+						<input class="form-control" type="text" onInput={event => setMediaDescription(event.currentTarget.value)} placeholder="Alt Text"/>
+						<button class="btn btn-danger" onClick={resetMedia} title="Remove Media"><VsChromeClose/></button>
+					</div>
+					<div>
+						<img class="w-100 border rounded" src={URL.createObjectURL(mediaFile())}/>
+					</div>
 				</div>
 			</Show>
 			<div class="d-flex gap-2 justify-content-end pt-2 border-top">
