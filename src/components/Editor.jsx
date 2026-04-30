@@ -18,7 +18,6 @@ const createQuoteUrl = `${postsBaseUrl}/quote`;
 const createReplyUrl = `${postsBaseUrl}/reply`;
 
 export default props => {
-	let currentInstance;
 	let plainTextInput;
 	let emojiPickerContainer;
 	let emojiTrigger;
@@ -31,6 +30,14 @@ export default props => {
 	const [poll, setPoll] = createSignal({});
 	const [mediaFile, setMediaFile] = createSignal();
 	const [mediaDescription, setMediaDescription] = createSignal(emptyString);
+	const characterLimitExceeded = createMemo(() => charCount() < 0);
+	const postButtonDisabled = createMemo(() => {
+		const noContent = charCount() === maxContentLength || characterLimitExceeded();
+		if (hasPoll()) {
+			return noContent;
+		}
+		return mediaFile() ? false : noContent;
+	});
 	const updateEditor = () => {
 		const text = plainTextInput.value;
 		plainTextInput.parentNode.setAttribute("data-replicated-value", text);
@@ -107,7 +114,6 @@ export default props => {
 			props.onSubmit?.();
 		}
 	};
-	const characterLimitExceeded = createMemo(() => charCount() < 0);
 	const dismissEmojiPicker = event => {
 		const sender = event.target;
 		if(!sender) {
@@ -141,7 +147,7 @@ export default props => {
 		}
 	});
 	return (
-		<div ref={currentInstance} {...props} class="editor border rounded p-2 my-2 overflow-hidden" classList={{ "mx-2": props.isReply }}>
+		<div {...props} class="editor border rounded p-2 my-2 overflow-hidden" classList={{ "mx-2": props.isReply }}>
 			<Show when={props.isEditing}>
 				<div class="alert alert-warning position-relative">
 					<span>You can edit a post only once. Editing a post will:</span>
@@ -230,7 +236,7 @@ export default props => {
 					<button class="btn btn-secondary btn-sm px-3 rounded-pill" classList={{ active: hasPoll() }} onClick={() => setHasPoll(!hasPoll())} title="Poll"><BiRegularPoll class="poll-icon"/></button>
 					<button class="btn btn-secondary btn-sm px-3 rounded-pill" onClick={() => mediaFileInput.click()} title="Media"><BsImage/></button>
 				</Show>
-				<button class="btn btn-secondary btn-sm px-3 rounded-pill" disabled={charCount() === maxContentLength || characterLimitExceeded()} onClick={() => makeQuip()} title="Post">Post</button>
+				<button class="btn btn-secondary btn-sm px-3 rounded-pill" disabled={postButtonDisabled()} onClick={() => makeQuip()} title="Post">Post</button>
 				<Show when={!props.isEditing}>
 					<input ref={mediaFileInput} onInput={event => setMediaFile(event.target.files?.[0])} class="visually-hidden" type="file"/>
 				</Show>
