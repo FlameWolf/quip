@@ -58,9 +58,9 @@ export default props => {
 		setHasPoll(false);
 		plainTextInput.value = emptyString;
 		updateEditor();
-		setIsBusy(false);
 	};
 	const makeQuip = async () => {
+		let success = false;
 		const parentPostId = props.parentPostId;
 		const formData = new FormData();
 		formData.append("content", plainTextInput.value.trim());
@@ -95,12 +95,14 @@ export default props => {
 				body: formData
 			});
 			if (props.isEditing && response.status === 304) {
+				success = true;
 				return;
 			}
 			if (!response.ok) {
 				setErrorStore("message", await getErrorMessage(response));
 				return;
 			}
+			success = true;
 			const payload = await response.json();
 			const post = payload.post || payload.quote || payload.updated || payload.reply;
 			post.author = { _id: authStore.userId, handle: authStore.handle };
@@ -113,8 +115,11 @@ export default props => {
 		} catch (err) {
 			setErrorStore("message", err.message);
 		} finally {
-			resetEditor();
-			props.onSubmit?.();
+			setIsBusy(false);
+			if (success) {
+				resetEditor();
+				props.onSubmit?.();
+			}
 		}
 	};
 	const dismissEmojiPicker = event => {
