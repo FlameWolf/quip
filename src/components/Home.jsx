@@ -45,7 +45,7 @@ export default props => {
 	});
 	return (
 		<>
-			<Editor id="post-editor" classList={{ "mb-2": true }}/>
+			<Editor classList={{ "mb-2": true }}/>
 			<Show when={!quipStore.quips.length}>
 				<div class="d-flex justify-content-center align-items-center text-info border border-info rounded p-3">
 					<div>No posts to display.</div>
