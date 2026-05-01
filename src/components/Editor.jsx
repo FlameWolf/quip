@@ -30,6 +30,7 @@ export default props => {
 	const [poll, setPoll] = createSignal({});
 	const [mediaFile, setMediaFile] = createSignal();
 	const [mediaDescription, setMediaDescription] = createSignal(emptyString);
+	const [isBusy, setIsBusy] = createSignal(false);
 	const characterLimitExceeded = createMemo(() => charCount() < 0);
 	const postButtonDisabled = createMemo(() => {
 		const noContent = charCount() === maxContentLength || characterLimitExceeded();
@@ -57,6 +58,7 @@ export default props => {
 		setHasPoll(false);
 		plainTextInput.value = emptyString;
 		updateEditor();
+		setIsBusy(false);
 	};
 	const makeQuip = async () => {
 		const parentPostId = props.parentPostId;
@@ -87,6 +89,7 @@ export default props => {
 					? `${updatePostUrl}/${props.post._id}`
 					: createPostUrl;
 		try {
+			setIsBusy(true);
 			const response = await fetch(url, {
 				method: props.isEditing ? "PATCH" : "POST",
 				body: formData
@@ -147,7 +150,7 @@ export default props => {
 		}
 	});
 	return (
-		<div {...props} class="editor border rounded p-2 my-2 overflow-hidden" classList={{ "mx-2": props.isReply }}>
+		<div {...props} class="editor border rounded p-2 my-2 overflow-hidden position-relative" classList={{ "mx-2": props.isReply }}>
 			<Show when={props.isEditing}>
 				<div class="alert alert-warning position-relative">
 					<span>You can edit a post only once. Editing a post will:</span>
@@ -240,6 +243,13 @@ export default props => {
 				<Show when={!props.isEditing}>
 					<input ref={mediaFileInput} onInput={event => setMediaFile(event.target.files?.[0])} class="visually-hidden" type="file"/>
 				</Show>
+			</div>
+			<div class="bg-secondary wait-overlay position-absolute start-0 top-0 w-100 h-100" classList={{ "d-none": !isBusy() }}>
+				<div class="position-absolute top-50 start-50 translate-middle">
+					<div class="spinner-border" role="status">
+						<span class="visually-hidden">Sending...</span>
+					</div>
+				</div>
 			</div>
 		</div>
 	);

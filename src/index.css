@@ -265,6 +265,11 @@ body {
 	margin-right: 0.25rem;
 }
 
+.wait-overlay {
+	cursor: progress;
+	opacity: 0.5;
+}
+
 .has-reply {
 	border-left-color: var(--bs-primary);
 }
