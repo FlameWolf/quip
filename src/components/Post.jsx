@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, onCleanup, Show } from "solid-js";
 import DisplayPost from "./DisplayPost";
 import DisplayPostList from "./DisplayPostList";
 import { useNavigate, useParams } from "@solidjs/router";
@@ -63,15 +63,13 @@ export default props => {
 			setErrorStore("message", err.message);
 		}
 	};
-	onMount(async () => {
-		setPost(null);
-		setParentPost(null);
-		setPostReplies([]);
-		setLastReplyId(null);
-		setHasMore(false);
-	});
 	createEffect(async () => {
 		if (postId()) {
+			setPost(null);
+			setParentPost(null);
+			setPostReplies([]);
+			setLastReplyId(null);
+			setHasMore(false);
 			await fetchPost();
 			await fetchParentPost();
 			await loadReplies();
