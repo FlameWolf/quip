@@ -1,4 +1,4 @@
-import { createSignal, createMemo, onMount, Show, For } from "solid-js";
+import { createSignal, createMemo, onMount, Show, For, createEffect, on } from "solid-js";
 import emojiData from "@emoji-mart/data";
 import { Picker } from "emoji-mart";
 import { computePosition, autoUpdate, offset, flip, shift } from "@floating-ui/dom";
@@ -27,17 +27,17 @@ export default props => {
 	const [hasEmojiPicker, setHasEmojiPicker] = createSignal(false);
 	const [charCount, setCharCount] = createSignal(maxContentLength);
 	const [hasPoll, setHasPoll] = createSignal(false);
-	const [poll, setPoll] = createSignal({});
+	const [poll, setPoll] = createSignal(Object.create(null));
 	const [mediaFile, setMediaFile] = createSignal();
 	const [mediaDescription, setMediaDescription] = createSignal(emptyString);
 	const [isBusy, setIsBusy] = createSignal(false);
 	const characterLimitExceeded = createMemo(() => charCount() < 0);
 	const postButtonDisabled = createMemo(() => {
-		const noContent = charCount() === maxContentLength || characterLimitExceeded();
+		const contentInvalid = charCount() === maxContentLength || characterLimitExceeded();
 		if (hasPoll()) {
-			return noContent;
+			return !(poll().first?.trim() && poll().second?.trim()) || contentInvalid;
 		}
-		return mediaFile() ? false : noContent;
+		return mediaFile() ? false : contentInvalid;
 	});
 	const updateEditor = () => {
 		const text = plainTextInput.value;
@@ -55,7 +55,7 @@ export default props => {
 	};
 	const resetEditor = () => {
 		resetMedia();
-		setHasPoll(false);
+		setPoll(Object.create(null));
 		plainTextInput.value = emptyString;
 		updateEditor();
 	};
@@ -146,6 +146,13 @@ export default props => {
 			cleanup();
 		}
 	};
+	createEffect(
+		on(poll, value => {
+			if (!Object.getOwnPropertyNames(value).length) {
+				setHasPoll(false);
+			}
+		})
+	);
 	onMount(() => {
 		setTimeout(() => {
 			editorLineHeight = parseInt(getComputedStyle(plainTextInput).lineHeight);
