@@ -155,7 +155,7 @@ export default props => {
 		}
 	});
 	return (
-		<div {...props} class="editor border rounded p-2 my-2 overflow-hidden position-relative" classList={{ "mx-2": props.isReply }}>
+		<div {...props} class="editor border rounded p-2 my-2 overflow-hidden" classList={{ "mx-2": props.isReply, "position-relative": !hasEmojiPicker() }}>
 			<Show when={props.isEditing}>
 				<div class="alert alert-warning position-relative">
 					<span>You can edit a post only once. Editing a post will:</span>
