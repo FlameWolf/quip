@@ -1,15 +1,12 @@
 import { Show } from "solid-js";
 import { A } from "@solidjs/router";
-import { formatTimeAgo, parseContent, toLongDateString, trimPost } from "../library";
-import { FaSolidImage, FaSolidListDots } from "solid-icons/fa";
-import { RiDocumentFileTextFill } from "solid-icons/ri";
+import { formatTimeAgo, nullId, parseContent, toLongDateString } from "../library";
 
 export default props => {
 	const post = props.post;
 	const createdAt = post.createdAt;
 	const attachments = post.attachments;
 	const { poll, mediaFile, post: attachedPost } = attachments || {};
-	const { attachments: nestedAttachments } = attachedPost || {};
 	const handle = post.author.handle;
 	return (
 		<>
@@ -58,34 +55,15 @@ export default props => {
 								</Show>
 							</div>
 						</Show>
-						<Show when={attachedPost}>
-							<div class="border rounded mt-2">
-								<ul class="list-group list-group-flush">
-									<Show when={attachedPost.content}>
-										<li class="list-group-item">
-											<span innerHTML={trimPost(attachedPost.content)}></span>
-										</li>
-									</Show>
-									<Show when={nestedAttachments?.poll}>
-										<li class="list-group-item">
-											<span><FaSolidListDots/></span>
-											<span class="fst-italic">&#xA0;[Poll]</span>
-										</li>
-									</Show>
-									<Show when={nestedAttachments?.mediaFile}>
-										<li class="list-group-item">
-											<span><FaSolidImage/></span>
-											<span class="fst-italic">&#xA0;[Media]</span>
-										</li>
-									</Show>
-									<Show when={typeof attachedPost === "string" || nestedAttachments?.post}>
-										<li class="list-group-item">
-											<span><RiDocumentFileTextFill/></span>
-											<span class="fst-italic">&#xA0;[Quote]</span>
-										</li>
-									</Show>
-								</ul>
-							</div>
+						<Show when={typeof attachedPost === "string"}>
+							<span>&#xA0;</span>
+							<Show when={attachedPost !== nullId} fallback={<div class="text-bg-secondary border rounded p-3">The quoted post is not available.</div>}>
+								<A href={`/post/${attachedPost}`} innerHTML={`${globalThis.location.origin}/post/${attachedPost}`} resolve={false}></A>
+							</Show>
+						</Show>
+						<Show when={typeof attachedPost === "object"}>
+							<span>&#xA0;</span>
+							<A href={`/post/${attachedPost._id}`} innerHTML={`${globalThis.location.origin}/post/${attachedPost._id}`} resolve={false}></A>
 						</Show>
 					</p>
 				</div>

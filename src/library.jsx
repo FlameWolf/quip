@@ -3,7 +3,6 @@ import * as nodeEmoji from "node-emoji";
 
 const epsilon = 1000;
 const segmenter = new Intl.Segmenter();
-const formatPlural = (value, unit) => `${value} ${unit}${value === 1 ? emptyString : "s"}`;
 
 export const emptyString = "";
 export const lightTheme = "light";
@@ -15,6 +14,7 @@ export const urlRegExp = new RegExp(`^${urlPattern}$`);
 export const tokenRegExp = new RegExp(`${urlPattern}|\\S+|\\s+`, "gmu");
 export const contentLengthRegExp = /\p{L}\p{M}?|\S|\s/gu;
 export const invalidHandles = ["auth", "home", "search", "user", "users", "post", "posts", "quip", "quips", "favourite", "favourites", "unfavourite", "repeat", "repeats", "unrepeat", "reply", "replies", "profile", "profiles", "setting", "settings", "follow", "followed", "follows", "following", "follower", "followers", "unfollow", "mute", "muted", "unmute", "block", "blocked", "unblock", "filter", "filters", "list", "lists", "bookmark", "bookmarks", "unbookmark", "hashtag", "hashtags", "notification", "notifications", "message", "messages", "account", "accounts", "security", "privacy", "admin"];
+export const nullId = "000000000000000000000000";
 export const maxContentLength = 256;
 export const maxPollOptionLength = 32;
 export const maxMediaDescriptionLength = 4096;
@@ -146,6 +146,8 @@ export const toLongDateString = input =>
 		hour12: false,
 		formatMatcher: "basic"
 	}).format(input.constructor === Date ? input : new Date(input));
+
+export const formatPlural = (value, unit) => `${value} ${unit}${value === 1 ? emptyString : "s"}`;
 
 export const formatTimeAgo = input => {
 	const dateValue = input.constructor === Date ? input : new Date(input);

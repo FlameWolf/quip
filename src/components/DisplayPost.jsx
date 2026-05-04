@@ -4,7 +4,7 @@ import { BsChatRight, BsQuote, BsStar, BsStarFill } from "solid-icons/bs";
 import { FiEdit3, FiRepeat, FiTrash } from "solid-icons/fi";
 import { authStore } from "../stores/auth-store";
 import { setErrorStore } from "../stores/error-store";
-import { formatTimeAgo, getErrorMessage, parseContent, toLongDateString } from "../library";
+import { formatTimeAgo, getErrorMessage, nullId, parseContent, toLongDateString } from "../library";
 import DisplayPoll from "./DisplayPoll";
 import DisplayPostMinimal from "./DisplayPostMinimal";
 import Editor from "./Editor";
@@ -118,8 +118,13 @@ export default props => {
 								<video class="img-fluid" alt={attachments.mediaFile.description} src={attachments.mediaFile.src} controls={true}/>
 							</Show>
 						</Show>
-						<Show when={attachments.post}>
-							<div onClick={() => navigate(`post/${attachments.post._id}`, { resolve: false })} role="button">
+						<Show when={typeof attachments.post === "string"}>
+							<Show when={attachments.post !== nullId} fallback={<div class="text-bg-secondary border rounded p-3">The quoted post is not available.</div>}>
+								<A href={`/post/${attachments.post}`} innerHTML={`${globalThis.location.origin}/post/${attachments.post}`} resolve={false}></A>
+							</Show>
+						</Show>
+						<Show when={typeof attachments.post === "object"}>
+							<div onClick={() => navigate(`/post/${attachments.post._id}`, { resolve: false })} role="button">
 								<DisplayPostMinimal post={attachments.post}/>
 							</div>
 						</Show>
