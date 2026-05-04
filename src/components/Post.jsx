@@ -3,7 +3,7 @@ import DisplayPost from "./DisplayPost";
 import DisplayPostList from "./DisplayPostList";
 import { useNavigate, useParams } from "@solidjs/router";
 import { setErrorStore } from "../stores/error-store";
-import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
+import { emptyString, getErrorMessage, maxItemsToFetch, nullId } from "../library";
 import { TbOutlineJumpRope } from "solid-icons/tb";
 import { Tooltip } from "bootstrap";
 
@@ -93,6 +93,9 @@ export default props => {
 					<h5>In reply to:</h5>
 					<DisplayPost post={parentPost()}/>
 				</div>
+			</Show>
+			<Show when={post()?.replyTo === nullId || (post()?.replyTo && !parentPost())}>
+				<div class="text-bg-secondary border rounded p-3 mb-2">The parent post is not available.</div>
 			</Show>
 			<Show when={!post()}>
 				<Show when={!hasError()}>
