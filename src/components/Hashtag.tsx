@@ -46,7 +46,7 @@ export default (props: Record<keyof any, any>) => {
 	);
 	return (
 		<>
-			<h2>#{params.tagName}</h2>
+			<h2>#{decodeURIComponent(params.tagName as string)}</h2>
 			<Show when={!hashtagPosts().length}>
 				<div class="d-flex justify-content-center align-items-center text-info border border-info rounded p-3">
 					<div>No posts to display.</div>
