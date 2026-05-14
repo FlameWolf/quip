@@ -1,14 +1,15 @@
-import { createMemo, createSignal, For, onCleanup, Show } from "solid-js";
+import { createMemo, For, Show } from "solid-js";
 import { trimPost } from "../library";
 import DisplayPost from "./DisplayPost";
+import { Attachments, Post } from "../types";
 
-export default props => {
-	const posts = createMemo(() => props.posts || []);
+export default (props: Record<keyof any, any>) => {
+	const posts = createMemo(() => (props.posts as Array<Post>) || []);
 	const topLevelPosts = createMemo(() => posts().filter(post => !post.replyTo || !posts().some(parent => parent._id === post.replyTo)));
-	const getPostBlurb = post => {
+	const getPostBlurb = (post: Post) => {
 		let blurb = trimPost(post.content);
 		if (!blurb) {
-			const { mediaFile } = post.attachments;
+			const { mediaFile } = post.attachments as Attachments;
 			if (mediaFile) {
 				let blurbPrefix = mediaFile.fileType === "image" ? "Image" : mediaFile.fileType === "video" ? "Video" : "Media";
 				blurb = `[${blurbPrefix}] <img class="blurb-media" src="${mediaFile.src}" alt="${mediaFile.mediaDescription || "Media attachment"}"/>`;
@@ -16,7 +17,7 @@ export default props => {
 		}
 		return blurb;
 	};
-	const renderRecursive = (post, isReply = false, parentBlurb = undefined) => {
+	const renderRecursive = (post: Post, isReply = false, parentBlurb: string | undefined = undefined) => {
 		const replies = createMemo(() => posts().filter(reply => reply.replyTo === post._id));
 		return (
 			<>

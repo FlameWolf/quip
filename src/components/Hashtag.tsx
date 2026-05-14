@@ -2,14 +2,15 @@ import { useParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, on, Show } from "solid-js";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
+import type { Post } from "../types";
 import DisplayPostList from "./DisplayPostList";
 
 const hashtagBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/hashtag`;
 
-export default props => {
+export default (props: Record<keyof any, any>) => {
 	const params = useParams();
 	const hashtagUrl = createMemo(() => `${hashtagBaseUrl}/${params.tagName}`);
-	const [hashtagPosts, setHashtagPosts] = createSignal([]);
+	const [hashtagPosts, setHashtagPosts] = createSignal<Post[]>([]);
 	const [lastPostId, setLastPostId] = createSignal(emptyString);
 	const [hasMore, setHasMore] = createSignal(true);
 	const loadHashtagPosts = async () => {
@@ -28,7 +29,7 @@ export default props => {
 				setHasMore(false);
 			}
 			setHashtagPosts(hashtagPosts().concat(posts));
-		} catch (err) {
+		} catch (err: any) {
 			setErrorStore("message", err.message);
 		}
 	};

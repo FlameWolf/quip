@@ -29,9 +29,12 @@ const [lastVisited, setLastVisited] = createSignal(storedLastVisit ? new Date(Nu
 
 render(() => {
 	createEffect(() => {
-		localStorage.setItem("lastVisited", lastVisited()?.valueOf() || emptyString);
+		localStorage.setItem("lastVisited", String(lastVisited()?.valueOf() ?? emptyString));
 	});
-	const needHealthCheck = createMemo(() => !lastVisited() || lastVisited() < new Date(Date.now() - 10 * 60 * 1000));
+	const needHealthCheck = createMemo(() => {
+		const lv = lastVisited();
+		return !lv || lv.getTime() < Date.now() - 10 * 60 * 1000;
+	});
 	const loadingPlaceholder = () => {
 		if (!needHealthCheck()) {
 			return null;
@@ -69,10 +72,10 @@ render(() => {
 		}
 	});
 	if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-		document.body.parentElement.setAttribute("data-bs-theme", "dark");
+		document.body.parentElement?.setAttribute("data-bs-theme", "dark");
 	}
 	return (
-		<Suspense fallback={loadingPlaceholder}>
+		<Suspense fallback={loadingPlaceholder()}>
 			<Show when={!healthCheckStatus()}>
 				<div class="row">
 					<div class="col py-3 page-container">
@@ -111,4 +114,4 @@ render(() => {
 			</Show>
 		</Suspense>
 	);
-}, document.getElementById("root"));
+}, document.getElementById("root")!);

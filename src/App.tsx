@@ -7,10 +7,10 @@ import { errorStore, setErrorStore } from "./stores/error-store";
 import { Dropdown } from "bootstrap";
 import { VsMenu } from "solid-icons/vs";
 
-let imgMenu;
-let searchInput;
-let errorAlert;
-let alertTimeout;
+let imgMenu: HTMLImageElement;
+let searchInput: HTMLInputElement;
+let errorAlert: HTMLDivElement;
+let alertTimeout: NodeJS.Timeout;
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const authBaseUrl = `${apiBaseUrl}/auth`;
 const refreshTokenUrl = `${authBaseUrl}/refresh-token`;
@@ -29,7 +29,7 @@ navigator.serviceWorker.controller?.postMessage({
 	}
 });
 
-export default props => {
+export default (props: Record<keyof any, any>) => {
 	const location = useLocation();
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
@@ -38,7 +38,7 @@ export default props => {
 	const basePath = createMemo(() => location.pathname.split("/")?.at(1) || emptyString);
 	createEffect(() => {
 		const theme = themeStore.theme;
-		document.body.parentElement.setAttribute("data-bs-theme", theme);
+		document.body.parentElement?.setAttribute("data-bs-theme", theme);
 		localStorage.setItem("theme", theme);
 	});
 	const updateTheme = () => setThemeStore("theme", themeStore.isLight ? darkTheme : lightTheme);
@@ -62,11 +62,11 @@ export default props => {
 	const populateSearchInput = () => {
 		const searchText = searchParams["q"];
 		if (searchText) {
-			searchInput.value = searchText;
+			searchInput!.value = searchText as string;
 		}
 	};
 	const doSearch = () => {
-		const searchText = searchInput.value;
+		const searchText = searchInput!.value;
 		if (!searchText) {
 			return;
 		}
@@ -79,7 +79,7 @@ export default props => {
 		setErrorStore({ message: emptyString });
 	};
 	createEffect(() => {
-		if (imgMenu) {
+		if (imgMenu!) {
 			if (themeStore.isDark) {
 				imgMenu.style.setProperty("filter", "invert(0.8)");
 				return;
@@ -97,7 +97,7 @@ export default props => {
 		navigator.serviceWorker.controller?.postMessage({
 			action: import.meta.env.VITE_GET_AUTH_DATA_ACTION
 		});
-		if (imgMenu) {
+		if (imgMenu!) {
 			new Dropdown(imgMenu);
 		}
 		if (basePath() === "search") {
@@ -155,7 +155,7 @@ export default props => {
 							</ul>
 						</div>
 						<div class="d-flex" role="search">
-							<input ref={searchInput} class="form-control me-2" type="text" placeholder="Search" onKeyUp={event => event.code === "Enter" && doSearch()} aria-label="Search"/>
+							<input ref={searchInput!} class="form-control me-2" type="text" placeholder="Search" onKeyUp={event => event.code === "Enter" && doSearch()} aria-label="Search"/>
 							<button class="btn btn-outline-primary" onClick={doSearch}>Search</button>
 						</div>
 					</div>
@@ -165,7 +165,7 @@ export default props => {
 				<div class="col py-3 page-container">{props.children}</div>
 			</div>
 			<Show when={errorStore.message}>
-				<div ref={errorAlert} class="alert alert-warning position-fixed top-0 start-50 translate-middle-x mt-2" role="alert">
+				<div ref={errorAlert!} class="alert alert-warning position-fixed top-0 start-50 translate-middle-x mt-2" role="alert">
 					<div class="me-4" innerHTML={errorStore.message}></div>
 					<button type="button" class="btn-close position-absolute top-50 end-0 translate-middle-y me-2" onClick={dismissAlert} aria-label="Close"></button>
 				</div>

@@ -6,20 +6,21 @@ import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage, maxItemsToFetch, nullId } from "../library";
 import { TbOutlineJumpRope } from "solid-icons/tb";
 import { Tooltip } from "bootstrap";
+import type { Post as PostType } from "../types";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 
-export default props => {
-	let threadViewbutton;
-	let threadViewTooltip;
-	let loadMoreButton;
+export default (props: Record<keyof any, any>) => {
+	let threadViewbutton!: HTMLButtonElement;
+	let threadViewTooltip: Tooltip;
+	let loadMoreButton!: HTMLButtonElement;
 	const params = useParams();
 	const navigate = useNavigate();
 	const postId = createMemo(() => params.postId);
-	const [post, setPost] = createSignal();
-	const [parentPost, setParentPost] = createSignal();
-	const [postReplies, setPostReplies] = createSignal([]);
-	const [lastReplyId, setLastReplyId] = createSignal();
+	const [post, setPost] = createSignal<PostType | null>(null);
+	const [parentPost, setParentPost] = createSignal<PostType | null>(null);
+	const [postReplies, setPostReplies] = createSignal<PostType[]>([]);
+	const [lastReplyId, setLastReplyId] = createSignal<string | null>(null);
 	const [hasMore, setHasMore] = createSignal(false);
 	const [hasError, setHasError] = createSignal(false);
 	const fetchPost = async () => {
@@ -32,7 +33,7 @@ export default props => {
 			}
 			setHasError(false);
 			setPost((await response.json()).post);
-		} catch (err) {
+		} catch (err: any) {
 			setErrorStore("message", err.message);
 		}
 	};
@@ -40,7 +41,7 @@ export default props => {
 		try {
 			const response = await fetch(`${postsBaseUrl}/${postId()}/parent`);
 			setParentPost(response.ok ? (await response.json()).parent : null);
-		} catch (err) {
+		} catch (err: any) {
 			setErrorStore("message", err.message);
 		}
 	};
@@ -59,7 +60,7 @@ export default props => {
 			} else {
 				setHasMore(false);
 			}
-		} catch (err) {
+		} catch (err: any) {
 			setErrorStore("message", err.message);
 		}
 	};

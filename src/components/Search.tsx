@@ -1,8 +1,11 @@
 import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js";
-import { useSearchParams, A } from "@solidjs/router";
+import { useSearchParams, A, SearchParams } from "@solidjs/router";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
+import type { Post, User } from "../types";
 import DisplayPost from "./DisplayPost";
+
+type SearchResult = Post | User;
 
 /*
 Post Search Parmeters:
@@ -151,19 +154,19 @@ Sample Result:
 }
 */
 
-export default props => {
-	let loadMoreButton;
+export default (props: Record<keyof any, any>) => {
+	let loadMoreButton: HTMLButtonElement | undefined;
 	const [searchParams] = useSearchParams();
 	const [isUserSearch, setIsUserSearch] = createSignal(false);
-	const [lastScore, setLastScore] = createSignal();
+	const [lastScore, setLastScore] = createSignal<number | undefined>();
 	const [lastItemId, setLastItemId] = createSignal(emptyString);
 	const [hasMore, setHasMore] = createSignal(true);
-	const [searchResults, setSearchResults] = createSignal([]);
+	const [searchResults, setSearchResults] = createSignal<SearchResult[]>([]);
 	const searchUrl = `${import.meta.env.VITE_API_BASE_URL}/search`;
-	const parseQueryTokens = query => {
-		const tokens = {};
-		const parts = query?.q?.split(/\s+/);
-		let searchText = [];
+	const parseQueryTokens = (query: Partial<SearchParams>) => {
+		const tokens: Record<string, string> = {};
+		const parts = (query?.q as string)?.split(/\s+/) ?? [];
+		let searchText: string[] = [];
 		for (const part of parts) {
 			const match = part.match(/^([a-z-]+):(.+)$/);
 			if (match) {
@@ -207,7 +210,7 @@ export default props => {
 			if (!isUserSearch() && lastScore()) {
 				const sortBy = tokens["sort-by"] || emptyString;
 				if (!sortBy || sortBy === "match" || sortBy === "popular") {
-					params.append("lastScore", lastScore());
+					params.append("lastScore", String(lastScore()));
 				}
 			}
 		}
@@ -246,7 +249,7 @@ export default props => {
 				setHasMore(false);
 			}
 			setSearchResults(searchResults().concat(items));
-		} catch (err) {
+		} catch (err: any) {
 			setErrorStore("message", err.message);
 		}
 	};
@@ -266,9 +269,15 @@ export default props => {
 			<div class="alert alert-info">
 				<p>Use the following syntax to refine your search:</p>
 				<ul>
-					<li><code>hello world has-media:1</code> - Search for posts containing "hello world" that have media attachments.</li>
-					<li><code>ma users:1 match:contains</code> - Search for users with handles containing the string "ma".</li>
-					<li><code>langs:ml|en</code> - Search for posts written in Malayalam or English.</li>
+					<li>
+						<code>hello world has-media:1</code> - Search for posts containing "hello world" that have media attachments.
+					</li>
+					<li>
+						<code>ma users:1 match:contains</code> - Search for users with handles containing the string "ma".
+					</li>
+					<li>
+						<code>langs:ml|en</code> - Search for posts written in Malayalam or English.
+					</li>
 				</ul>
 			</div>
 			<h2>Search Results</h2>
@@ -276,20 +285,22 @@ export default props => {
 				<p>No results found. Try a different search.</p>
 			</Show>
 			<Show when={!isUserSearch() && searchResults().length > 0}>
-				<For each={searchResults()}>{(result) => <DisplayPost post={result}/>}</For>
+				<For each={searchResults() as Post[]}>{result => <DisplayPost post={result}/>}</For>
 			</Show>
 			<Show when={isUserSearch() && searchResults().length > 0}>
 				<ul class="list-group">
-					<For each={searchResults()}>
+					<For each={searchResults() as User[]}>
 						{result => (
 							<li class="list-group-item">
-								<h3><A href={`/${result.handle}`}>{result.handle}</A></h3>
+								<h3>
+									<A href={`/${result.handle}`}>{result.handle}</A>
+								</h3>
 								<div class="d-flex gap-2">
 									{result.protected && <div class="badge text-bg-info">Protected</div>}
 									{result.deactivated && <div class="badge text-bg-info">Deactivated</div>}
 									{result.self && <div class="badge text-bg-info">This is you</div>}
-									{result.following > 0 && <div class="badge text-bg-info">Following: {result.following}</div>}
-									{result.followers > 0 && <div class="badge text-bg-info">Followers: {result.followers}</div>}
+									{(result.following ?? 0) > 0 && <div class="badge text-bg-info">Following: {result.following}</div>}
+									{(result.followers ?? 0) > 0 && <div class="badge text-bg-info">Followers: {result.followers}</div>}
 									{result.blockedByMe && <div class="badge text-bg-info">Blocked by you</div>}
 									{result.blockedMe && <div class="badge text-bg-info">Blocked you</div>}
 									{result.requestedToFollowByMe && <div class="badge text-bg-info">Follow requested by you</div>}
@@ -298,7 +309,9 @@ export default props => {
 									{result.followedMe && <div class="badge text-bg-info">Followed you</div>}
 									{result.mutedByMe && <div class="badge text-bg-info">Muted by you</div>}
 								</div>
-								<p>{result.postsCount} {result.postsCount === 1 ? "post" : "posts"}</p>
+								<p>
+									{result.postsCount} {result.postsCount === 1 ? "post" : "posts"}
+								</p>
 							</li>
 						)}
 					</For>

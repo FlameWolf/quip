@@ -1,24 +1,27 @@
 import { createEffect, createSignal, For, on, Show } from "solid-js";
-import { setErrorStore } from "../stores/error-store.jsx";
-import DisplayPostList from "./DisplayPostList.jsx";
-import { emptyString, getErrorMessage, maxItemsToFetch } from "../library.jsx";
+import { setErrorStore } from "../stores/error-store";
+import DisplayPostList from "./DisplayPostList";
+import { getErrorMessage, maxItemsToFetch } from "../library";
+import type { Post } from "../types";
 
 const topmostUrl = `${import.meta.env.VITE_API_BASE_URL}/topmost`;
 const sortOptions = ["Day", "Week", "Month", "Year", "All"];
 
-export default props => {
+export default (props: Record<keyof any, any>) => {
 	const [sortBy, setSortBy] = createSignal(sortOptions[0]);
-	const [topPosts, setTopPosts] = createSignal([]);
-	const [lastPostId, setLastPostId] = createSignal();
-	const [lastScore, setLastScore] = createSignal();
+	const [topPosts, setTopPosts] = createSignal<Post[]>([]);
+	const [lastPostId, setLastPostId] = createSignal<string | undefined>();
+	const [lastScore, setLastScore] = createSignal<number | undefined>();
 	const [hasMore, setHasMore] = createSignal(true);
 	const loadTopPosts = async () => {
 		const queryParams = new URLSearchParams();
-		if (lastPostId()) {
-			queryParams.append("lastPostId", lastPostId());
+		const currentLastPostId = lastPostId();
+		if (currentLastPostId) {
+			queryParams.append("lastPostId", currentLastPostId);
 		}
-		if (lastScore()) {
-			queryParams.append("lastScore", lastScore());
+		const currentLastScore = lastScore();
+		if (currentLastScore) {
+			queryParams.append("lastScore", String(currentLastScore));
 		}
 		const response = await fetch(`${topmostUrl}/${sortBy().toLowerCase()}${queryParams.size ? `?${queryParams.toString()}` : ""}`);
 		if (!response.ok) {
@@ -30,7 +33,7 @@ export default props => {
 		setTopPosts(topPosts().concat(posts));
 		setLastPostId(lastPost._id);
 		setLastScore(lastPost.score || 0);
-		if (posts.length < maxItemsToFetch || lastScore() < 1) {
+		if (posts.length < maxItemsToFetch || (lastScore() ?? 0) < 1) {
 			setHasMore(false);
 		}
 	};
@@ -55,7 +58,9 @@ export default props => {
 						return (
 							<>
 								<input id={itemId} type="radio" class="btn-check" name="sort-option" value={option} onInput={() => setSortBy(option)}/>
-								<label class="btn btn-outline-primary" for={itemId}>{option}</label>
+								<label class="btn btn-outline-primary" for={itemId}>
+									{option}
+								</label>
 							</>
 						);
 					}}
@@ -67,7 +72,9 @@ export default props => {
 					<For each={sortOptions}>
 						{(option, index) => (
 							<li>
-								<a class="dropdown-item" onClick={() => setSortBy(option)} role="button">{option}</a>
+								<a class="dropdown-item" onClick={() => setSortBy(option)} role="button">
+									{option}
+								</a>
 							</li>
 						)}
 					</For>

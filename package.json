@@ -6,12 +6,16 @@
 	"scripts": {
 		"start": "vite",
 		"dev": "vite",
-		"build": "vite build",
+		"build": "tsc --noEmit && vite build",
+		"typecheck": "tsc --noEmit",
 		"serve": "vite preview",
-		"deploy": "vite build && firebase deploy"
+		"deploy": "npm run build && firebase deploy"
 	},
 	"license": "MIT",
 	"devDependencies": {
+		"@types/bootstrap": "^5.2.10",
+		"@types/node": "^25.7.0",
+		"typescript": "^5.9.3",
 		"vite": "^8.0.10",
 		"vite-plugin-solid": "^2.11.12"
 	},

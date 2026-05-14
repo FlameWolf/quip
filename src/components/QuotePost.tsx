@@ -1,15 +1,15 @@
-import { createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import Editor from "./Editor";
 import DisplayPostMinimal from "./DisplayPostMinimal";
 
-export default props => {
+export default (props: Record<keyof any, any>) => {
 	const [isOpen, setIsOpen] = createSignal(props.isOpen || false);
 	const quotedPost = props.post;
 
 	const closeModal = () => {
 		setIsOpen(false);
 		props.onClose?.();
-	}
+	};
 	return (
 		<Show when={isOpen()}>
 			<div class="modal d-block open">

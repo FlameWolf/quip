@@ -1,4 +1,8 @@
+// @ts-check
 "use strict";
+
+/** @typedef {import("../src/types").BroadcastMessage} BroadcastMessage */
+/** @typedef {{ action: string; payload?: any }} WorkerMessage */
 
 const envKey = "env";
 const env = {
@@ -137,6 +141,7 @@ const interceptApiRequest = async request => {
 	return await fetch(request, requestInitOptions);
 };
 
+/** @param {WorkerMessage} message */
 const dispatch = async ({ action, payload }) => {
 	switch (action) {
 		case env.setAuthDataAction:

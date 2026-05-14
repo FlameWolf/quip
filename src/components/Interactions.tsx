@@ -2,11 +2,12 @@ import { useParams, useLocation } from "@solidjs/router";
 import { createMemo, createSignal, onMount, Show } from "solid-js";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
+import type { Bookmark, Favourite, Post } from "../types";
 import DisplayPostList from "./DisplayPostList";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
-export default props => {
+export default (props: Record<keyof any, any>) => {
 	const params = useParams();
 	const location = useLocation();
 	const profileUrl = createMemo(() => `${profileBaseUrl}/${params.handle}`);
@@ -25,7 +26,7 @@ export default props => {
 				throw new Error("Invalid path");
 		}
 	})();
-	const [interactions, setInteractions] = createSignal([]);
+	const [interactions, setInteractions] = createSignal<Array<Post>>([]);
 	const [lastInteractionId, setLastInteractionId] = createSignal(emptyString);
 	const [hasMore, setHasMore] = createSignal(true);
 	const fetchInteractions = async () => {
@@ -38,7 +39,7 @@ export default props => {
 				setErrorStore("message", await getErrorMessage(response));
 				return;
 			}
-			const data = (await response.json())?.[pathToUse];
+			const data = (await response.json())?.[pathToUse] as Array<Favourite | Bookmark | Post>;
 			const fetchedCount = data?.length ?? 0;
 			if (fetchedCount < maxItemsToFetch) {
 				setHasMore(false);
@@ -50,18 +51,18 @@ export default props => {
 							switch (pathToUse) {
 								case "favourites":
 								case "bookmarks":
-									return x.post;
+									return (x as Favourite | Bookmark).post;
 								case "votes":
 								case "mentions":
 								default:
-									return x;
+									return x as Post;
 							}
 						})
 					)
 				);
 				setLastInteractionId(data[fetchedCount - 1]._id);
 			}
-		} catch (err) {
+		} catch (err: any) {
 			setErrorStore("message", err.message);
 		}
 	};

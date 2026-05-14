@@ -4,19 +4,20 @@ import DisplayPostList from "./DisplayPostList";
 import { useParams } from "@solidjs/router";
 import { setErrorStore } from "../stores/error-store";
 import { getErrorMessage, maxItemsToFetch } from "../library";
+import type { Post as PostType } from "../types";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 
-export default props => {
-	let loadMoreButton;
+export default (props: Record<keyof any, any>) => {
+	let loadMoreButton: HTMLButtonElement | undefined;
 	const params = useParams();
 	const postId = createMemo(() => params.postId);
-	const [post, setPost] = createSignal();
-	const [parentPost, setParentPost] = createSignal();
-	const [postReplies, setPostReplies] = createSignal([]);
-	const [lastReplyId, setLastReplyId] = createSignal(postId());
+	const [post, setPost] = createSignal<PostType | null>(null);
+	const [parentPost, setParentPost] = createSignal<PostType | null>(null);
+	const [postReplies, setPostReplies] = createSignal<PostType[]>([]);
+	const [lastReplyId, setLastReplyId] = createSignal<string | undefined>(postId());
 	const [hasMore, setHasMore] = createSignal(false);
-	const [hasError, setHasError] = createSignal();
+	const [hasError, setHasError] = createSignal<boolean>(false);
 	const fetchPost = async () => {
 		try {
 			const response = await fetch(`${postsBaseUrl}/${postId()}`);
@@ -27,7 +28,7 @@ export default props => {
 			}
 			setHasError(false);
 			setPost((await response.json()).post);
-		} catch (err) {
+		} catch (err: any) {
 			setErrorStore("message", err.message);
 		}
 	};
@@ -35,7 +36,7 @@ export default props => {
 		try {
 			const response = await fetch(`${postsBaseUrl}/${postId()}/parent`);
 			setParentPost(response.ok ? (await response.json()).parent : null);
-		} catch (err) {
+		} catch (err: any) {
 			setErrorStore("message", err.message);
 		}
 	};
@@ -54,7 +55,7 @@ export default props => {
 			} else {
 				setHasMore(false);
 			}
-		} catch (err) {
+		} catch (err: any) {
 			setErrorStore("message", err.message);
 		}
 	};

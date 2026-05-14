@@ -2,10 +2,11 @@ import { useParams, useLocation, A } from "@solidjs/router";
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
+import type { Post, User } from "../types";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
-export default props => {
+export default (props: Record<keyof any, any>) => {
 	const params = useParams();
 	const location = useLocation();
 	const profileUrl = createMemo(() => `${profileBaseUrl}/${params.handle}`);
@@ -20,7 +21,7 @@ export default props => {
 				throw new Error("Invalid path");
 		}
 	})();
-	const [follows, setFollows] = createSignal([]);
+	const [follows, setFollows] = createSignal<User[]>([]);
 	const [lastFollowId, setLastFollowId] = createSignal(emptyString);
 	const [hasMore, setHasMore] = createSignal(true);
 	const fetchFollows = async () => {
@@ -33,16 +34,16 @@ export default props => {
 				setErrorStore("message", await getErrorMessage(response));
 				return;
 			}
-			const data = (await response.json())?.[pathToUse];
+			const data = (await response.json())?.[pathToUse] as Array<{ [userKey: string]: User }>;
 			const fetchedCount = data?.length ?? 0;
 			if (fetchedCount < maxItemsToFetch) {
 				setHasMore(false);
 			}
 			if (fetchedCount > 0) {
 				setFollows(follows().concat(data.map(x => x[userKey])));
-				setLastFollowId(data[fetchedCount - 1]._id);
+				setLastFollowId(data[fetchedCount - 1][userKey]._id);
 			}
-		} catch (err) {
+		} catch (err: any) {
 			setErrorStore("message", err.messsage);
 		}
 	};
@@ -55,15 +56,19 @@ export default props => {
 				<For each={follows()}>
 					{follow => (
 						<li class="list-group-item">
-							<h3><A href={`/${follow.handle}`}>{follow.handle}</A></h3>
+							<h3>
+								<A href={`/${follow.handle}`}>{follow.handle}</A>
+							</h3>
 							<div class="d-flex gap-2">
 								{follow.protected && <div class="badge text-bg-info">Protected</div>}
 								{follow.deactivated && <div class="badge text-bg-info">Deactivated</div>}
-								{(follow.followedByMe && pathToUse === "followers") && <div class="badge text-bg-info">Followed by you</div>}
-								{(follow.followedMe && pathToUse === "following") && <div class="badge text-bg-info">Followed you</div>}
+								{follow.followedByMe && pathToUse === "followers" && <div class="badge text-bg-info">Followed by you</div>}
+								{follow.followedMe && pathToUse === "following" && <div class="badge text-bg-info">Followed you</div>}
 								{follow.mutedByMe && <div class="badge text-bg-info">Muted by you</div>}
 							</div>
-							<p>{follow.postsCount} {follow.postsCount === 1 ? "post" : "posts"}</p>
+							<p>
+								{follow.postsCount} {follow.postsCount === 1 ? "post" : "posts"}
+							</p>
 						</li>
 					)}
 				</For>
