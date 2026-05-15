@@ -58,9 +58,7 @@ export default (props: Record<keyof any, any>) => {
 						return (
 							<>
 								<input id={itemId} type="radio" class="btn-check" name="sort-option" value={option} onInput={() => setSortBy(option)}/>
-								<label class="btn btn-outline-primary" for={itemId}>
-									{option}
-								</label>
+								<label class="btn btn-outline-primary" for={itemId}>{option}</label>
 							</>
 						);
 					}}
@@ -72,9 +70,7 @@ export default (props: Record<keyof any, any>) => {
 					<For each={sortOptions}>
 						{(option, index) => (
 							<li>
-								<a class="dropdown-item" onClick={() => setSortBy(option)} role="button">
-									{option}
-								</a>
+								<a class="dropdown-item" onClick={() => setSortBy(option)} role="button">{option}</a>
 							</li>
 						)}
 					</For>

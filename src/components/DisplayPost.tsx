@@ -79,9 +79,7 @@ export default (props: Record<keyof any, any>) => {
 		<>
 			<div data-post-id={postId} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, reply: props.isReply, "d-none": isDeleted() }}>
 				<div class="post-header">
-					<A class="handle" href={`/${handle}`}>
-						{handle}
-					</A>
+					<A class="handle" href={`/${handle}`}>{handle}</A>
 					<Show when={props.parentBlurb || props.isReply}>
 						<span>&#xA0;</span>
 						<span>In reply to</span>
@@ -95,13 +93,12 @@ export default (props: Record<keyof any, any>) => {
 					</Show>
 					<Show when={repeatedBy}>
 						<div>&#xA0;</div>
-						<div>Repeated by<span class="handle">{repeatedBy.handle}</span>
+						<div>
+							Repeated by<span class="handle">{repeatedBy.handle}</span>
 						</div>
 					</Show>
 					<div class="ms-auto">
-						<A class="link-secondary" title={toLongDateString(createdAt)} href={`/post/${post._id}`} target="_self">
-							{formatTimeAgo(createdAt)}
-						</A>
+						<A class="link-secondary" title={toLongDateString(createdAt)} href={`/post/${post._id}`} target="_self">{formatTimeAgo(createdAt)}</A>
 					</div>
 				</div>
 				<div class="card-body px-2">
@@ -142,18 +139,12 @@ export default (props: Record<keyof any, any>) => {
 								<FiEdit3 classList={{ "text-primary": isEditing() }} title="Edit"/>
 							</button>
 						</Show>
-						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleFave} title={faveFlag() ? "Unfavourite" : "Favourite"}>
-							{faveFlag() ? <BsStarFill color="gold"/> : <BsStar/>}
-						</button>
+						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleFave} title={faveFlag() ? "Unfavourite" : "Favourite"}>{faveFlag() ? <BsStarFill color="gold"/> : <BsStar/>}</button>
 						<button class="btn bg-transparent border-0 py-2 px-3" onClick={() => setQuoteFlag(true)} title="Quote">
 							<BsQuote/>
 						</button>
-						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleRepeat} title={repeatFlag() ? "Unrepeat" : "Repeat"}>
-							{repeatFlag() ? <FiRepeat color="green" class="stroke-3"/> : <FiRepeat/>}
-						</button>
-						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleReply} title="Reply">
-							{replyFlag() ? <BsChatRight color="blue"/> : <BsChatRight/>}
-						</button>
+						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleRepeat} title={repeatFlag() ? "Unrepeat" : "Repeat"}>{repeatFlag() ? <FiRepeat color="green" class="stroke-3"/> : <FiRepeat/>}</button>
+						<button class="btn bg-transparent border-0 py-2 px-3" onClick={toggleReply} title="Reply">{replyFlag() ? <BsChatRight color="blue"/> : <BsChatRight/>}</button>
 						<Show when={isOwnPost()}>
 							<button class="btn bg-transparent border-0 py-2 px-3" title="Delete">
 								<FiTrash onClick={() => setConfirmDelete(true)}/>

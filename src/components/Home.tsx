@@ -54,7 +54,7 @@ export default (props: Record<keyof any, any>) => {
 			<Show when={quipStore.quips.length}>
 				<DisplayPostList posts={quipStore.quips}/>
 				<div class="my-2">
-					<button ref={loadMoreButton} class="btn btn-primary form-control" onClick={() =>loadPosts(lastPostId())}>Load More</button>
+					<button ref={loadMoreButton} class="btn btn-primary form-control" onClick={() => loadPosts(lastPostId())}>Load More</button>
 				</div>
 			</Show>
 		</>

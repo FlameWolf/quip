@@ -244,12 +244,8 @@ export default (props: Record<keyof any, any>) => {
 						}) as unknown as Element
 					}
 				</div>
-				<button ref={emojiTrigger} class="btn btn-secondary btn-sm px-3 rounded-pill" classList={{ active: hasEmojiPicker() }} onClick={toggleEmojiMart} title="Add Emoji">
-					&#x2026;
-				</button>
-				<div class="char-count" classList={{ "bg-danger text-light": characterLimitExceeded() }} title="Character Count">
-					{charCount()}
-				</div>
+				<button ref={emojiTrigger} class="btn btn-secondary btn-sm px-3 rounded-pill" classList={{ active: hasEmojiPicker() }} onClick={toggleEmojiMart} title="Add Emoji">&#x2026;</button>
+				<div class="char-count" classList={{ "bg-danger text-light": characterLimitExceeded() }} title="Character Count">{charCount()}</div>
 				<Show when={!props.isEditing}>
 					<button class="btn btn-secondary btn-sm px-3 rounded-pill" classList={{ active: hasPoll() }} onClick={() => setHasPoll(!hasPoll())} title="Poll">
 						<BiRegularPoll class="poll-icon"/>

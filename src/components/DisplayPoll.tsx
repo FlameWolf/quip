@@ -73,21 +73,13 @@ export default (props: Record<keyof any, any>) => {
 			</Show>
 			<Show when={!inactivePoll()}>
 				<div class="d-flex flex-column poll-buttons">
-					<button class="btn btn-outline-primary" onClick={() => castVote("first")}>
-						{poll().first}
-					</button>
-					<button class="btn btn-outline-primary" onClick={() => castVote("second")}>
-						{poll().second}
-					</button>
+					<button class="btn btn-outline-primary" onClick={() => castVote("first")}>{poll().first}</button>
+					<button class="btn btn-outline-primary" onClick={() => castVote("second")}>{poll().second}</button>
 					<Show when={poll().third}>
-						<button class="btn btn-outline-primary" onClick={() => castVote("third")}>
-							{poll().third}
-						</button>
+						<button class="btn btn-outline-primary" onClick={() => castVote("third")}>{poll().third}</button>
 					</Show>
 					<Show when={poll().fourth}>
-						<button class="btn btn-outline-primary" onClick={() => castVote("fourth")}>
-							{poll().fourth}
-						</button>
+						<button class="btn btn-outline-primary" onClick={() => castVote("fourth")}>{poll().fourth}</button>
 					</Show>
 					<button class="btn btn-primary" onClick={() => castVote("nota")}>NOTA</button>
 				</div>

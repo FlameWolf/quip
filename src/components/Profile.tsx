@@ -117,13 +117,9 @@ export default (props: Record<keyof any, any>) => {
 								<Show when={followsMe()}>
 									<div class="badge bg-secondary">Follows you</div>
 								</Show>
-								<button class="btn btn-sm btn-primary" onClick={() => toggleAction("follow", followed(), setFollowed)}>
-									{followed() ? "Unfollow" : "Follow"}
-								</button>
+								<button class="btn btn-sm btn-primary" onClick={() => toggleAction("follow", followed(), setFollowed)}>{followed() ? "Unfollow" : "Follow"}</button>
 								<div class="btn-group">
-									<button ref={muteButton} class="btn btn-sm btn-primary" onClick={() => toggleAction("mute", muted(), setMuted)}>
-										{muted() ? "Unmute" : "Mute"}
-									</button>
+									<button ref={muteButton} class="btn btn-sm btn-primary" onClick={() => toggleAction("mute", muted(), setMuted)}>{muted() ? "Unmute" : "Mute"}</button>
 									<Show when={!isSelf() && !muted()}>
 										<div class="btn-group dropdown">
 											<button ref={muteMenuToggle} type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -131,7 +127,7 @@ export default (props: Record<keyof any, any>) => {
 											</button>
 											<ul class="dropdown-menu">
 												<li>
-													<a class="dropdown-item" role="button" onClick={() =>setActionTrigger(muteButton)}>Specify a reason</a>
+													<a class="dropdown-item" role="button" onClick={() => setActionTrigger(muteButton)}>Specify a reason</a>
 												</li>
 											</ul>
 										</div>
@@ -141,9 +137,7 @@ export default (props: Record<keyof any, any>) => {
 									<a class="bi bi-info-circle" role="button" onClick={() => setShowMutedReason(!showMutedReason())}></a>
 								</Show>
 								<div class="btn-group">
-									<button ref={blockButton} class="btn btn-sm btn-danger" onClick={() => toggleAction("block", blocked(), setBlocked)}>
-										{blocked() ? "Unblock" : "Block"}
-									</button>
+									<button ref={blockButton} class="btn btn-sm btn-danger" onClick={() => toggleAction("block", blocked(), setBlocked)}>{blocked() ? "Unblock" : "Block"}</button>
 									<Show when={!isSelf() && !blocked()}>
 										<div class="btn-group dropdown">
 											<button ref={blockMenuToggle} type="button" class="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -151,7 +145,7 @@ export default (props: Record<keyof any, any>) => {
 											</button>
 											<ul class="dropdown-menu">
 												<li>
-													<a class="dropdown-item" role="button" onClick={() =>setActionTrigger(blockButton)}>Specify a reason</a>
+													<a class="dropdown-item" role="button" onClick={() => setActionTrigger(blockButton)}>Specify a reason</a>
 												</li>
 											</ul>
 										</div>
@@ -181,12 +175,15 @@ export default (props: Record<keyof any, any>) => {
 				<div class="card-body">
 					<div class="d-flex flex-wrap gap-2">
 						<A class="badge text-bg-info" activeClass="text-decoration-none" href="posts">
-							{profileUser()?.postsCount} Quips</A>
+							{profileUser()?.postsCount} Quips
+						</A>
 						<Show when={isSelf()}>
 							<A class="badge text-bg-info" activeClass="text-decoration-none" href="following">
-								{followingCount()} Following</A>
+								{followingCount()} Following
+							</A>
 							<A class="badge text-bg-info" activeClass="text-decoration-none" href="followers">
-								{followerCount()} Followers</A>
+								{followerCount()} Followers
+							</A>
 							<A class="badge text-bg-info" activeClass="text-decoration-none" href="favourites">Favourites</A>
 						</Show>
 						<A class="badge text-bg-info" activeClass="text-decoration-none" href="mentions">Mentions</A>

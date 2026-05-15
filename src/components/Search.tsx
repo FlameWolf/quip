@@ -309,9 +309,7 @@ export default (props: Record<keyof any, any>) => {
 									{result.followedMe && <div class="badge text-bg-info">Followed you</div>}
 									{result.mutedByMe && <div class="badge text-bg-info">Muted by you</div>}
 								</div>
-								<p>
-									{result.postsCount} {result.postsCount === 1 ? "post" : "posts"}
-								</p>
+								<p>{result.postsCount} {result.postsCount === 1 ? "post" : "posts"}</p>
 							</li>
 						)}
 					</For>

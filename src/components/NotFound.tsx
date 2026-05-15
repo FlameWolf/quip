@@ -6,17 +6,11 @@ export default (props: Record<keyof any, any>) => {
 	const shrugEmojo = nodeEmoji.get(":woman_shrugging:");
 	return (
 		<div class="position-absolute-middle text-center w-100 p-5">
-			<h1 class="text-primary">
-				{pageFacingUpEmojo} Page {pageFacingUpEmojo}
-			</h1>
+			<h1 class="text-primary">{pageFacingUpEmojo} Page {pageFacingUpEmojo}</h1>
 			<hr/>
-			<h1 class="text-danger">
-				{noEntryEmojo} Not {noEntryEmojo}
-			</h1>
+			<h1 class="text-danger">{noEntryEmojo} Not {noEntryEmojo}</h1>
 			<hr/>
-			<h1 class="text-primary">
-				{shrugEmojo} Found {shrugEmojo}
-			</h1>
+			<h1 class="text-primary">{shrugEmojo} Found {shrugEmojo}</h1>
 		</div>
 	);
 };

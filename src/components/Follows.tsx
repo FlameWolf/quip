@@ -66,9 +66,7 @@ export default (props: Record<keyof any, any>) => {
 								{follow.followedMe && pathToUse === "following" && <div class="badge text-bg-info">Followed you</div>}
 								{follow.mutedByMe && <div class="badge text-bg-info">Muted by you</div>}
 							</div>
-							<p>
-								{follow.postsCount} {follow.postsCount === 1 ? "post" : "posts"}
-							</p>
+							<p>{follow.postsCount} {follow.postsCount === 1 ? "post" : "posts"}</p>
 						</li>
 					)}
 				</For>

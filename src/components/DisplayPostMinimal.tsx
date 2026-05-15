@@ -12,9 +12,7 @@ export default (props: Record<keyof any, any>) => {
 		<>
 			<div data-post-id={post._id} class="card border px-2" classList={{ reply: props.isReply }}>
 				<div class="post-header">
-					<A class="handle" href={`/${handle}`}>
-						{handle}
-					</A>
+					<A class="handle" href={`/${handle}`}>{handle}</A>
 					<Show when={props.parentBlurb}>
 						<div>&#xA0;</div>
 						<div innerHTML={`Replied to "${props.parentBlurb}"`}></div>
