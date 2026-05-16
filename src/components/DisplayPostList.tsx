@@ -2,9 +2,10 @@ import { createMemo, For, Show } from "solid-js";
 import { trimPost } from "../library";
 import DisplayPost from "./DisplayPost";
 import { Attachments, Post } from "../types";
+import type { DisplayPostListProps } from "../types/DisplayPostListProps";
 
-export default (props: Record<keyof any, any>) => {
-	const posts = createMemo(() => (props.posts as Array<Post>) || []);
+export default (props: DisplayPostListProps) => {
+	const posts = createMemo(() => props.posts || []);
 	const topLevelPosts = createMemo(() => posts().filter(post => !post.replyTo || !posts().some(parent => parent._id === post.replyTo)));
 	const getPostBlurb = (post: Post) => {
 		let blurb = trimPost(post.content);
@@ -12,7 +13,7 @@ export default (props: Record<keyof any, any>) => {
 			const { mediaFile } = post.attachments as Attachments;
 			if (mediaFile) {
 				let blurbPrefix = mediaFile.fileType === "image" ? "Image" : mediaFile.fileType === "video" ? "Video" : "Media";
-				blurb = `[${blurbPrefix}] <img class="blurb-media" src="${mediaFile.src}" alt="${mediaFile.mediaDescription || "Media attachment"}"/>`;
+				blurb = `[${blurbPrefix}] <img class="blurb-media" src="${mediaFile.src}" alt="${mediaFile.description || "Media attachment"}"/>`;
 			}
 		}
 		return blurb;

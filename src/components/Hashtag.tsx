@@ -3,11 +3,12 @@ import { createEffect, createMemo, createSignal, on, Show } from "solid-js";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
 import type { Post } from "../types";
+import type { HashtagProps } from "../types/HashtagProps";
 import DisplayPostList from "./DisplayPostList";
 
 const hashtagBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/hashtag`;
 
-export default (props: Record<keyof any, any>) => {
+export default (props: HashtagProps) => {
 	const params = useParams();
 	const hashtagUrl = createMemo(() => `${hashtagBaseUrl}/${params.tagName}`);
 	const [hashtagPosts, setHashtagPosts] = createSignal<Post[]>([]);

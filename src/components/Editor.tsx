@@ -10,6 +10,7 @@ import { themeStore } from "../stores/theme-store";
 import { setQuipStore } from "../stores/quip-store";
 import { authStore } from "../stores/auth-store";
 import { setErrorStore } from "../stores/error-store";
+import type { EditorProps } from "../types/EditorProps";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 const createPostUrl = `${postsBaseUrl}/create`;
@@ -17,7 +18,7 @@ const updatePostUrl = `${postsBaseUrl}/update`;
 const createQuoteUrl = `${postsBaseUrl}/quote`;
 const createReplyUrl = `${postsBaseUrl}/reply`;
 
-export default (props: Record<keyof any, any>) => {
+export default (props: EditorProps) => {
 	let plainTextInput!: HTMLTextAreaElement;
 	let emojiPickerContainer!: HTMLDivElement;
 	let emojiTrigger!: HTMLButtonElement;
@@ -82,7 +83,7 @@ export default (props: Record<keyof any, any>) => {
 				formData.append("media-description", mediaDescription());
 			}
 		}
-		const url = props.isQuote ? `${createQuoteUrl}/${props.quotedPost._id}` : parentPostId ? `${createReplyUrl}/${parentPostId}` : props.isEditing ? `${updatePostUrl}/${props.post._id}` : createPostUrl;
+		const url = props.isQuote ? `${createQuoteUrl}/${props.quotedPost!._id}` : parentPostId ? `${createReplyUrl}/${parentPostId}` : props.isEditing ? `${updatePostUrl}/${props.post!._id}` : createPostUrl;
 		try {
 			setIsBusy(true);
 			const response = await fetch(url, {
@@ -169,7 +170,7 @@ export default (props: Record<keyof any, any>) => {
 				</div>
 			</Show>
 			<div class="autogrow" tabIndex={-1}>
-				<textarea ref={plainTextInput} value={props.isEditing ? props.post.content : emptyString} onInput={updateEditor} title="Editor"></textarea>
+				<textarea ref={plainTextInput} value={props.isEditing ? props.post!.content : emptyString} onInput={updateEditor} title="Editor"></textarea>
 			</div>
 			<Show when={hasPoll()}>
 				<div class="card mb-1" onInput={updatePoll}>

@@ -1,7 +1,8 @@
 import { A } from "@solidjs/router";
 import logoUrl from "../assets/images/logo.svg";
+import type { AuthProps } from "../types/AuthProps";
 
-export default (props: Record<keyof any, any>) => {
+export default (props: AuthProps) => {
 	return (
 		<div class="hstack gap-2 flex-column flex-md-row align-items-stretch auth-panel">
 			<div class="col-12 col-md-5">

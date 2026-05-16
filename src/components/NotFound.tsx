@@ -1,6 +1,7 @@
 import * as nodeEmoji from "node-emoji";
+import type { NotFoundProps } from "../types/NotFoundProps";
 
-export default (props: Record<keyof any, any>) => {
+export default (props: NotFoundProps) => {
 	const pageFacingUpEmojo = nodeEmoji.get(":page_facing_up:");
 	const noEntryEmojo = nodeEmoji.get(":no_entry_sign:");
 	const shrugEmojo = nodeEmoji.get(":woman_shrugging:");

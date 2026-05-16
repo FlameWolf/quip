@@ -3,8 +3,9 @@ import { produce } from "solid-js/store";
 import { quipStore, setQuipStore } from "../stores/quip-store";
 import { setErrorStore } from "../stores/error-store";
 import { getErrorMessage } from "../library";
+import type { DisplayPollProps } from "../types/DisplayPollProps";
 
-export default (props: Record<keyof any, any>) => {
+export default (props: DisplayPollProps) => {
 	const poll = createMemo(() => props.poll);
 	const votes = createMemo(() => poll().votes);
 	const firstOptionVotes = createMemo(() => votes().first ?? 0);

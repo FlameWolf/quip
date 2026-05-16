@@ -7,10 +7,11 @@ import { emptyString, getErrorMessage, maxItemsToFetch, nullId } from "../librar
 import { TbOutlineJumpRope } from "solid-icons/tb";
 import { Tooltip } from "bootstrap";
 import type { Post as PostType } from "../types";
+import type { PostProps } from "../types/PostProps";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 
-export default (props: Record<keyof any, any>) => {
+export default (props: PostProps) => {
 	let threadViewbutton!: HTMLButtonElement;
 	let threadViewTooltip: Tooltip;
 	let loadMoreButton!: HTMLButtonElement;
@@ -92,7 +93,7 @@ export default (props: Record<keyof any, any>) => {
 			<Show when={parentPost()}>
 				<div class="mb-4">
 					<h5>In reply to:</h5>
-					<DisplayPost post={parentPost()}/>
+					<DisplayPost post={parentPost()!}/>
 				</div>
 			</Show>
 			<Show when={post()?.replyTo === nullId || (post()?.replyTo && !parentPost())}>
@@ -119,7 +120,7 @@ export default (props: Record<keyof any, any>) => {
 					</button>
 				</div>
 				<div class="fs-5">
-					<DisplayPost post={post()}/>
+					<DisplayPost post={post()!}/>
 				</div>
 			</Show>
 			<Show when={postReplies()?.length}>

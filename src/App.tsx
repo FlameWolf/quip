@@ -6,6 +6,7 @@ import { authStore, setAuthStore } from "./stores/auth-store";
 import { errorStore, setErrorStore } from "./stores/error-store";
 import { Dropdown } from "bootstrap";
 import { VsMenu } from "solid-icons/vs";
+import type { AppProps } from "./types/AppProps";
 
 let imgMenu: HTMLImageElement;
 let searchInput: HTMLInputElement;
@@ -29,7 +30,7 @@ navigator.serviceWorker.controller?.postMessage({
 	}
 });
 
-export default (props: Record<keyof any, any>) => {
+export default (props: AppProps) => {
 	const location = useLocation();
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();

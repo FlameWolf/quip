@@ -3,11 +3,12 @@ import { createMemo, createSignal, onMount, Show } from "solid-js";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
 import type { Bookmark, Favourite, Post } from "../types";
+import type { InteractionsProps } from "../types/InteractionsProps";
 import DisplayPostList from "./DisplayPostList";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
-export default (props: Record<keyof any, any>) => {
+export default (props: InteractionsProps) => {
 	const params = useParams();
 	const location = useLocation();
 	const profileUrl = createMemo(() => `${profileBaseUrl}/${params.handle}`);

@@ -5,10 +5,11 @@ import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
 import { setErrorStore } from "../stores/error-store";
 import { getErrorMessage } from "../library";
+import type { SignInProps } from "../types/SignInProps";
 
 const signInUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/sign-in`;
 
-export default (props: Record<keyof any, any>) => {
+export default (props: SignInProps) => {
 	let signInForm!: HTMLFormElement;
 	let usernameInfoToggle!: HTMLAnchorElement;
 	let passwordInfoToggle!: HTMLAnchorElement;

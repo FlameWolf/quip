@@ -1,8 +1,9 @@
 import { createSignal, Show } from "solid-js";
 import Editor from "./Editor";
 import DisplayPostMinimal from "./DisplayPostMinimal";
+import type { QuotePostProps } from "../types/QuotePostProps";
 
-export default (props: Record<keyof any, any>) => {
+export default (props: QuotePostProps) => {
 	const [isOpen, setIsOpen] = createSignal(props.isOpen || false);
 	const quotedPost = props.post;
 

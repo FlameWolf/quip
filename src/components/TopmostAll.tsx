@@ -3,11 +3,12 @@ import { setErrorStore } from "../stores/error-store";
 import DisplayPostList from "./DisplayPostList";
 import { getErrorMessage, maxItemsToFetch } from "../library";
 import type { Post } from "../types";
+import type { TopmostAllProps } from "../types/TopmostAllProps";
 
 const topmostUrl = `${import.meta.env.VITE_API_BASE_URL}/topmost`;
 const sortOptions = ["Day", "Week", "Month", "Year", "All"];
 
-export default (props: Record<keyof any, any>) => {
+export default (props: TopmostAllProps) => {
 	const [sortBy, setSortBy] = createSignal(sortOptions[0]);
 	const [topPosts, setTopPosts] = createSignal<Post[]>([]);
 	const [lastPostId, setLastPostId] = createSignal<string | undefined>();

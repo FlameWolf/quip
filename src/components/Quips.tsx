@@ -3,11 +3,12 @@ import { createMemo, createSignal, onMount, Show } from "solid-js";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
 import type { Post } from "../types";
+import type { QuipsProps } from "../types/QuipsProps";
 import DisplayPostList from "./DisplayPostList";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
-export default (props: Record<keyof any, any>) => {
+export default (props: QuipsProps) => {
 	let loadMoreButton: HTMLButtonElement | undefined;
 	const params = useParams();
 	const profileUrl = createMemo(() => `${profileBaseUrl}/${params.handle}`);

@@ -12,7 +12,7 @@ export interface Author {
 export interface MediaFile {
 	src: string;
 	fileType: "image" | "video";
-	mediaDescription?: string;
+	description?: string;
 }
 
 export type PollVotes = {

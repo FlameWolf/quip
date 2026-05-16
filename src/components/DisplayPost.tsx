@@ -9,6 +9,8 @@ import DisplayPoll from "./DisplayPoll";
 import DisplayPostMinimal from "./DisplayPostMinimal";
 import Editor from "./Editor";
 import QuotePost from "./QuotePost";
+import type { Post } from "../types";
+import type { DisplayPostProps } from "../types/DisplayPostProps";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 const favouriteUrl = `${postsBaseUrl}/favourite`;
@@ -17,7 +19,7 @@ const repeatUrl = `${postsBaseUrl}/repeat`;
 const unrepeatUrl = `${postsBaseUrl}/unrepeat`;
 const deleteUrl = `${postsBaseUrl}/delete`;
 
-export default (props: Record<keyof any, any>) => {
+export default (props: DisplayPostProps) => {
 	const post = props.post;
 	const postId = post._id;
 	const createdAt = post.createdAt;
@@ -58,7 +60,7 @@ export default (props: Record<keyof any, any>) => {
 			setErrorStore("message", err.message);
 		}
 	};
-	const toggleReply = (event: Event) => {
+	const toggleReply = () => {
 		setReplyFlag(!replyFlag());
 	};
 	const deletePost = async () => {
@@ -77,7 +79,7 @@ export default (props: Record<keyof any, any>) => {
 	};
 	return (
 		<>
-			<div data-post-id={postId} class="list-group-item p-0" classList={{ "has-reply": props.hasReplies, reply: props.isReply, "d-none": isDeleted() }}>
+			<div data-post-id={postId} class="list-group-item p-0" classList={{ "has-reply": !!props.hasReplies, reply: !!props.isReply, "d-none": isDeleted() }}>
 				<div class="post-header">
 					<A class="handle" href={`/${handle}`}>{handle}</A>
 					<Show when={props.parentBlurb || props.isReply}>
@@ -92,10 +94,8 @@ export default (props: Record<keyof any, any>) => {
 						</Show>
 					</Show>
 					<Show when={repeatedBy}>
-						<div>&#xA0;</div>
-						<div>
-							Repeated by<span class="handle">{repeatedBy.handle}</span>
-						</div>
+						<span>&#xA0;</span>
+						<span>Repeated by<span class="handle">{repeatedBy!.handle}</span></span>
 					</Show>
 					<div class="ms-auto">
 						<A class="link-secondary" title={toLongDateString(createdAt)} href={`/post/${post._id}`} target="_self">{formatTimeAgo(createdAt)}</A>
@@ -109,25 +109,25 @@ export default (props: Record<keyof any, any>) => {
 						<Editor post={post} isEditing={isEditing()} onSubmit={() => setIsEditing(false)}/>
 					</Show>
 					<Show when={attachments}>
-						<Show when={attachments.poll}>
-							<DisplayPoll postId={post._id} poll={attachments.poll} voted={post.voted} isOwnPoll={post.author._id === authStore.userId}/>
+						<Show when={attachments!.poll}>
+							<DisplayPoll postId={post._id} poll={attachments!.poll!} voted={post.voted} isOwnPoll={post.author._id === authStore.userId}/>
 						</Show>
-						<Show when={attachments.mediaFile}>
-							<Show when={attachments.mediaFile.fileType === "image"}>
-								<img class="img-fluid" alt={attachments.mediaFile.description} src={attachments.mediaFile.src}/>
+						<Show when={attachments!.mediaFile}>
+							<Show when={attachments!.mediaFile!.fileType === "image"}>
+								<img class="img-fluid" alt={attachments!.mediaFile!.description} src={attachments!.mediaFile!.src}/>
 							</Show>
-							<Show when={attachments.mediaFile.fileType === "video"}>
-								<video class="img-fluid" aria-label={attachments.mediaFile.description} src={attachments.mediaFile.src} controls={true}/>
-							</Show>
-						</Show>
-						<Show when={typeof attachments.post === "string"}>
-							<Show when={attachments.post !== nullId} fallback={<div class="text-bg-secondary border rounded p-3">The quoted post is not available.</div>}>
-								<A href={`/post/${attachments.post}`} innerHTML={`${globalThis.location.origin}/post/${attachments.post}`} {...({ resolve: false } as any)}></A>
+							<Show when={attachments!.mediaFile!.fileType === "video"}>
+								<video class="img-fluid" aria-label={attachments!.mediaFile!.description} src={attachments!.mediaFile!.src} controls={true}/>
 							</Show>
 						</Show>
-						<Show when={typeof attachments.post === "object"}>
-							<div onClick={() => navigate(`/post/${attachments.post._id}`, { resolve: false })} role="button">
-								<DisplayPostMinimal post={attachments.post}/>
+						<Show when={typeof attachments!.post === "string"}>
+							<Show when={attachments!.post !== nullId} fallback={<div class="text-bg-secondary border rounded p-3">The quoted post is not available.</div>}>
+								<A href={`/post/${attachments!.post as string}`} innerHTML={`${globalThis.location.origin}/post/${attachments!.post as string}`} {...({ resolve: false } as any)}></A>
+							</Show>
+						</Show>
+						<Show when={typeof attachments!.post === "object"}>
+							<div onClick={() => navigate(`/post/${(attachments!.post as Post)._id}`, { resolve: false })} role="button">
+								<DisplayPostMinimal post={attachments!.post as Post}/>
 							</div>
 						</Show>
 					</Show>

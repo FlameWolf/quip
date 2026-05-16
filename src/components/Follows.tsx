@@ -3,10 +3,11 @@ import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
 import type { Post, User } from "../types";
+import type { FollowsProps } from "../types/FollowsProps";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
-export default (props: Record<keyof any, any>) => {
+export default (props: FollowsProps) => {
 	const params = useParams();
 	const location = useLocation();
 	const profileUrl = createMemo(() => `${profileBaseUrl}/${params.handle}`);

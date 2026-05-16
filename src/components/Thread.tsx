@@ -5,10 +5,11 @@ import { useParams } from "@solidjs/router";
 import { setErrorStore } from "../stores/error-store";
 import { getErrorMessage, maxItemsToFetch } from "../library";
 import type { Post as PostType } from "../types";
+import type { ThreadProps } from "../types/ThreadProps";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 
-export default (props: Record<keyof any, any>) => {
+export default (props: ThreadProps) => {
 	let loadMoreButton: HTMLButtonElement | undefined;
 	const params = useParams();
 	const postId = createMemo(() => params.postId);
@@ -78,7 +79,7 @@ export default (props: Record<keyof any, any>) => {
 			<Show when={parentPost()}>
 				<div class="mb-4">
 					<h5>In reply to:</h5>
-					<DisplayPost post={parentPost()}/>
+					<DisplayPost post={parentPost()!}/>
 				</div>
 			</Show>
 			<Show when={!post()}>
@@ -97,7 +98,7 @@ export default (props: Record<keyof any, any>) => {
 			</Show>
 			<Show when={post()}>
 				<div class="fs-5">
-					<DisplayPost post={post()}/>
+					<DisplayPost post={post()!}/>
 				</div>
 			</Show>
 			<Show when={postReplies()?.length}>

@@ -6,10 +6,11 @@ import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage } from "../library";
 import { Dropdown } from "bootstrap";
 import type { User } from "../types";
+import type { ProfileProps } from "../types/ProfileProps";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
-export default (props: Record<keyof any, any>) => {
+export default (props: ProfileProps) => {
 	let muteButton!: HTMLButtonElement;
 	let muteMenuToggle!: HTMLButtonElement;
 	let blockButton!: HTMLButtonElement;

@@ -5,10 +5,11 @@ import { quipStore, setQuipStore } from "../stores/quip-store";
 import { setErrorStore } from "../stores/error-store";
 import Editor from "./Editor";
 import DisplayPostList from "./DisplayPostList";
+import type { HomeProps } from "../types/HomeProps";
 
 const postsUrl = `${import.meta.env.VITE_API_BASE_URL}/timeline`;
 
-export default (props: Record<keyof any, any>) => {
+export default (props: HomeProps) => {
 	let loadMoreButton: HTMLButtonElement | undefined;
 	const navigate = useNavigate();
 	const [lastPostId, setLastPostId] = createSignal(emptyString);

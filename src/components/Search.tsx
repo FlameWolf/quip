@@ -3,6 +3,7 @@ import { useSearchParams, A, SearchParams } from "@solidjs/router";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
 import type { Post, User } from "../types";
+import type { SearchProps } from "../types/SearchProps";
 import DisplayPost from "./DisplayPost";
 
 type SearchResult = Post | User;
@@ -154,7 +155,7 @@ Sample Result:
 }
 */
 
-export default (props: Record<keyof any, any>) => {
+export default (props: SearchProps) => {
 	let loadMoreButton: HTMLButtonElement | undefined;
 	const [searchParams] = useSearchParams();
 	const [isUserSearch, setIsUserSearch] = createSignal(false);
