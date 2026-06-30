@@ -16,7 +16,6 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const authBaseUrl = `${apiBaseUrl}/auth`;
 const refreshTokenUrl = `${authBaseUrl}/refresh-token`;
 const authChannelName = import.meta.env.VITE_AUTH_CHANNEL_NAME;
-
 const initPayload = {
 	action: "init",
 	payload: {
@@ -29,10 +28,6 @@ const initPayload = {
 		getAuthDataAction: import.meta.env.VITE_GET_AUTH_DATA_ACTION
 	}
 };
-
-// On the first visit the page is not yet controlled, so `controller` is null and a
-// plain postMessage would be silently dropped. Fall back to the active worker once
-// it is ready so the env/auth seed is always delivered.
 const postToWorker = (message: { action: string; payload?: any }) => {
 	const controller = navigator.serviceWorker.controller;
 	if (controller) {

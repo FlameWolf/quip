@@ -18,7 +18,6 @@ export default (props: HomeProps) => {
 	const [exhausted, setExhausted] = createSignal(false);
 	const [page] = createResource(cursor, async lastPostId => {
 		if (!lastPostId) {
-			// Reset on the initial load so a failed reload never shows a prior session's posts.
 			setQuipStore("quips", []);
 		}
 		try {

@@ -45,7 +45,6 @@ lastUserId	string	(query)
 */
 
 const searchUrl = `${import.meta.env.VITE_API_BASE_URL}/search`;
-
 const parseQueryTokens = (query: Partial<SearchParams>) => {
 	const tokens: Record<string, string> = {};
 	const searchText: string[] = [];
@@ -108,8 +107,6 @@ export default (props: SearchProps) => {
 			return (isUserSearch() ? data.users : data.posts) as SearchResult[];
 		}
 	);
-	// Branch the rendering on the actual result shape (posts carry `content`) rather than the
-	// live query, so a mid-navigation render of the previous result set never renders the wrong markup.
 	const isUserResult = createMemo(() => {
 		const first = list.items()[0];
 		return first ? !("content" in first) : isUserSearch();
