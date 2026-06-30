@@ -17,7 +17,7 @@ const authBaseUrl = `${apiBaseUrl}/auth`;
 const refreshTokenUrl = `${authBaseUrl}/refresh-token`;
 const authChannelName = import.meta.env.VITE_AUTH_CHANNEL_NAME;
 
-navigator.serviceWorker.controller?.postMessage({
+const initPayload = {
 	action: "init",
 	payload: {
 		apiBaseUrl,
@@ -28,7 +28,21 @@ navigator.serviceWorker.controller?.postMessage({
 		setAuthDataAction: import.meta.env.VITE_SET_AUTH_DATA_ACTION,
 		getAuthDataAction: import.meta.env.VITE_GET_AUTH_DATA_ACTION
 	}
-});
+};
+
+// On the first visit the page is not yet controlled, so `controller` is null and a
+// plain postMessage would be silently dropped. Fall back to the active worker once
+// it is ready so the env/auth seed is always delivered.
+const postToWorker = (message: { action: string; payload?: any }) => {
+	const controller = navigator.serviceWorker.controller;
+	if (controller) {
+		controller.postMessage(message);
+		return;
+	}
+	navigator.serviceWorker.ready.then(registration => registration.active?.postMessage(message)).catch(() => {});
+};
+
+postToWorker(initPayload);
 
 export default (props: AppProps) => {
 	const location = useLocation();
@@ -52,7 +66,7 @@ export default (props: AppProps) => {
 			createdAt: emptyString,
 			expiresIn: emptyString
 		});
-		navigator.serviceWorker.controller?.postMessage({
+		postToWorker({
 			action: import.meta.env.VITE_SET_AUTH_DATA_ACTION,
 			payload: { ...authStore }
 		});
@@ -95,12 +109,15 @@ export default (props: AppProps) => {
 				navigate("/auth", { resolve: false });
 			}
 		});
-		navigator.serviceWorker.controller?.postMessage({
+		navigator.serviceWorker.addEventListener("controllerchange", () => postToWorker(initPayload));
+		postToWorker({
 			action: import.meta.env.VITE_GET_AUTH_DATA_ACTION
 		});
 		if (imgMenu!) {
 			new Dropdown(imgMenu);
 		}
+	});
+	createEffect(() => {
 		if (basePath() === "search") {
 			populateSearchInput();
 		}
@@ -167,7 +184,7 @@ export default (props: AppProps) => {
 			</div>
 			<Show when={errorStore.message}>
 				<div ref={errorAlert!} class="alert alert-warning position-fixed top-0 start-50 translate-middle-x mt-2" role="alert">
-					<div class="me-4" innerHTML={errorStore.message}></div>
+					<div class="me-4">{errorStore.message}</div>
 					<button type="button" class="btn-close position-absolute top-50 end-0 translate-middle-y me-2" onClick={dismissAlert} aria-label="Close"></button>
 				</div>
 			</Show>

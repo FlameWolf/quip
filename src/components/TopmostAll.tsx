@@ -1,55 +1,34 @@
-import { createEffect, createSignal, For, on, Show } from "solid-js";
+import { createMemo, createSignal, For, Show, Suspense } from "solid-js";
 import { setErrorStore } from "../stores/error-store";
-import DisplayPostList from "./DisplayPostList";
-import { getErrorMessage, maxItemsToFetch } from "../library";
+import { emptyString, getErrorMessage } from "../library";
+import { createInfiniteList } from "../hooks/createInfiniteList";
 import type { Post } from "../types";
 import type { TopmostAllProps } from "../types/TopmostAllProps";
+import DisplayPostList from "./DisplayPostList";
+import { EmptyState, LoadMore, Spinner } from "./Common";
 
 const topmostUrl = `${import.meta.env.VITE_API_BASE_URL}/topmost`;
 const sortOptions = ["Day", "Week", "Month", "Year", "All"];
 
 export default (props: TopmostAllProps) => {
 	const [sortBy, setSortBy] = createSignal(sortOptions[0]);
-	const [topPosts, setTopPosts] = createSignal<Post[]>([]);
-	const [lastPostId, setLastPostId] = createSignal<string | undefined>();
-	const [lastScore, setLastScore] = createSignal<number | undefined>();
-	const [hasMore, setHasMore] = createSignal(true);
-	const loadTopPosts = async () => {
+	const list = createInfiniteList<Post>(sortBy, async (sortOption, lastItem) => {
 		const queryParams = new URLSearchParams();
-		const currentLastPostId = lastPostId();
-		if (currentLastPostId) {
-			queryParams.append("lastPostId", currentLastPostId);
+		if (lastItem) {
+			queryParams.append("lastPostId", lastItem._id);
+			if (lastItem.score) {
+				queryParams.append("lastScore", String(lastItem.score));
+			}
 		}
-		const currentLastScore = lastScore();
-		if (currentLastScore) {
-			queryParams.append("lastScore", String(currentLastScore));
-		}
-		const response = await fetch(`${topmostUrl}/${sortBy().toLowerCase()}${queryParams.size ? `?${queryParams.toString()}` : ""}`);
+		const response = await fetch(`${topmostUrl}/${sortOption.toLowerCase()}${queryParams.size ? `?${queryParams}` : emptyString}`);
 		if (!response.ok) {
 			setErrorStore("message", await getErrorMessage(response));
-			return;
+			return null;
 		}
-		const posts = (await response.json()).posts;
-		const lastPost = posts.at(-1);
-		setTopPosts(topPosts().concat(posts));
-		setLastPostId(lastPost._id);
-		setLastScore(lastPost.score || 0);
-		if (posts.length < maxItemsToFetch || (lastScore() ?? 0) < 1) {
-			setHasMore(false);
-		}
-	};
-	createEffect(
-		on(sortBy, async (curr, prev) => {
-			document.querySelector(`input[name="sort-option"][value="${curr}"]`)?.dispatchEvent(new MouseEvent("click"));
-			if (curr !== prev) {
-				setTopPosts([]);
-				setLastPostId(undefined);
-				setLastScore(undefined);
-				setHasMore(true);
-				await loadTopPosts();
-			}
-		})
-	);
+		return (await response.json()).posts as Post[];
+	});
+	// Top posts are exhausted once a page is short or the trailing score drops below 1.
+	const hasMore = createMemo(() => list.hasMore() && (list.items().at(-1)?.score ?? 0) >= 1);
 	return (
 		<>
 			<div class="btn-group d-none d-sm-flex w-100" role="group" aria-label="Sort top posts by">
@@ -58,7 +37,7 @@ export default (props: TopmostAllProps) => {
 						const itemId = `sort-option-${index() + 1}`;
 						return (
 							<>
-								<input id={itemId} type="radio" class="btn-check" name="sort-option" value={option} onInput={() => setSortBy(option)}/>
+								<input id={itemId} type="radio" class="btn-check" name="sort-option" value={option} checked={option === sortBy()} onInput={() => setSortBy(option)}/>
 								<label class="btn btn-outline-primary" for={itemId}>{option}</label>
 							</>
 						);
@@ -66,10 +45,10 @@ export default (props: TopmostAllProps) => {
 				</For>
 			</div>
 			<div class="dropdown d-block d-sm-none">
-				<button class="btn btn-secondary dropdown-toggle w-100" innerHTML={sortBy()} data-bs-toggle="dropdown" aria-expanded="false"></button>
+				<button class="btn btn-secondary dropdown-toggle w-100" data-bs-toggle="dropdown" aria-expanded="false">{sortBy()}</button>
 				<ul class="dropdown-menu">
 					<For each={sortOptions}>
-						{(option, index) => (
+						{option => (
 							<li>
 								<a class="dropdown-item" onClick={() => setSortBy(option)} role="button">{option}</a>
 							</li>
@@ -78,17 +57,12 @@ export default (props: TopmostAllProps) => {
 				</ul>
 			</div>
 			<div class="mt-4">
-				<Show when={!topPosts().length}>
-					<div class="d-flex justify-content-center align-items-center text-info border border-info rounded p-3">
-						<div>No posts to display.</div>
-					</div>
-				</Show>
-				<Show when={topPosts().length}>
-					<DisplayPostList posts={topPosts()}/>
-					<div class="my-2">
-						<button class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Posts"} disabled={!hasMore()} onClick={loadTopPosts}></button>
-					</div>
-				</Show>
+				<Suspense fallback={<Spinner/>}>
+					<Show when={list.items().length} fallback={<EmptyState/>}>
+						<DisplayPostList posts={list.items()}/>
+						<LoadMore hasMore={hasMore()} loading={list.loadingMore()} onClick={list.loadMore}/>
+					</Show>
+				</Suspense>
 			</div>
 		</>
 	);

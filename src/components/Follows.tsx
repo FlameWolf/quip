@@ -1,19 +1,20 @@
 import { useParams, useLocation, A } from "@solidjs/router";
-import { createMemo, createSignal, For, onMount, Show } from "solid-js";
+import { createMemo, For, Show, Suspense } from "solid-js";
 import { setErrorStore } from "../stores/error-store";
-import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
-import type { Post, User } from "../types";
+import { emptyString, getErrorMessage } from "../library";
+import { createInfiniteList } from "../hooks/createInfiniteList";
+import type { User } from "../types";
 import type { FollowsProps } from "../types/FollowsProps";
+import { LoadMore, Spinner } from "./Common";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
 export default (props: FollowsProps) => {
 	const params = useParams();
 	const location = useLocation();
-	const profileUrl = createMemo(() => `${profileBaseUrl}/${params.handle}`);
-	const { [2]: pathToUse } = location.pathname.split("/");
-	const userKey = (() => {
-		switch (pathToUse) {
+	const pathToUse = createMemo(() => location.pathname.split("/")[2]);
+	const userKey = createMemo(() => {
+		switch (pathToUse()) {
 			case "following":
 				return "user";
 			case "followers":
@@ -21,60 +22,43 @@ export default (props: FollowsProps) => {
 			default:
 				throw new Error("Invalid path");
 		}
-	})();
-	const [follows, setFollows] = createSignal<User[]>([]);
-	const [lastFollowId, setLastFollowId] = createSignal(emptyString);
-	const [hasMore, setHasMore] = createSignal(true);
-	const fetchFollows = async () => {
-		if (!hasMore()) {
-			return;
-		}
-		try {
-			const response = await fetch(`${profileUrl()}/${pathToUse}${lastFollowId() ? `?lastFollowId=${lastFollowId()}` : emptyString}`);
+	});
+	const list = createInfiniteList<User>(
+		() => `${params.handle}:${pathToUse()}`,
+		async (_key, lastItem) => {
+			const response = await fetch(`${profileBaseUrl}/${params.handle}/${pathToUse()}${lastItem ? `?lastFollowId=${lastItem._id}` : emptyString}`);
 			if (!response.ok) {
 				setErrorStore("message", await getErrorMessage(response));
-				return;
+				return null;
 			}
-			const data = (await response.json())?.[pathToUse] as Array<{ [userKey: string]: User }>;
-			const fetchedCount = data?.length ?? 0;
-			if (fetchedCount < maxItemsToFetch) {
-				setHasMore(false);
-			}
-			if (fetchedCount > 0) {
-				setFollows(follows().concat(data.map(x => x[userKey])));
-				setLastFollowId(data[fetchedCount - 1][userKey]._id);
-			}
-		} catch (err: any) {
-			setErrorStore("message", err.messsage);
+			const data = (await response.json())?.[pathToUse()] as Array<Record<string, User>>;
+			return (data ?? []).map(entry => entry[userKey()]);
 		}
-	};
-	onMount(async () => {
-		await fetchFollows();
-	});
+	);
 	return (
-		<Show when={follows().length}>
-			<ul class="list-group">
-				<For each={follows()}>
-					{follow => (
-						<li class="list-group-item">
-							<h3>
-								<A href={`/${follow.handle}`}>{follow.handle}</A>
-							</h3>
-							<div class="d-flex gap-2">
-								{follow.protected && <div class="badge text-bg-info">Protected</div>}
-								{follow.deactivated && <div class="badge text-bg-info">Deactivated</div>}
-								{follow.followedByMe && pathToUse === "followers" && <div class="badge text-bg-info">Followed by you</div>}
-								{follow.followedMe && pathToUse === "following" && <div class="badge text-bg-info">Followed you</div>}
-								{follow.mutedByMe && <div class="badge text-bg-info">Muted by you</div>}
-							</div>
-							<p>{follow.postsCount} {follow.postsCount === 1 ? "post" : "posts"}</p>
-						</li>
-					)}
-				</For>
-			</ul>
-			<div class="my-2">
-				<button class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Results"} onClick={fetchFollows} disabled={!hasMore()}></button>
-			</div>
-		</Show>
+		<Suspense fallback={<Spinner/>}>
+			<Show when={list.items().length}>
+				<ul class="list-group">
+					<For each={list.items()}>
+						{follow => (
+							<li class="list-group-item">
+								<h3>
+									<A href={`/${follow.handle}`}>{follow.handle}</A>
+								</h3>
+								<div class="d-flex gap-2">
+									{follow.protected && <div class="badge text-bg-info">Protected</div>}
+									{follow.deactivated && <div class="badge text-bg-info">Deactivated</div>}
+									{follow.followedByMe && pathToUse() === "followers" && <div class="badge text-bg-info">Followed by you</div>}
+									{follow.followedMe && pathToUse() === "following" && <div class="badge text-bg-info">Followed you</div>}
+									{follow.mutedByMe && <div class="badge text-bg-info">Muted by you</div>}
+								</div>
+								<p>{follow.postsCount} {follow.postsCount === 1 ? "post" : "posts"}</p>
+							</li>
+						)}
+					</For>
+				</ul>
+				<LoadMore hasMore={list.hasMore()} loading={list.loadingMore()} doneLabel="No More Results" onClick={list.loadMore}/>
+			</Show>
+		</Suspense>
 	);
 };

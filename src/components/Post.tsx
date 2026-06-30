@@ -1,139 +1,95 @@
-import { createEffect, createMemo, createSignal, onCleanup, Show } from "solid-js";
+import { createEffect, createResource, onCleanup, Show, Suspense } from "solid-js";
 import DisplayPost from "./DisplayPost";
 import DisplayPostList from "./DisplayPostList";
 import { useNavigate, useParams } from "@solidjs/router";
 import { setErrorStore } from "../stores/error-store";
-import { emptyString, getErrorMessage, maxItemsToFetch, nullId } from "../library";
+import { emptyString, getErrorMessage, nullId } from "../library";
+import { createInfiniteList } from "../hooks/createInfiniteList";
 import { TbOutlineJumpRope } from "solid-icons/tb";
 import { Tooltip } from "bootstrap";
 import type { Post as PostType } from "../types";
 import type { PostProps } from "../types/PostProps";
+import { LoadMore, Spinner } from "./Common";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 
 export default (props: PostProps) => {
-	let threadViewbutton!: HTMLButtonElement;
-	let threadViewTooltip: Tooltip;
-	let loadMoreButton!: HTMLButtonElement;
+	let threadViewButton!: HTMLButtonElement;
+	let threadViewTooltip: Tooltip | undefined;
 	const params = useParams();
 	const navigate = useNavigate();
-	const postId = createMemo(() => params.postId);
-	const [post, setPost] = createSignal<PostType | null>(null);
-	const [parentPost, setParentPost] = createSignal<PostType | null>(null);
-	const [postReplies, setPostReplies] = createSignal<PostType[]>([]);
-	const [lastReplyId, setLastReplyId] = createSignal<string | null>(null);
-	const [hasMore, setHasMore] = createSignal(false);
-	const [hasError, setHasError] = createSignal(false);
-	const fetchPost = async () => {
+	const postId = () => params.postId;
+	const [post] = createResource(postId, async id => {
 		try {
-			const response = await fetch(`${postsBaseUrl}/${postId()}`);
-			if (!response.ok) {
-				setHasError(true);
-				setErrorStore("message", await getErrorMessage(response));
-				return;
-			}
-			setHasError(false);
-			setPost((await response.json()).post);
-		} catch (err: any) {
-			setErrorStore("message", err.message);
-		}
-	};
-	const fetchParentPost = async () => {
-		try {
-			const response = await fetch(`${postsBaseUrl}/${postId()}/parent`);
-			setParentPost(response.ok ? (await response.json()).parent : null);
-		} catch (err: any) {
-			setErrorStore("message", err.message);
-		}
-	};
-	const loadReplies = async () => {
-		try {
-			const response = await fetch(`${postsBaseUrl}/${postId()}/replies${lastReplyId() ? `?lastReplyId=${lastReplyId()}` : emptyString}`);
+			const response = await fetch(`${postsBaseUrl}/${id}`);
 			if (!response.ok) {
 				setErrorStore("message", await getErrorMessage(response));
-				return;
+				return null;
 			}
-			const loadedReplies = (await response.json()).replies;
-			setPostReplies(postReplies().concat(loadedReplies));
-			if (loadedReplies.length === maxItemsToFetch) {
-				setHasMore(true);
-				setLastReplyId(loadedReplies.at(-1)._id);
-			} else {
-				setHasMore(false);
-			}
+			return (await response.json()).post as PostType;
 		} catch (err: any) {
 			setErrorStore("message", err.message);
+			return null;
 		}
-	};
-	createEffect(async () => {
-		if (postId()) {
-			setPost(null);
-			setParentPost(null);
-			setPostReplies([]);
-			setLastReplyId(null);
-			setHasMore(false);
-			await fetchPost();
-			await fetchParentPost();
-			await loadReplies();
+	});
+	const [parent] = createResource(postId, async id => {
+		try {
+			const response = await fetch(`${postsBaseUrl}/${id}/parent`);
+			return response.ok ? ((await response.json()).parent as PostType) : null;
+		} catch (err: any) {
+			setErrorStore("message", err.message);
+			return null;
 		}
+	});
+	const replies = createInfiniteList<PostType>(postId, async (id, lastItem) => {
+		const response = await fetch(`${postsBaseUrl}/${id}/replies${lastItem ? `?lastReplyId=${lastItem._id}` : emptyString}`);
+		if (!response.ok) {
+			setErrorStore("message", await getErrorMessage(response));
+			return null;
+		}
+		return (await response.json()).replies as PostType[];
 	});
 	createEffect(() => {
+		threadViewTooltip?.dispose();
 		if (post()) {
-			threadViewTooltip = new Tooltip(threadViewbutton, {
-				trigger: "hover",
-				title: "Thread View"
-			});
+			threadViewTooltip = new Tooltip(threadViewButton, { trigger: "hover", title: "Thread View" });
 		}
 	});
-	onCleanup(() => {
-		threadViewTooltip?.dispose();
-	});
+	onCleanup(() => threadViewTooltip?.dispose());
 	return (
 		<>
-			<Show when={parentPost()}>
-				<div class="mb-4">
-					<h5>In reply to:</h5>
-					<DisplayPost post={parentPost()!}/>
-				</div>
-			</Show>
-			<Show when={post()?.replyTo === nullId || (post()?.replyTo && !parentPost())}>
-				<div class="text-bg-secondary border rounded p-3 mb-2">The parent post is not available.</div>
-			</Show>
-			<Show when={!post()}>
-				<Show when={!hasError()}>
-					<div class="text-center mt-4">
-						<div class="spinner-border" role="status">
-							<span class="visually-hidden">Loading...</span>
-						</div>
+			<Suspense fallback={<Spinner/>}>
+				<Show when={parent()}>
+					<div class="mb-4">
+						<h5>In reply to:</h5>
+						<DisplayPost post={parent()!}/>
 					</div>
 				</Show>
-				<Show when={hasError()}>
-					<div class="alert alert-info mt-4" role="alert">
-						<span>Failed to load post.</span>
+				<Show when={post()?.replyTo === nullId || (post()?.replyTo && !parent())}>
+					<div class="text-bg-secondary border rounded p-3 mb-2">The parent post is not available.</div>
+				</Show>
+				<Show when={post()} fallback={<div class="alert alert-info mt-4" role="alert"><span>Failed to load post.</span></div>}>
+					<div class="d-flex justify-content-end">
+						<button ref={threadViewButton} class="btn btn-outline-primary" onClick={() => navigate(`/thread/${postId()}`)} aria-label="Thread View">
+							<TbOutlineJumpRope/>
+						</button>
+					</div>
+					<div class="fs-5">
+						<DisplayPost post={post()!}/>
 					</div>
 				</Show>
-			</Show>
-			<Show when={post()}>
-				<div class="d-flex justify-content-end">
-					<button ref={threadViewbutton} class="btn btn-outline-primary" onClick={() => navigate(`/thread/${postId()}`)} aria-label="Thread View">
-						<TbOutlineJumpRope/>
-					</button>
-				</div>
-				<div class="fs-5">
-					<DisplayPost post={post()!}/>
-				</div>
-			</Show>
-			<Show when={postReplies()?.length}>
-				<div class="mt-4">
-					<h5>Replies:</h5>
-					<DisplayPostList posts={postReplies()}/>
-				</div>
-				<Show when={hasMore()}>
-					<div class="my-2">
-						<button ref={loadMoreButton} class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Replies"} onClick={loadReplies}></button>
+			</Suspense>
+			<Suspense>
+				<Show when={replies.items().length}>
+					<div class="mt-4">
+						<h5>Replies:</h5>
+						<DisplayPostList posts={replies.items()}/>
 					</div>
+					<Show when={replies.hasMore()}>
+						<LoadMore hasMore={replies.hasMore()} loading={replies.loadingMore()} doneLabel="No More Replies" onClick={replies.loadMore}/>
+					</Show>
 				</Show>
-			</Show>
+			</Suspense>
 		</>
 	);
 };

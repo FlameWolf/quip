@@ -81,29 +81,33 @@ export const insertEmojo = (elem: HTMLTextAreaElement, emojo: string, callback: 
 
 export const getGraphemeClusterCount = (text: string) => Array.from(segmenter.segment(text)).length;
 
+export const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+
 export const trimPost = (text: string) => {
 	return text && getGraphemeClusterCount(text) > 20
 		? `${Array.from(segmenter.segment(text))
 				.slice(0, 20)
 				.map(x => x.segment)
-				.join(emptyString)}&#x2026;`
+				.join(emptyString)}…`
 		: text;
 };
 
 export const convertToLink = (token: string, linkType: LinkType) => {
 	if (linkType === "url") {
-		return `<a href="${token}">${token}</a>`;
+		const safeToken = escapeHtml(token);
+		return `<a href="${safeToken}">${safeToken}</a>`;
 	}
-	return token.replace(/[@#]/, emptyString).replace(/[\p{L}\p{M}]+/u, value => {
-		switch (linkType) {
-			case "mention":
-				return `<a href="/${value}">@${value}</a>`;
-			case "hashtag":
-				return `<a href="/hashtag/${value}">#${value}</a>`;
-			default:
-				return value;
-		}
-	});
+	// Linkify only the leading handle/tag (letters and marks); escape everything around it so markup cannot break out.
+	const body = token.replace(/[@#]/, emptyString);
+	const match = body.match(/[\p{L}\p{M}]+/u);
+	if (!match) {
+		return escapeHtml(token);
+	}
+	const value = match[0];
+	const before = escapeHtml(body.slice(0, match.index));
+	const after = escapeHtml(body.slice(match.index! + value.length));
+	const link = linkType === "mention" ? `<a href="/${value}">@${value}</a>` : `<a href="/hashtag/${value}">#${value}</a>`;
+	return `${before}${link}${after}`;
 };
 
 export const parseContent = (text: string | undefined) => {
@@ -123,10 +127,10 @@ export const parseContent = (text: string | undefined) => {
 				if (token[0] === "#") {
 					return convertToLink(token, "hashtag");
 				}
-				return token;
+				return escapeHtml(token);
 			})
 			.join(emptyString)
-			.replace(/\n/g, "<br/>") ?? text
+			.replace(/\n/g, "<br/>") ?? escapeHtml(text)
 	);
 };
 

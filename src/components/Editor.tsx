@@ -1,4 +1,4 @@
-import { createSignal, createMemo, onMount, Show, For, createEffect, on } from "solid-js";
+import { createSignal, createMemo, onMount, onCleanup, Show, For, createEffect, on } from "solid-js";
 import emojiData from "@emoji-mart/data";
 import { Picker } from "emoji-mart";
 import { computePosition, autoUpdate, offset, flip, shift } from "@floating-ui/dom";
@@ -118,17 +118,28 @@ export default (props: EditorProps) => {
 			}
 		}
 	};
+	let cleanupAutoUpdate: (() => void) | undefined;
+	const closeEmojiPicker = () => {
+		setHasEmojiPicker(false);
+		cleanupAutoUpdate?.();
+		cleanupAutoUpdate = undefined;
+	};
 	const dismissEmojiPicker = (event: Event) => {
 		const sender = event.target as HTMLButtonElement | Element;
 		if (!sender) {
 			return;
 		}
 		if (sender !== emojiTrigger && (sender.getRootNode?.() as ShadowRoot)?.host?.tagName !== "EM-EMOJI-PICKER") {
-			setHasEmojiPicker(false);
+			closeEmojiPicker();
 		}
 	};
 	const toggleEmojiMart = () => {
-		const cleanup = autoUpdate(emojiTrigger, emojiPickerContainer, async () => {
+		if (hasEmojiPicker()) {
+			closeEmojiPicker();
+			return;
+		}
+		setHasEmojiPicker(true);
+		cleanupAutoUpdate = autoUpdate(emojiTrigger, emojiPickerContainer, async () => {
 			const { x, y } = await computePosition(emojiTrigger, emojiPickerContainer, {
 				middleware: [offset(4), flip(), shift()]
 			});
@@ -137,11 +148,8 @@ export default (props: EditorProps) => {
 				top: `${y}px`
 			});
 		});
-		setHasEmojiPicker(!hasEmojiPicker());
-		if (!hasEmojiPicker()) {
-			cleanup();
-		}
 	};
+	onCleanup(() => cleanupAutoUpdate?.());
 	createEffect(
 		on(poll, value => {
 			if (!Object.getOwnPropertyNames(value).length) {

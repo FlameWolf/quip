@@ -1,10 +1,12 @@
-import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js";
+import { createMemo, For, Show, Suspense } from "solid-js";
 import { useSearchParams, A, SearchParams } from "@solidjs/router";
 import { setErrorStore } from "../stores/error-store";
-import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
+import { emptyString, getErrorMessage } from "../library";
+import { createInfiniteList } from "../hooks/createInfiniteList";
 import type { Post, User } from "../types";
 import type { SearchProps } from "../types/SearchProps";
 import DisplayPost from "./DisplayPost";
+import { LoadMore, Spinner } from "./Common";
 
 type SearchResult = Post | User;
 
@@ -26,39 +28,6 @@ media-desc	string	(query)
 lastScore	integer	(query)
 lastPostId	string	(query)
 
-Sample Result:
-----------------------
-{
-  "posts": [
-    {
-      "_id": "632ddac1bf1aee2eacdce984",
-      "content": "test",
-      "author": {
-        "_id": "624d96f871a9268f6c3cea1d",
-        "handle": "ulkka"
-      },
-      "languages": [
-        "xx"
-      ],
-      "createdAt": "2022-09-23T16:11:45.058Z",
-      "__v": 0
-    },
-    {
-      "_id": "64898a473d63631be6226d80",
-      "content": "Test quip.",
-      "author": {
-        "_id": "62540ed99bea74f5ec60901c",
-        "handle": "manthri"
-      },
-      "languages": [
-        "xx"
-      ],
-      "createdAt": "2023-06-14T09:37:11.152Z",
-      "__v": 0
-    }
-  ]
-}
-
 Nearby Search Parameters:
 ----------------------
 long *	number($float)	(query)
@@ -67,204 +36,84 @@ max-dist	integer	(query)
 lastDistance	number($double)	(query)
 lastPostId	string	(query)
 
-Sample Result:
-----------------------
-{
-  "posts": [
-    {
-      "_id": "62de381dab4bee4d0e7c8a3e",
-      "content": "Test.",
-      "author": {
-        "_id": "624d96f871a9268f6c3cea1d",
-        "handle": "ulkka"
-      },
-      "languages": [
-        "xx"
-      ],
-      "location": {
-        "type": "Point",
-        "coordinates": [
-          180,
-          90
-        ]
-      },
-      "createdAt": "2022-07-25T06:28:45.386Z",
-      "__v": 0,
-      "distance": 5.523154322275599e-10
-    },
-    {
-      "_id": "62de234ce82b01e65b1d9584",
-      "content": "asdf",
-      "author": {
-        "_id": "624d96f871a9268f6c3cea1d",
-        "handle": "ulkka"
-      },
-      "languages": [
-        "xx"
-      ],
-      "location": {
-        "type": "Point",
-        "coordinates": [
-          180,
-          90
-        ]
-      },
-      "createdAt": "2022-07-25T04:59:56.089Z",
-      "__v": 0,
-      "distance": 5.523154322275599e-10
-    }
-  ]
-}
-
 User Search Parameters:
 ----------------------
 q *	string	(query)
 match	string	(query) [exact, contains, startsWith, endsWith]
 date-order	string	(query) [desc, asc]
 lastUserId	string	(query)
-
-Sample Result:
-----------------------
-{
-  "users": [
-    {
-      "_id": "624d973c71a9268f6c3cea36",
-      "handle": "Unicorn",
-      "protected": false,
-      "deactivated": false,
-      "postsCount": 13,
-      "blockedByMe": false,
-      "blockedMe": false,
-      "requestedToFollowByMe": false,
-      "requestedToFollowMe": false,
-      "followedByMe": true,
-      "followedMe": true,
-      "mutedByMe": false
-    },
-    {
-      "_id": "624d96f871a9268f6c3cea1d",
-      "handle": "ulkka",
-      "protected": false,
-      "deactivated": false,
-      "postsCount": 130,
-      "self": true,
-      "following": 14,
-      "followers": 17
-    }
-  ]
-}
 */
 
-export default (props: SearchProps) => {
-	let loadMoreButton: HTMLButtonElement | undefined;
-	const [searchParams] = useSearchParams();
-	const [isUserSearch, setIsUserSearch] = createSignal(false);
-	const [lastScore, setLastScore] = createSignal<number | undefined>();
-	const [lastItemId, setLastItemId] = createSignal(emptyString);
-	const [hasMore, setHasMore] = createSignal(true);
-	const [searchResults, setSearchResults] = createSignal<SearchResult[]>([]);
-	const searchUrl = `${import.meta.env.VITE_API_BASE_URL}/search`;
-	const parseQueryTokens = (query: Partial<SearchParams>) => {
-		const tokens: Record<string, string> = {};
-		const parts = (query?.q as string)?.split(/\s+/) ?? [];
-		let searchText: string[] = [];
-		for (const part of parts) {
-			const match = part.match(/^([a-z-]+):(.+)$/);
-			if (match) {
-				const [, key, value] = match;
-				tokens[key] = value;
-			} else {
-				searchText.push(part);
-			}
+const searchUrl = `${import.meta.env.VITE_API_BASE_URL}/search`;
+
+const parseQueryTokens = (query: Partial<SearchParams>) => {
+	const tokens: Record<string, string> = {};
+	const searchText: string[] = [];
+	for (const part of (query?.q as string)?.split(/\s+/) ?? []) {
+		const match = part.match(/^([a-z-]+):(.+)$/);
+		if (match) {
+			tokens[match[1]] = match[2];
+		} else {
+			searchText.push(part);
 		}
-		return {
-			searchText: searchText.join(" "),
-			tokens
-		};
-	};
+	}
+	return { searchText: searchText.join(" ").trim(), tokens };
+};
+
+export default (props: SearchProps) => {
+	const [searchParams] = useSearchParams();
+	const isUserSearch = createMemo(() => parseQueryTokens(searchParams).tokens.users === "1");
 	const searchType = createMemo(() => {
 		const { tokens } = parseQueryTokens(searchParams);
 		if (tokens.nearby === "1") {
 			return "/nearby";
 		}
 		if (tokens.users === "1") {
-			setIsUserSearch(true);
 			return "/users";
 		}
-		setIsUserSearch(false);
 		return emptyString;
 	});
-	const buildSearchUrl = (includeLastItem = false) => {
+	const buildSearchUrl = (lastItem: SearchResult | undefined) => {
 		const { searchText, tokens } = parseQueryTokens(searchParams);
 		const params = new URLSearchParams();
-		if (searchText.trim()) {
-			params.append("q", searchText.trim());
+		if (searchText) {
+			params.append("q", searchText);
 		}
 		for (const [key, value] of Object.entries(tokens)) {
 			if (!["nearby", "users"].includes(key)) {
 				params.append(key, value);
 			}
 		}
-		if (includeLastItem && lastItemId()) {
-			const lastItemIdParamName = isUserSearch() ? "lastUserId" : "lastPostId";
-			params.append(lastItemIdParamName, lastItemId());
-			if (!isUserSearch() && lastScore()) {
+		if (lastItem) {
+			params.append(isUserSearch() ? "lastUserId" : "lastPostId", lastItem._id);
+			const score = (lastItem as Post).score;
+			if (!isUserSearch() && score) {
 				const sortBy = tokens["sort-by"] || emptyString;
 				if (!sortBy || sortBy === "match" || sortBy === "popular") {
-					params.append("lastScore", String(lastScore()));
+					params.append("lastScore", String(score));
 				}
 			}
 		}
-		return `${searchUrl}${searchType()}?${params.toString()}`;
+		return `${searchUrl}${searchType()}?${params}`;
 	};
-	const loadSearchResults = async (loadMore = false) => {
-		if (loadMore) {
-			await fetchAndAppendResults();
-		} else {
-			setSearchResults([]);
-			setLastItemId(emptyString);
-			setLastScore(undefined);
-			setHasMore(true);
-			await fetchAndAppendResults();
-		}
-	};
-	const fetchAndAppendResults = async () => {
-		try {
-			const url = buildSearchUrl(lastItemId() !== emptyString);
-			const response = await fetch(url);
+	const list = createInfiniteList<SearchResult>(
+		() => searchParams["q"] as string | undefined,
+		async (_query, lastItem) => {
+			const response = await fetch(buildSearchUrl(lastItem));
 			if (!response.ok) {
 				setErrorStore("message", await getErrorMessage(response));
-				return;
+				return null;
 			}
 			const data = await response.json();
-			const items = isUserSearch() ? data.users : data.posts;
-			const itemCount = items.length;
-			if (itemCount) {
-				const lastItem = items[itemCount - 1];
-				setLastItemId(lastItem._id);
-				if (!isUserSearch()) {
-					setLastScore(lastItem.score || 0);
-				}
-			}
-			if (itemCount < maxItemsToFetch) {
-				setHasMore(false);
-			}
-			setSearchResults(searchResults().concat(items));
-		} catch (err: any) {
-			setErrorStore("message", err.message);
+			return (isUserSearch() ? data.users : data.posts) as SearchResult[];
 		}
-	};
-	const handleLoadMore = async () => {
-		await loadSearchResults(true);
-	};
-	createEffect(
-		on(
-			() => searchParams["q"],
-			async () => {
-				await loadSearchResults(false);
-			}
-		)
 	);
+	// Branch the rendering on the actual result shape (posts carry `content`) rather than the
+	// live query, so a mid-navigation render of the previous result set never renders the wrong markup.
+	const isUserResult = createMemo(() => {
+		const first = list.items()[0];
+		return first ? !("content" in first) : isUserSearch();
+	});
 	return (
 		<>
 			<div class="alert alert-info">
@@ -282,45 +131,42 @@ export default (props: SearchProps) => {
 				</ul>
 			</div>
 			<h2>Search Results</h2>
-			<Show when={searchResults().length === 0}>
-				<p>No results found. Try a different search.</p>
-			</Show>
-			<Show when={!isUserSearch() && searchResults().length > 0}>
-				<For each={searchResults() as Post[]}>{result => <DisplayPost post={result}/>}</For>
-			</Show>
-			<Show when={isUserSearch() && searchResults().length > 0}>
-				<ul class="list-group">
-					<For each={searchResults() as User[]}>
-						{result => (
-							<li class="list-group-item">
-								<h3>
-									<A href={`/${result.handle}`}>{result.handle}</A>
-								</h3>
-								<div class="d-flex gap-2">
-									{result.protected && <div class="badge text-bg-info">Protected</div>}
-									{result.deactivated && <div class="badge text-bg-info">Deactivated</div>}
-									{result.self && <div class="badge text-bg-info">This is you</div>}
-									{(result.following ?? 0) > 0 && <div class="badge text-bg-info">Following: {result.following}</div>}
-									{(result.followers ?? 0) > 0 && <div class="badge text-bg-info">Followers: {result.followers}</div>}
-									{result.blockedByMe && <div class="badge text-bg-info">Blocked by you</div>}
-									{result.blockedMe && <div class="badge text-bg-info">Blocked you</div>}
-									{result.requestedToFollowByMe && <div class="badge text-bg-info">Follow requested by you</div>}
-									{result.requestedToFollowMe && <div class="badge text-bg-info">Follow requested you</div>}
-									{result.followedByMe && <div class="badge text-bg-info">Followed by you</div>}
-									{result.followedMe && <div class="badge text-bg-info">Followed you</div>}
-									{result.mutedByMe && <div class="badge text-bg-info">Muted by you</div>}
-								</div>
-								<p>{result.postsCount} {result.postsCount === 1 ? "post" : "posts"}</p>
-							</li>
-						)}
-					</For>
-				</ul>
-			</Show>
-			<Show when={searchResults().length > 0}>
-				<div class="my-2">
-					<button ref={loadMoreButton} class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Results"} onClick={handleLoadMore} disabled={!hasMore()}></button>
-				</div>
-			</Show>
+			<Suspense fallback={<Spinner/>}>
+				<Show when={list.items().length} fallback={<p>No results found. Try a different search.</p>}>
+					<Show when={!isUserResult()}>
+						<For each={list.items() as Post[]}>{result => <DisplayPost post={result}/>}</For>
+					</Show>
+					<Show when={isUserResult()}>
+						<ul class="list-group">
+							<For each={list.items() as User[]}>
+								{result => (
+									<li class="list-group-item">
+										<h3>
+											<A href={`/${result.handle}`}>{result.handle}</A>
+										</h3>
+										<div class="d-flex gap-2">
+											{result.protected && <div class="badge text-bg-info">Protected</div>}
+											{result.deactivated && <div class="badge text-bg-info">Deactivated</div>}
+											{result.self && <div class="badge text-bg-info">This is you</div>}
+											{(result.following ?? 0) > 0 && <div class="badge text-bg-info">Following: {result.following}</div>}
+											{(result.followers ?? 0) > 0 && <div class="badge text-bg-info">Followers: {result.followers}</div>}
+											{result.blockedByMe && <div class="badge text-bg-info">Blocked by you</div>}
+											{result.blockedMe && <div class="badge text-bg-info">Blocked you</div>}
+											{result.requestedToFollowByMe && <div class="badge text-bg-info">Follow requested by you</div>}
+											{result.requestedToFollowMe && <div class="badge text-bg-info">Follow requested you</div>}
+											{result.followedByMe && <div class="badge text-bg-info">Followed by you</div>}
+											{result.followedMe && <div class="badge text-bg-info">Followed you</div>}
+											{result.mutedByMe && <div class="badge text-bg-info">Muted by you</div>}
+										</div>
+										<p>{result.postsCount} {result.postsCount === 1 ? "post" : "posts"}</p>
+									</li>
+								)}
+							</For>
+						</ul>
+					</Show>
+					<LoadMore hasMore={list.hasMore()} loading={list.loadingMore()} doneLabel="No More Results" onClick={list.loadMore}/>
+				</Show>
+			</Suspense>
 		</>
 	);
 };
