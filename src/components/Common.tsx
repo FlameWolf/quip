@@ -19,8 +19,6 @@ export const EmptyState = (props: { children?: JSX.Element }) => (
 
 export const LoadMore = (props: { hasMore: boolean; loading?: boolean; doneLabel?: string; onClick: () => void }) => (
 	<div class="my-2">
-		<button class="btn btn-primary form-control" disabled={!props.hasMore || props.loading} onClick={() => props.onClick()}>
-			{props.loading ? "Loading…" : props.hasMore ? "Load More" : props.doneLabel || "No More Posts"}
-		</button>
+		<button class="btn btn-primary form-control" disabled={!props.hasMore || props.loading} onClick={() => props.onClick()}>{props.loading ? "Loading…" : props.hasMore ? "Load More" : props.doneLabel || "No More Posts"}</button>
 	</div>
 );

@@ -2,10 +2,10 @@ import { createMemo, createSignal, For, Show, Suspense } from "solid-js";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage } from "../library";
 import { createInfiniteList } from "../hooks/createInfiniteList";
-import type { Post } from "../types";
-import type { TopmostAllProps } from "../types/TopmostAllProps";
 import DisplayPostList from "./DisplayPostList";
 import { EmptyState, LoadMore, Spinner } from "./Common";
+import type { Post } from "../types";
+import type { TopmostAllProps } from "../types/TopmostAllProps";
 
 const topmostUrl = `${import.meta.env.VITE_API_BASE_URL}/topmost`;
 const sortOptions = ["Day", "Week", "Month", "Year", "All"];

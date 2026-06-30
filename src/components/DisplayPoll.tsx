@@ -44,12 +44,18 @@ export default (props: DisplayPollProps) => {
 	};
 	return (
 		<div class="card-body poll">
-			<Show when={inactivePoll()} fallback={
-				<div class="d-flex flex-column poll-buttons">
-					<For each={options()}>{option => <button class="btn btn-outline-primary" onClick={() => castVote(option.key)}>{option.label}</button>}</For>
-					<button class="btn btn-primary" onClick={() => castVote("nota")}>NOTA</button>
-				</div>
-			}>
+			<Show
+				when={inactivePoll()}
+				fallback={
+					<div class="d-flex flex-column poll-buttons">
+						<For each={options()}>
+							{option => (
+								<button class="btn btn-outline-primary" onClick={() => castVote(option.key)}>{option.label}</button>
+							)}
+						</For>
+						<button class="btn btn-primary" onClick={() => castVote("nota")}>NOTA</button>
+					</div>
+				}>
 				<ul class="list-group">
 					<For each={options()}>
 						{option => (

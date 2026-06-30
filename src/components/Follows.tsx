@@ -3,9 +3,9 @@ import { createMemo, For, Show, Suspense } from "solid-js";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage } from "../library";
 import { createInfiniteList } from "../hooks/createInfiniteList";
+import { LoadMore, Spinner } from "./Common";
 import type { User } from "../types";
 import type { FollowsProps } from "../types/FollowsProps";
-import { LoadMore, Spinner } from "./Common";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 

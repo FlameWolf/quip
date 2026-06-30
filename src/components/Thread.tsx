@@ -5,9 +5,9 @@ import { useParams } from "@solidjs/router";
 import { setErrorStore } from "../stores/error-store";
 import { getErrorMessage } from "../library";
 import { createInfiniteList } from "../hooks/createInfiniteList";
+import { LoadMore, Spinner } from "./Common";
 import type { Post as PostType } from "../types";
 import type { ThreadProps } from "../types/ThreadProps";
-import { LoadMore, Spinner } from "./Common";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 
@@ -53,7 +53,13 @@ export default (props: ThreadProps) => {
 						<DisplayPost post={parent()!}/>
 					</div>
 				</Show>
-				<Show when={post()} fallback={<div class="alert alert-info mt-4" role="alert"><span>Failed to load post.</span></div>}>
+				<Show
+					when={post()}
+					fallback={
+						<div class="alert alert-info mt-4" role="alert">
+							<span>Failed to load post.</span>
+						</div>
+					}>
 					<div class="fs-5">
 						<DisplayPost post={post()!}/>
 					</div>

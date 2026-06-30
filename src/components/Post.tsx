@@ -7,9 +7,9 @@ import { emptyString, getErrorMessage, nullId } from "../library";
 import { createInfiniteList } from "../hooks/createInfiniteList";
 import { TbOutlineJumpRope } from "solid-icons/tb";
 import { Tooltip } from "bootstrap";
+import { LoadMore, Spinner } from "./Common";
 import type { Post as PostType } from "../types";
 import type { PostProps } from "../types/PostProps";
-import { LoadMore, Spinner } from "./Common";
 
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 
@@ -68,7 +68,13 @@ export default (props: PostProps) => {
 				<Show when={post()?.replyTo === nullId || (post()?.replyTo && !parent())}>
 					<div class="text-bg-secondary border rounded p-3 mb-2">The parent post is not available.</div>
 				</Show>
-				<Show when={post()} fallback={<div class="alert alert-info mt-4" role="alert"><span>Failed to load post.</span></div>}>
+				<Show
+					when={post()}
+					fallback={
+						<div class="alert alert-info mt-4" role="alert">
+							<span>Failed to load post.</span>
+						</div>
+					}>
 					<div class="d-flex justify-content-end">
 						<button ref={threadViewButton} class="btn btn-outline-primary" onClick={() => navigate(`/thread/${postId()}`)} aria-label="Thread View">
 							<TbOutlineJumpRope/>

@@ -3,10 +3,10 @@ import { Show, Suspense } from "solid-js";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage } from "../library";
 import { createInfiniteList } from "../hooks/createInfiniteList";
-import type { Post } from "../types";
-import type { HashtagProps } from "../types/HashtagProps";
 import DisplayPostList from "./DisplayPostList";
 import { EmptyState, LoadMore, Spinner } from "./Common";
+import type { Post } from "../types";
+import type { HashtagProps } from "../types/HashtagProps";
 
 const hashtagBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/hashtag`;
 

@@ -95,7 +95,9 @@ export default (props: DisplayPostProps) => {
 					</Show>
 					<Show when={repeatedBy}>
 						<span>&#xA0;</span>
-						<span>Repeated by<span class="handle">{repeatedBy!.handle}</span></span>
+						<span>
+							Repeated by<span class="handle">{repeatedBy!.handle}</span>
+						</span>
 					</Show>
 					<div class="ms-auto">
 						<A class="link-secondary" title={toLongDateString(createdAt)} href={`/post/${post._id}`} target="_self">{formatTimeAgo(createdAt)}</A>

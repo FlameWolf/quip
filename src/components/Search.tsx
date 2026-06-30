@@ -3,10 +3,10 @@ import { useSearchParams, A, SearchParams } from "@solidjs/router";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage } from "../library";
 import { createInfiniteList } from "../hooks/createInfiniteList";
-import type { Post, User } from "../types";
-import type { SearchProps } from "../types/SearchProps";
 import DisplayPost from "./DisplayPost";
 import { LoadMore, Spinner } from "./Common";
+import type { Post, User } from "../types";
+import type { SearchProps } from "../types/SearchProps";
 
 type SearchResult = Post | User;
 

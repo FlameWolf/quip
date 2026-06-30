@@ -22,7 +22,7 @@ export interface InfiniteList<T> {
 export const createInfiniteList = <T extends Identifiable>(key: Accessor<string | undefined>, fetchPage: (key: string, lastItem: T | undefined) => Promise<T[] | null>, cursorOf: (item: T) => string = item => item._id): InfiniteList<T> => {
 	const [cursor, setCursor] = createSignal(emptyString);
 	const [loadingMore, setLoadingMore] = createSignal(false);
-	const [, startLoadMore] = useTransition();
+	const [_, startLoadMore] = useTransition();
 	const source = createMemo(() => ({ key: key(), cursor: cursor() }));
 	const [page] = createResource(source, async ({ key, cursor }, info): Promise<ListState<T>> => {
 		if (!key) {

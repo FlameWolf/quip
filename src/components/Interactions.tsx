@@ -3,10 +3,10 @@ import { createMemo, Show, Suspense } from "solid-js";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage } from "../library";
 import { createInfiniteList } from "../hooks/createInfiniteList";
-import type { Bookmark, Favourite, Post } from "../types";
-import type { InteractionsProps } from "../types/InteractionsProps";
 import DisplayPostList from "./DisplayPostList";
 import { EmptyState, LoadMore, Spinner } from "./Common";
+import type { Bookmark, Favourite, Post } from "../types";
+import type { InteractionsProps } from "../types/InteractionsProps";
 
 type Interaction = Favourite | Bookmark | Post;
 

@@ -105,7 +105,6 @@ export interface ErrorState {
 
 export interface QuipState {
 	quips: Post[];
-	nextId: number;
 }
 
 export type LinkType = "url" | "mention" | "hashtag";

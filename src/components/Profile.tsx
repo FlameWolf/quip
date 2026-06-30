@@ -5,9 +5,9 @@ import { authStore } from "../stores/auth-store";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage } from "../library";
 import { Dropdown } from "bootstrap";
+import { Spinner } from "./Common";
 import type { User } from "../types";
 import type { ProfileProps } from "../types/ProfileProps";
-import { Spinner } from "./Common";
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
