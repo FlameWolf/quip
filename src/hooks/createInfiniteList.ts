@@ -19,20 +19,8 @@ export interface InfiniteList<T> {
 	loadMore: () => void;
 }
 
-/**
- * Drives a paginated "load more" list with `createResource` so the initial page
- * integrates with `<Suspense>` while subsequent pages append without flashing
- * the fallback. The list resets automatically whenever `key` changes, which
- * keeps the data in sync with route params instead of going stale on navigation.
- *
- * `fetchPage` receives the current `key` and the last accumulated item (or
- * `undefined` for a fresh page) and should return the next page, or `null` to
- * signal an already-reported error (the current items are then preserved).
- */
 export const createInfiniteList = <T extends Identifiable>(key: Accessor<string | undefined>, fetchPage: (key: string, lastItem: T | undefined) => Promise<T[] | null>, cursorOf: (item: T) => string = item => item._id): InfiniteList<T> => {
 	const [cursor, setCursor] = createSignal(emptyString);
-	// A dedicated flag rather than the transition's pending accessor, which is global and
-	// would also report true during unrelated route navigations.
 	const [loadingMore, setLoadingMore] = createSignal(false);
 	const [, startLoadMore] = useTransition();
 	const source = createMemo(() => ({ key: key(), cursor: cursor() }));
@@ -59,7 +47,6 @@ export const createInfiniteList = <T extends Identifiable>(key: Accessor<string 
 	});
 	const items = createMemo(() => page()?.items ?? []);
 	const hasMore = createMemo(() => !(page()?.done ?? false));
-	// Clear the load-more flag once the page request settles (success or error).
 	createEffect(() => {
 		if (!page.loading) {
 			setLoadingMore(false);
@@ -72,5 +59,10 @@ export const createInfiniteList = <T extends Identifiable>(key: Accessor<string 
 			startLoadMore(() => setCursor(cursorOf(lastItem)));
 		}
 	};
-	return { items, hasMore, loadingMore, loadMore };
+	return {
+		items,
+		hasMore,
+		loadingMore,
+		loadMore
+	};
 };

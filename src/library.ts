@@ -97,7 +97,6 @@ export const convertToLink = (token: string, linkType: LinkType) => {
 		const safeToken = escapeHtml(token);
 		return `<a href="${safeToken}">${safeToken}</a>`;
 	}
-	// Linkify only the leading handle/tag (letters and marks); escape everything around it so markup cannot break out.
 	const body = token.replace(/[@#]/, emptyString);
 	const match = body.match(/[\p{L}\p{M}]+/u);
 	if (!match) {

@@ -27,7 +27,6 @@ export default (props: TopmostAllProps) => {
 		}
 		return (await response.json()).posts as Post[];
 	});
-	// Top posts are exhausted once a page is short or the trailing score drops below 1.
 	const hasMore = createMemo(() => list.hasMore() && (list.items().at(-1)?.score ?? 0) >= 1);
 	return (
 		<>

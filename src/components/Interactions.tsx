@@ -30,9 +30,6 @@ export default (props: InteractionsProps) => {
 				throw new Error("Invalid path");
 		}
 	});
-	// Detect the shape rather than the live path: favourites/bookmarks wrap the post in
-	// a record, mentions are bare posts. This stays correct during the brief window where
-	// the router keeps the previous tab's data while navigating between tabs.
 	const toPost = (interaction: Interaction): Post => ("post" in interaction ? (interaction as Favourite | Bookmark).post : (interaction as Post));
 	const list = createInfiniteList<Interaction>(
 		() => `${params.handle}:${pathToUse()}`,
