@@ -49,6 +49,8 @@ export interface Post {
 	repeatedBy?: Author;
 	replyTo?: string;
 	voted?: string;
+	score?: number;
+	distance?: number;
 	__v: number;
 }
 

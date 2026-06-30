@@ -1,20 +1,23 @@
 import { useParams, useLocation } from "@solidjs/router";
-import { createMemo, createSignal, onMount, Show } from "solid-js";
+import { createMemo, Show, Suspense } from "solid-js";
 import { setErrorStore } from "../stores/error-store";
-import { emptyString, getErrorMessage, maxItemsToFetch } from "../library";
+import { emptyString, getErrorMessage } from "../library";
+import { createInfiniteList } from "../hooks/createInfiniteList";
 import type { Bookmark, Favourite, Post } from "../types";
 import type { InteractionsProps } from "../types/InteractionsProps";
 import DisplayPostList from "./DisplayPostList";
+import { EmptyState, LoadMore, Spinner } from "./Common";
+
+type Interaction = Favourite | Bookmark | Post;
 
 const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
 export default (props: InteractionsProps) => {
 	const params = useParams();
 	const location = useLocation();
-	const profileUrl = createMemo(() => `${profileBaseUrl}/${params.handle}`);
-	const { [2]: pathToUse } = location.pathname.split("/");
-	const lastInteractionIdKey = (() => {
-		switch (pathToUse) {
+	const pathToUse = createMemo(() => location.pathname.split("/")[2]);
+	const lastInteractionIdKey = createMemo(() => {
+		switch (pathToUse()) {
 			case "favourites":
 				return "lastFavouriteId";
 			case "votes":
@@ -26,63 +29,29 @@ export default (props: InteractionsProps) => {
 			default:
 				throw new Error("Invalid path");
 		}
-	})();
-	const [interactions, setInteractions] = createSignal<Array<Post>>([]);
-	const [lastInteractionId, setLastInteractionId] = createSignal(emptyString);
-	const [hasMore, setHasMore] = createSignal(true);
-	const fetchInteractions = async () => {
-		if (pathToUse !== "mentions" && !hasMore()) {
-			return;
-		}
-		try {
-			const response = await fetch(`${profileUrl()}/${pathToUse}${lastInteractionId() ? `?${lastInteractionIdKey}=${lastInteractionId()}` : emptyString}`);
+	});
+	// Detect the shape rather than the live path: favourites/bookmarks wrap the post in
+	// a record, mentions are bare posts. This stays correct during the brief window where
+	// the router keeps the previous tab's data while navigating between tabs.
+	const toPost = (interaction: Interaction): Post => ("post" in interaction ? (interaction as Favourite | Bookmark).post : (interaction as Post));
+	const list = createInfiniteList<Interaction>(
+		() => `${params.handle}:${pathToUse()}`,
+		async (_key, lastItem) => {
+			const response = await fetch(`${profileBaseUrl}/${params.handle}/${pathToUse()}${lastItem ? `?${lastInteractionIdKey()}=${lastItem._id}` : emptyString}`);
 			if (!response.ok) {
 				setErrorStore("message", await getErrorMessage(response));
-				return;
+				return null;
 			}
-			const data = (await response.json())?.[pathToUse] as Array<Favourite | Bookmark | Post>;
-			const fetchedCount = data?.length ?? 0;
-			if (fetchedCount < maxItemsToFetch) {
-				setHasMore(false);
-			}
-			if (fetchedCount > 0) {
-				setInteractions(
-					interactions().concat(
-						data.map(x => {
-							switch (pathToUse) {
-								case "favourites":
-								case "bookmarks":
-									return (x as Favourite | Bookmark).post;
-								case "votes":
-								case "mentions":
-								default:
-									return x as Post;
-							}
-						})
-					)
-				);
-				setLastInteractionId(data[fetchedCount - 1]._id);
-			}
-		} catch (err: any) {
-			setErrorStore("message", err.message);
+			return ((await response.json())?.[pathToUse()] as Interaction[]) ?? [];
 		}
-	};
-	onMount(async () => {
-		await fetchInteractions();
-	});
+	);
+	const posts = createMemo(() => list.items().map(toPost));
 	return (
-		<>
-			<Show when={!interactions().length}>
-				<div class="d-flex justify-content-center align-items-center text-info border border-info rounded p-3">
-					<div>No posts to display.</div>
-				</div>
+		<Suspense fallback={<Spinner/>}>
+			<Show when={posts().length} fallback={<EmptyState/>}>
+				<DisplayPostList posts={posts()}/>
+				<LoadMore hasMore={list.hasMore()} loading={list.loadingMore()} doneLabel="No More Results" onClick={list.loadMore}/>
 			</Show>
-			<Show when={interactions().length}>
-				<DisplayPostList posts={interactions()}/>
-				<div class="my-2">
-					<button class="btn btn-primary form-control" innerHTML={hasMore() ? "Load More" : "No More Results"} onClick={fetchInteractions} disabled={!hasMore()}></button>
-				</div>
-			</Show>
-		</>
+		</Suspense>
 	);
 };

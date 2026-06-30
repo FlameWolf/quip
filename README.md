@@ -42,41 +42,44 @@ Quip is a single-page application (SPA) that consumes the [Quip API v2](https://
 quip/
 ├── src/
 │   ├── components/
-│   │   ├── Auth.jsx                  # Auth layout (sign-in / sign-up shell)
-│   │   ├── SignIn.jsx                # Sign-in form
-│   │   ├── SignUp.jsx                # Sign-up form
-│   │   ├── Home.jsx                  # Timeline + composer
-│   │   ├── Search.jsx                # Search results
-│   │   ├── Post.jsx                  # Single post view
-│   │   ├── Thread.jsx                # Threaded conversation view
-│   │   ├── Profile.jsx               # User profile shell (tabs)
-│   │   ├── Quips.jsx                 # A user's posts list
-│   │   ├── Interactions.jsx          # Favourites / mentions list
-│   │   ├── Follows.jsx               # Followers / following list
-│   │   ├── Editor.jsx                # Rich post composer (with emoji picker)
-│   │   ├── QuotePost.jsx             # Quote-post composer
-│   │   ├── DisplayPost.jsx           # Full post renderer
-│   │   ├── DisplayPostMinimal.jsx    # Compact post renderer (e.g. in threads)
-│   │   ├── DisplayPostList.jsx       # Paginated list of posts
-│   │   ├── DisplayPoll.jsx           # Poll renderer / voting UI
-│   │   └── NotFound.jsx              # 404 page
+│   │   ├── Auth.tsx                  # Auth layout (sign-in / sign-up shell)
+│   │   ├── SignIn.tsx                # Sign-in form
+│   │   ├── SignUp.tsx                # Sign-up form
+│   │   ├── Home.tsx                  # Timeline + composer
+│   │   ├── Search.tsx                # Search results
+│   │   ├── Post.tsx                  # Single post view
+│   │   ├── Thread.tsx                # Threaded conversation view
+│   │   ├── Profile.tsx               # User profile shell (tabs)
+│   │   ├── Quips.tsx                 # A user's posts list
+│   │   ├── Interactions.tsx          # Favourites / mentions list
+│   │   ├── Follows.tsx               # Followers / following list
+│   │   ├── Editor.tsx                # Rich post composer (with emoji picker)
+│   │   ├── QuotePost.tsx             # Quote-post composer
+│   │   ├── DisplayPost.tsx           # Full post renderer
+│   │   ├── DisplayPostMinimal.tsx    # Compact post renderer (e.g. in threads)
+│   │   ├── DisplayPostList.tsx       # Recursive list of posts + replies
+│   │   ├── DisplayPoll.tsx           # Poll renderer / voting UI
+│   │   ├── Common.tsx                # Shared Spinner / EmptyState / LoadMore primitives
+│   │   └── NotFound.tsx              # 404 page
+│   ├── hooks/
+│   │   └── createInfiniteList.ts     # Paginated createResource + Suspense list primitive
 │   ├── stores/                       # SolidJS reactive stores
-│   │   ├── auth-store.jsx            # Authenticated user + token state
-│   │   ├── theme-store.jsx           # Light/dark theme state
-│   │   ├── error-store.jsx           # Global error/alert message
-│   │   └── quip-store.jsx            # Cached timeline posts
+│   │   ├── auth-store.ts             # Authenticated user + token state
+│   │   ├── theme-store.ts            # Light/dark theme state
+│   │   ├── error-store.ts            # Global error/alert message
+│   │   └── quip-store.ts             # Cached timeline posts
+│   ├── types/                        # Shared TypeScript types + per-component prop types
 │   ├── certificates/                 # Local HTTPS dev certs (key.pem, cert.pem)
 │   ├── assets/                       # favicon, images, static files
-│   ├── App.jsx                       # Root layout: navbar, theme toggle, alert, auth wiring
-│   ├── index.jsx                     # Entry point: router + API health check
+│   ├── App.tsx                       # Root layout: navbar, theme toggle, alert, auth wiring
+│   ├── index.tsx                     # Entry point: router + API health check
 │   ├── index.css                     # Global styles
-│   ├── library.jsx                   # Shared utilities (text, dates, cookies, emoji)
-│   └── secure-fetch.jsx              # Auth-aware fetch wrapper with token refresh
+│   └── library.ts                    # Shared utilities (text, dates, cookies, emoji, escaping)
 ├── public/
-│   └── auth-worker.js                # Service worker for secure token storage + request interception
+│   └── pwa-worker.js                 # Service worker: token storage, request interception, caching
 ├── index.html                        # HTML entry point; registers the service worker
 ├── firebase.json                     # Firebase Hosting config (SPA rewrite to index.html)
-├── vite.config.js                    # Vite + Solid config, HTTPS dev server
+├── vite.config.ts                    # Vite + Solid config, HTTPS dev server
 ├── environment.config                # Template for required environment variables
 └── package.json
 ```
@@ -113,7 +116,7 @@ quip/
     VITE_GET_AUTH_DATA_ACTION=get-auth-data          # Action name the SW expects for reading auth
     ```
 
-4. **HTTPS certificates** — the dev server expects `src/certificates/key.pem` and `src/certificates/cert.pem` (see [vite.config.js](vite.config.js)). Generate self-signed certs if they aren't present; the config uses a passphrase of `Pass@123`.
+4. **HTTPS certificates** — the dev server expects `src/certificates/key.pem` and `src/certificates/cert.pem` (see [vite.config.ts](vite.config.ts)). Generate self-signed certs if they aren't present; the config uses a passphrase of `Pass@123`.
 
 ### Scripts
 
@@ -127,7 +130,7 @@ quip/
 
 ## Routing
 
-Routes are defined in [src/index.jsx](src/index.jsx):
+Routes are defined in [src/index.tsx](src/index.tsx):
 
 | Path                                       | Component           |
 | ------------------------------------------ | ------------------- |
@@ -147,15 +150,14 @@ Home (`/` and `/home`) requires authentication; unauthenticated visits are redir
 
 ## Authentication Architecture
 
-Quip's authentication flow is built around the service worker at [public/auth-worker.js](public/auth-worker.js):
+Quip's authentication flow is built around the service worker at [public/pwa-worker.js](public/pwa-worker.js):
 
-- The SW intercepts all `fetch` calls. Requests to `VITE_API_BASE_URL` get the current bearer token injected; requests to the auth base URL populate the auth cache from the response.
+- The SW intercepts `fetch` calls. Requests to `VITE_API_BASE_URL` get the current bearer token injected; requests to the auth base URL populate the auth cache from the response. Other requests fall through to its cache strategies (cache-first for hashed build assets, stale-while-revalidate for other assets, network-first for navigations).
 - Auth data (user id, handle, token, `createdAt`, `expiresIn`) is persisted in a `Cache` named by `VITE_AUTH_CACHE_NAME`, so it survives reloads without touching `localStorage`.
 - Before each API call, the SW validates the token and calls `/auth/refresh-token` when it's expired, then broadcasts the new state over `BroadcastChannel` (`VITE_AUTH_CHANNEL_NAME`).
-- The main app subscribes to that channel in [src/App.jsx](src/App.jsx) and mirrors the state into `authStore`. This also synchronises sign-in / sign-out across tabs.
-- [src/secure-fetch.jsx](src/secure-fetch.jsx) offers an in-page fallback for auth-aware requests when the service worker is not in control.
+- The main app subscribes to that channel in [src/App.tsx](src/App.tsx) and mirrors the state into `authStore`. This also synchronises sign-in / sign-out across tabs. The env/auth seed is delivered to the worker via `navigator.serviceWorker.ready` so it is not lost on the first (uncontrolled) load.
 
-## Utilities (`library.jsx`)
+## Utilities (`library.ts`)
 
 Shared helpers used throughout the app:
 

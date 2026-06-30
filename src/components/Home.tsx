@@ -1,63 +1,64 @@
-import { createSignal, onMount, Show } from "solid-js";
+import { createResource, createSignal, Show, Suspense, useTransition } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { emptyString, getErrorMessage } from "../library";
 import { quipStore, setQuipStore } from "../stores/quip-store";
 import { setErrorStore } from "../stores/error-store";
 import Editor from "./Editor";
 import DisplayPostList from "./DisplayPostList";
+import { EmptyState, LoadMore, Spinner } from "./Common";
+import type { Post } from "../types";
 import type { HomeProps } from "../types/HomeProps";
 
 const postsUrl = `${import.meta.env.VITE_API_BASE_URL}/timeline`;
 
 export default (props: HomeProps) => {
-	let loadMoreButton: HTMLButtonElement | undefined;
 	const navigate = useNavigate();
-	const [lastPostId, setLastPostId] = createSignal(emptyString);
-	const loadPosts = async (lastPostId?: string) => {
+	const [cursor, setCursor] = createSignal(emptyString);
+	const [loadingMore, startLoadMore] = useTransition();
+	const [exhausted, setExhausted] = createSignal(false);
+	const [page] = createResource(cursor, async lastPostId => {
+		if (!lastPostId) {
+			// Reset on the initial load so a failed reload never shows a prior session's posts.
+			setQuipStore("quips", []);
+		}
 		try {
 			const response = await fetch(lastPostId ? `${postsUrl}?lastPostId=${lastPostId}` : postsUrl);
-			switch (response.status) {
-				case 200:
-					const posts = (await response.json()).posts;
-					if (posts.length) {
-						setQuipStore("quips", quips => quips.concat(posts));
-						setLastPostId(posts.at(-1)._id);
-						return;
-					}
-					if (loadMoreButton) {
-						loadMoreButton.textContent = "No More Posts";
-						loadMoreButton.disabled = true;
-					}
-					break;
-				case 401:
-					navigate("/auth");
-					break;
-				default:
-					setErrorStore("message", await getErrorMessage(response));
-					break;
+			if (response.status === 401) {
+				navigate("/auth");
+				return false;
 			}
+			if (!response.ok) {
+				setErrorStore("message", await getErrorMessage(response));
+				return false;
+			}
+			const posts = (await response.json()).posts as Post[];
+			setQuipStore("quips", quips => (lastPostId ? quips.concat(posts) : posts));
+			if (!posts.length) {
+				setExhausted(true);
+			}
+			return true;
 		} catch (err: any) {
 			setErrorStore("message", err.message);
+			return false;
+		}
+	});
+	const loadMore = () => {
+		const lastPostId = quipStore.quips.at(-1)?._id;
+		if (lastPostId && !loadingMore()) {
+			startLoadMore(() => setCursor(lastPostId));
 		}
 	};
-	onMount(async () => {
-		setQuipStore("quips", []);
-		await loadPosts();
-	});
 	return (
 		<>
 			<Editor classList={{ "mb-2": true }}/>
-			<Show when={!quipStore.quips.length}>
-				<div class="d-flex justify-content-center align-items-center text-info border border-info rounded p-3">
-					<div>No posts to display.</div>
-				</div>
-			</Show>
-			<Show when={quipStore.quips.length}>
-				<DisplayPostList posts={quipStore.quips}/>
-				<div class="my-2">
-					<button ref={loadMoreButton} class="btn btn-primary form-control" onClick={() => loadPosts(lastPostId())}>Load More</button>
-				</div>
-			</Show>
+			<Suspense fallback={<Spinner/>}>
+				<Show when={page() !== undefined}>
+					<Show when={quipStore.quips.length} fallback={<EmptyState/>}>
+						<DisplayPostList posts={quipStore.quips}/>
+						<LoadMore hasMore={!exhausted()} loading={loadingMore()} onClick={loadMore}/>
+					</Show>
+				</Show>
+			</Suspense>
 		</>
 	);
 };
