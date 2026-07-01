@@ -133,6 +133,8 @@ export const parseContent = (text: string | undefined) => {
 	);
 };
 
+export const toTitleCase = (text: string) => text.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+
 export const toShortDateString = (input: Date | string | number) =>
 	new Intl.DateTimeFormat("default", {
 		year: "numeric",
