@@ -85,7 +85,7 @@ export default (props: PostProps) => {
 					</div>
 				</Show>
 			</Suspense>
-			<Suspense>
+			<Suspense fallback={<Spinner/>}>
 				<Show when={replies.items().length}>
 					<div class="mt-4">
 						<h5>Replies:</h5>
