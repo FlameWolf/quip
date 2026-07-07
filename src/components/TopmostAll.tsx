@@ -4,6 +4,7 @@ import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage, toTitleCase } from "../library";
 import { createInfiniteList } from "../hooks/createInfiniteList";
 import DisplayPostList from "./DisplayPostList";
+import { Dropdown } from "solid-bootstrap";
 import { EmptyState, LoadMore, Spinner } from "./Common";
 import type { Post } from "../types";
 import type { TopmostAllProps } from "../types/TopmostAllProps";
@@ -70,18 +71,16 @@ export default (props: TopmostAllProps) => {
 					}}
 				</For>
 			</div>
-			<div class="dropdown d-block d-sm-none">
-				<button class="btn btn-secondary dropdown-toggle w-100" data-bs-toggle="dropdown" aria-expanded="false">{sortBy()}</button>
-				<ul class="dropdown-menu">
+			<Dropdown class="d-block d-sm-none">
+				<Dropdown.Toggle variant="secondary" class="w-100" id="sort-dropdown">{sortBy()}</Dropdown.Toggle>
+				<Dropdown.Menu class="w-100">
 					<For each={sortOptions}>
 						{option => (
-							<li>
-								<a class="dropdown-item" onClick={() => setSortBy(option)} role="button">{option}</a>
-							</li>
+							<Dropdown.Item as="button" active={option === sortBy()} onClick={() => setSortBy(option)}>{option}</Dropdown.Item>
 						)}
 					</For>
-				</ul>
-			</div>
+				</Dropdown.Menu>
+			</Dropdown>
 			<div class="mt-4">
 				<Suspense fallback={<Spinner/>}>
 					<Show when={list.items().length} fallback={<EmptyState/>}>

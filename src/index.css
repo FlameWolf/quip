@@ -281,9 +281,14 @@ body {
 	border-left-color: revert;
 }
 
-.modal {
-	background: rgba(55, 55, 55, 0.6);
+.modal-backdrop {
+	--bs-backdrop-bg: rgb(55, 55, 55);
+	--bs-backdrop-opacity: 0.6;
 	backdrop-filter: blur(2px);
+}
+
+.dropdown-toggle.no-caret::after {
+	display: none;
 }
 
 .position-absolute-middle {

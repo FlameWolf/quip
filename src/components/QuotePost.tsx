@@ -1,4 +1,5 @@
-import { createSignal, Show } from "solid-js";
+import { createSignal } from "solid-js";
+import { Modal } from "solid-bootstrap";
 import Editor from "./Editor";
 import DisplayPostMinimal from "./DisplayPostMinimal";
 import type { QuotePostProps } from "../types/QuotePostProps";
@@ -12,23 +13,16 @@ export default (props: QuotePostProps) => {
 		props.onClose?.();
 	};
 	return (
-		<Show when={isOpen()}>
-			<div class="modal d-block open">
-				<div class="modal-dialog modal-dialog-centered">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title">Quote Post</h5>
-							<button type="button" class="btn-close" onClick={closeModal}></button>
-						</div>
-						<div class="modal-body">
-							<Editor isQuote={true} quotedPost={quotedPost} onSubmit={closeModal}/>
-							<div class="mt-3 border-top pt-3">
-								<DisplayPostMinimal post={quotedPost}/>
-							</div>
-						</div>
-					</div>
+		<Modal show={isOpen()} onHide={closeModal} centered={true}>
+			<Modal.Header closeButton={true}>
+				<Modal.Title>Quote Post</Modal.Title>
+			</Modal.Header>
+			<Modal.Body>
+				<Editor isQuote={true} quotedPost={quotedPost} onSubmit={closeModal}/>
+				<div class="mt-3 border-top pt-3">
+					<DisplayPostMinimal post={quotedPost}/>
 				</div>
-			</div>
-		</Show>
+			</Modal.Body>
+		</Modal>
 	);
 };

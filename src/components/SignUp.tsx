@@ -1,5 +1,5 @@
-import { createSignal, onMount, Show } from "solid-js";
-import { Popover } from "bootstrap";
+import { createSignal } from "solid-js";
+import { OverlayTrigger, Popover } from "solid-bootstrap";
 import { useNavigate } from "@solidjs/router";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
@@ -11,9 +11,6 @@ const signUpUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/sign-up`;
 
 export default (props: SignUpProps) => {
 	let signUpForm!: HTMLFormElement;
-	let usernameInfoToggle!: HTMLAnchorElement;
-	let passwordInfoToggle!: HTMLAnchorElement;
-	let confirmPasswordInfoToggle: HTMLAnchorElement;
 	let usernameInput!: HTMLInputElement;
 	let passwordInput!: HTMLInputElement;
 	let confirmPasswordInput!: HTMLInputElement;
@@ -69,30 +66,15 @@ export default (props: SignUpProps) => {
 			setErrorStore("message", err.message);
 		}
 	};
-	onMount(() => {
-		new Popover(usernameInfoToggle, {
-			content: "Username must start with a letter, be 4-32 characters long, and may contain underscores and digits",
-			trigger: "focus",
-			placement: "auto"
-		});
-		new Popover(passwordInfoToggle, {
-			content: "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one digit",
-			trigger: "focus",
-			placement: "auto"
-		});
-		new Popover(confirmPasswordInfoToggle!, {
-			content: "Password entered here should match the password entered in the previous input box",
-			trigger: "focus",
-			placement: "auto"
-		});
-	});
 	return (
 		<form ref={signUpForm} onInput={updateFormValidity}>
 			<div class="d-flex mb-2">
 				<label>Username</label>
-				<a ref={usernameInfoToggle} class="ms-auto clickable" tabIndex={-1}>
-					<AiOutlineInfoCircle/>
-				</a>
+				<OverlayTrigger trigger="focus" placement="auto" overlay={<Popover id="username-info"><Popover.Body>Username must start with a letter, be 4-32 characters long, and may contain underscores and digits</Popover.Body></Popover>}>
+					<a class="ms-auto clickable" tabIndex={-1}>
+						<AiOutlineInfoCircle/>
+					</a>
+				</OverlayTrigger>
 			</div>
 			<div class="input-group mb-4">
 				<span class="input-group-text">@</span>
@@ -100,9 +82,11 @@ export default (props: SignUpProps) => {
 			</div>
 			<div class="d-flex mb-2">
 				<label>Password</label>
-				<a ref={passwordInfoToggle} class="ms-auto clickable" tabIndex={-1}>
-					<AiOutlineInfoCircle/>
-				</a>
+				<OverlayTrigger trigger="focus" placement="auto" overlay={<Popover id="password-info"><Popover.Body>Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one digit</Popover.Body></Popover>}>
+					<a class="ms-auto clickable" tabIndex={-1}>
+						<AiOutlineInfoCircle/>
+					</a>
+				</OverlayTrigger>
 			</div>
 			<div class="input-group mb-4">
 				<input ref={passwordInput} class="form-control" type={showPassword() ? "text" : "password"} placeholder="Password" pattern={passwordRegExp.source}/>
@@ -110,9 +94,11 @@ export default (props: SignUpProps) => {
 			</div>
 			<div class="d-flex mb-2">
 				<label>Confirm password</label>
-				<a ref={confirmPasswordInfoToggle!} class="ms-auto clickable" tabIndex={-1}>
-					<AiOutlineInfoCircle/>
-				</a>
+				<OverlayTrigger trigger="focus" placement="auto" overlay={<Popover id="confirm-password-info"><Popover.Body>Password entered here should match the password entered in the previous input box</Popover.Body></Popover>}>
+					<a class="ms-auto clickable" tabIndex={-1}>
+						<AiOutlineInfoCircle/>
+					</a>
+				</OverlayTrigger>
 			</div>
 			<div class="input-group mb-4">
 				<input ref={confirmPasswordInput} class="form-control" type={showConfirmPassword() ? "text" : "password"} placeholder="Confirm password"/>

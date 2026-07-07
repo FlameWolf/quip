@@ -2,6 +2,7 @@ import { createMemo, createSignal, Show } from "solid-js";
 import { useNavigate, A } from "@solidjs/router";
 import { BsChatRight, BsQuote, BsStar, BsStarFill } from "solid-icons/bs";
 import { FiEdit3, FiRepeat, FiTrash } from "solid-icons/fi";
+import { Modal } from "solid-bootstrap";
 import { authStore } from "../stores/auth-store";
 import { setErrorStore } from "../stores/error-store";
 import { formatTimeAgo, getErrorMessage, nullId, parseContent, toLongDateString } from "../library";
@@ -161,26 +162,19 @@ export default (props: DisplayPostProps) => {
 					<QuotePost post={post} isOpen={true} onClose={() => setQuoteFlag(false)}/>
 				</Show>
 			</div>
-			<Show when={confirmDelete()}>
-				<div class="modal fade show d-block" tabindex="-1">
-					<div class="modal-dialog">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h5 class="modal-title">Confirm</h5>
-								<button type="button" class="btn-close" onClick={() => setConfirmDelete(false)}></button>
-							</div>
-							<div class="modal-body">
-								<p>Are you sure you want to delete this post?</p>
-								<DisplayPostMinimal post={post}/>
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-secondary" onClick={() => setConfirmDelete(false)}>Cancel</button>
-								<button type="button" class="btn btn-danger" onClick={deletePost}>Delete</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</Show>
+			<Modal show={confirmDelete()} onHide={() => setConfirmDelete(false)}>
+				<Modal.Header closeButton={true}>
+					<Modal.Title>Confirm</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<p>Are you sure you want to delete this post?</p>
+					<DisplayPostMinimal post={post}/>
+				</Modal.Body>
+				<Modal.Footer>
+					<button type="button" class="btn btn-secondary" onClick={() => setConfirmDelete(false)}>Cancel</button>
+					<button type="button" class="btn btn-danger" onClick={deletePost}>Delete</button>
+				</Modal.Footer>
+			</Modal>
 		</>
 	);
 };
