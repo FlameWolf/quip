@@ -27,9 +27,9 @@ Quip is a single-page application (SPA) that consumes the [Quip API v2](https://
 - **@solidjs/router** (^0.15.4) — client-side routing
 - **Vite** (^7.3.1) — build tool and dev server
 - **vite-plugin-solid** (^2.11.10) — Solid JSX support for Vite
-- **Bootstrap** (^5.3.8) + **Bootstrap Icons** (^1.13.1) — UI framework and icons
-- **@popperjs/core** (^2.11.8) — dropdown/tooltip positioning for Bootstrap
-- **@floating-ui/dom** (^1.7.6) — floating element positioning
+- **solid-bootstrap** (^1.0.21) — SolidJS Bootstrap 5 components (dropdowns, overlays, modals) with no dependency on bootstrap.js or jQuery
+- **Bootstrap** (^5.3.8) + **Bootstrap Icons** (^1.13.1) — Bootstrap is retained for its stylesheet only; Bootstrap Icons for icons
+- **@floating-ui/dom** (^1.7.6) — floating element positioning (emoji picker)
 - **solid-icons** (^1.2.0) — icon components for SolidJS
 - **emoji-mart** (^5.6.0) + **@emoji-mart/data** (^1.2.1) + **picmo** (^5.8.5) — emoji picker stack
 - **node-emoji** (^2.2.0) — emoji shortcode lookup

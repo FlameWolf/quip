@@ -4,11 +4,10 @@ import { lightTheme, darkTheme, emptyString } from "./library";
 import { themeStore, setThemeStore } from "./stores/theme-store";
 import { authStore, setAuthStore } from "./stores/auth-store";
 import { errorStore, setErrorStore } from "./stores/error-store";
-import { Dropdown } from "bootstrap";
+import { Dropdown } from "solid-bootstrap";
 import { VsMenu } from "solid-icons/vs";
 import type { AppProps } from "./types/AppProps";
 
-let imgMenu: HTMLImageElement;
 let searchInput: HTMLInputElement;
 let errorAlert: HTMLDivElement;
 let alertTimeout: NodeJS.Timeout;
@@ -88,15 +87,6 @@ export default (props: AppProps) => {
 		clearTimeout(alertTimeout);
 		setErrorStore({ message: emptyString });
 	};
-	createEffect(() => {
-		if (imgMenu!) {
-			if (themeStore.isDark) {
-				imgMenu.style.setProperty("filter", "invert(0.8)");
-				return;
-			}
-			imgMenu.style.removeProperty("filter");
-		}
-	});
 	onMount(() => {
 		authChannel.addEventListener("message", event => {
 			setAuthStore(event.data);
@@ -108,9 +98,6 @@ export default (props: AppProps) => {
 		postToWorker({
 			action: import.meta.env.VITE_GET_AUTH_DATA_ACTION
 		});
-		if (imgMenu!) {
-			new Dropdown(imgMenu);
-		}
 	});
 	createEffect(() => {
 		if (basePath() === "search") {
@@ -132,32 +119,22 @@ export default (props: AppProps) => {
 				<nav class="navbar mb-3">
 					<div class="container gap-2">
 						<div class="d-flex gap-4">
-							<div class="dropdown">
-								<button class="btn btn-outline-secondary" data-bs-toggle="dropdown" aria-expanded="false">
+							<Dropdown>
+								<Dropdown.Toggle variant="outline-secondary" class="no-caret" id="nav-menu" aria-label="Menu">
 									<VsMenu/>
-								</button>
-								<ul class="dropdown-menu">
+								</Dropdown.Toggle>
+								<Dropdown.Menu>
 									<Show when={authStore.userId}>
-										<li>
-											<A class="dropdown-item" href={`/${authStore.handle}`}>Profile</A>
-										</li>
-										<li>
-											<A class="dropdown-item disabled" href="javascript: void(0)">Settings</A>
-										</li>
-										<li>
-											<hr class="dropdown-divider"/>
-										</li>
-										<li>
-											<a class="dropdown-item" onClick={signOut} role="button">Sign out</a>
-										</li>
+										<Dropdown.Item as={A} href={`/${authStore.handle}`}>Profile</Dropdown.Item>
+										<Dropdown.Item disabled={true}>Settings</Dropdown.Item>
+										<Dropdown.Divider/>
+										<Dropdown.Item as="button" onClick={signOut}>Sign out</Dropdown.Item>
 									</Show>
 									<Show when={!authStore.userId}>
-										<li>
-											<A class="dropdown-item" href="/auth">Sign up</A>
-										</li>
+										<Dropdown.Item as={A} href="/auth">Sign up</Dropdown.Item>
 									</Show>
-								</ul>
-							</div>
+								</Dropdown.Menu>
+							</Dropdown>
 							<A class="navbar-brand mb-0 h1" href="/">Home</A>
 						</div>
 						<div class="d-flex me-auto">

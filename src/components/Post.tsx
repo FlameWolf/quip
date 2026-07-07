@@ -1,4 +1,4 @@
-import { createEffect, createResource, onCleanup, Show, Suspense } from "solid-js";
+import { createResource, Show, Suspense } from "solid-js";
 import DisplayPost from "./DisplayPost";
 import DisplayPostList from "./DisplayPostList";
 import { useNavigate, useParams } from "@solidjs/router";
@@ -6,7 +6,7 @@ import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage, nullId } from "../library";
 import { createInfiniteList } from "../hooks/createInfiniteList";
 import { TbOutlineJumpRope } from "solid-icons/tb";
-import { Tooltip } from "bootstrap";
+import { OverlayTrigger, Tooltip } from "solid-bootstrap";
 import { LoadMore, Spinner } from "./Common";
 import type { Post as PostType } from "../types";
 import type { PostProps } from "../types/PostProps";
@@ -14,8 +14,6 @@ import type { PostProps } from "../types/PostProps";
 const postsBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/posts`;
 
 export default (props: PostProps) => {
-	let threadViewButton!: HTMLButtonElement;
-	let threadViewTooltip: Tooltip | undefined;
 	const params = useParams();
 	const navigate = useNavigate();
 	const postId = () => params.postId;
@@ -49,13 +47,6 @@ export default (props: PostProps) => {
 		}
 		return (await response.json()).replies as PostType[];
 	});
-	createEffect(() => {
-		threadViewTooltip?.dispose();
-		if (post()) {
-			threadViewTooltip = new Tooltip(threadViewButton, { trigger: "hover", title: "Thread View" });
-		}
-	});
-	onCleanup(() => threadViewTooltip?.dispose());
 	return (
 		<>
 			<Suspense fallback={<Spinner/>}>
@@ -76,9 +67,11 @@ export default (props: PostProps) => {
 						</div>
 					}>
 					<div class="d-flex justify-content-end">
-						<button ref={threadViewButton} class="btn btn-outline-primary" onClick={() => navigate(`/thread/${postId()}`)} aria-label="Thread View">
-							<TbOutlineJumpRope/>
-						</button>
+						<OverlayTrigger placement="top" overlay={<Tooltip id="thread-view-tooltip">Thread View</Tooltip>}>
+							<button class="btn btn-outline-primary" onClick={() => navigate(`/thread/${postId()}`)} aria-label="Thread View">
+								<TbOutlineJumpRope/>
+							</button>
+						</OverlayTrigger>
 					</div>
 					<div class="fs-5">
 						<DisplayPost post={post()!}/>

@@ -4,7 +4,7 @@ import { BsPersonBadgeFill } from "solid-icons/bs";
 import { authStore } from "../stores/auth-store";
 import { setErrorStore } from "../stores/error-store";
 import { emptyString, getErrorMessage } from "../library";
-import { Dropdown } from "bootstrap";
+import { Dropdown, ButtonGroup, Modal } from "solid-bootstrap";
 import { Spinner } from "./Common";
 import type { User } from "../types";
 import type { ProfileProps } from "../types/ProfileProps";
@@ -13,9 +13,7 @@ const profileBaseUrl = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
 export default (props: ProfileProps) => {
 	let muteButton!: HTMLButtonElement;
-	let muteMenuToggle: HTMLButtonElement | undefined;
 	let blockButton!: HTMLButtonElement;
-	let blockMenuToggle: HTMLButtonElement | undefined;
 	const params = useParams();
 	const [isSelf, setIsSelf] = createSignal(false);
 	const [followed, setFollowed] = createSignal(false);
@@ -99,16 +97,6 @@ export default (props: ProfileProps) => {
 			setShowBlockedReason(false);
 		}
 	});
-	createEffect(() => {
-		if (user() && authStore.userId && !isSelf()) {
-			if (muteMenuToggle) {
-				new Dropdown(muteMenuToggle);
-			}
-			if (blockMenuToggle) {
-				new Dropdown(blockMenuToggle);
-			}
-		}
-	});
 	return (
 		<>
 			<Suspense fallback={<Spinner/>}>
@@ -126,39 +114,31 @@ export default (props: ProfileProps) => {
 										<div class="badge bg-secondary">Follows you</div>
 									</Show>
 									<button class="btn btn-sm btn-primary" onClick={() => toggleAction("follow", followed(), setFollowed)}>{followed() ? "Unfollow" : "Follow"}</button>
-									<div class="btn-group">
+									<Dropdown as={ButtonGroup}>
 										<button ref={muteButton} class="btn btn-sm btn-primary" onClick={() => toggleAction("mute", muted(), setMuted)}>{muted() ? "Unmute" : "Mute"}</button>
 										<Show when={!isSelf() && !muted()}>
-											<div class="btn-group dropdown">
-												<button ref={muteMenuToggle} type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-													<span class="visually-hidden">Toggle Dropdown</span>
-												</button>
-												<ul class="dropdown-menu">
-													<li>
-														<a class="dropdown-item" role="button" onClick={() => setActionTrigger(muteButton)}>Specify a reason</a>
-													</li>
-												</ul>
-											</div>
+											<Dropdown.Toggle split={true} size="sm" variant="primary" id="mute-menu">
+												<span class="visually-hidden">Toggle Dropdown</span>
+											</Dropdown.Toggle>
+											<Dropdown.Menu>
+												<Dropdown.Item as="button" onClick={() => setActionTrigger(muteButton)}>Specify a reason</Dropdown.Item>
+											</Dropdown.Menu>
 										</Show>
-									</div>
+									</Dropdown>
 									<Show when={muted() && mutedReason()}>
 										<a class="bi bi-info-circle" role="button" onClick={() => setShowMutedReason(!showMutedReason())}></a>
 									</Show>
-									<div class="btn-group">
+									<Dropdown as={ButtonGroup}>
 										<button ref={blockButton} class="btn btn-sm btn-danger" onClick={() => toggleAction("block", blocked(), setBlocked)}>{blocked() ? "Unblock" : "Block"}</button>
 										<Show when={!isSelf() && !blocked()}>
-											<div class="btn-group dropdown">
-												<button ref={blockMenuToggle} type="button" class="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-													<span class="visually-hidden">Toggle Dropdown</span>
-												</button>
-												<ul class="dropdown-menu">
-													<li>
-														<a class="dropdown-item" role="button" onClick={() => setActionTrigger(blockButton)}>Specify a reason</a>
-													</li>
-												</ul>
-											</div>
+											<Dropdown.Toggle split={true} size="sm" variant="danger" id="block-menu">
+												<span class="visually-hidden">Toggle Dropdown</span>
+											</Dropdown.Toggle>
+											<Dropdown.Menu>
+												<Dropdown.Item as="button" onClick={() => setActionTrigger(blockButton)}>Specify a reason</Dropdown.Item>
+											</Dropdown.Menu>
 										</Show>
-									</div>
+									</Dropdown>
 									<Show when={blocked() && blockedReason()}>
 										<a class="bi bi-info-circle" role="button" onClick={() => setShowBlockedReason(!showBlockedReason())}></a>
 									</Show>
@@ -199,25 +179,18 @@ export default (props: ProfileProps) => {
 					</div>
 				</div>
 			</Suspense>
-			<Show when={actionTrigger()}>
-				<div class="modal d-block open">
-					<div class="modal-dialog modal-dialog-centered">
-						<div class="modal-content">
-							<div class="modal-header">
-								<p class="modal-title">Specify reason</p>
-								<button type="button" class="btn-close" onClick={() => setActionTrigger(null)}></button>
-							</div>
-							<div class="modal-body">
-								<input type="text" class="form-control" placeholder="Reason for action" value={actionReason()} onInput={e => setActionReason(e.target.value)}/>
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-secondary" onClick={() => setActionTrigger(null)}>Cancel</button>
-								<button type="button" class="btn btn-primary" onClick={() => actionTrigger()?.click()}>Confirm</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</Show>
+			<Modal show={!!actionTrigger()} onHide={() => setActionTrigger(null)} centered={true}>
+				<Modal.Header closeButton={true}>
+					<Modal.Title>Specify reason</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<input type="text" class="form-control" placeholder="Reason for action" value={actionReason()} onInput={e => setActionReason(e.target.value)}/>
+				</Modal.Body>
+				<Modal.Footer>
+					<button type="button" class="btn btn-secondary" onClick={() => setActionTrigger(null)}>Cancel</button>
+					<button type="button" class="btn btn-primary" onClick={() => actionTrigger()?.click()}>Confirm</button>
+				</Modal.Footer>
+			</Modal>
 			<section>{props.children}</section>
 		</>
 	);

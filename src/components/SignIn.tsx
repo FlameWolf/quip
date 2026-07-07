@@ -1,5 +1,5 @@
-import { createSignal, onMount } from "solid-js";
-import { Popover } from "bootstrap";
+import { createSignal } from "solid-js";
+import { OverlayTrigger, Popover } from "solid-bootstrap";
 import { useNavigate } from "@solidjs/router";
 import { AiOutlineInfoCircle } from "solid-icons/ai";
 import { BsEye, BsEyeSlash } from "solid-icons/bs";
@@ -11,8 +11,6 @@ const signInUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/sign-in`;
 
 export default (props: SignInProps) => {
 	let signInForm!: HTMLFormElement;
-	let usernameInfoToggle!: HTMLAnchorElement;
-	let passwordInfoToggle!: HTMLAnchorElement;
 	let usernameInput!: HTMLInputElement;
 	let passwordInput!: HTMLInputElement;
 	const [showPassword, setShowPassword] = createSignal(false);
@@ -60,25 +58,15 @@ export default (props: SignInProps) => {
 			setErrorStore("message", err.message);
 		}
 	};
-	onMount(() => {
-		new Popover(usernameInfoToggle, {
-			content: "Username is required",
-			trigger: "focus",
-			placement: "auto"
-		});
-		new Popover(passwordInfoToggle, {
-			content: "Password is required",
-			trigger: "focus",
-			placement: "auto"
-		});
-	});
 	return (
 		<form ref={signInForm} onInput={updateFormValidity}>
 			<div class="d-flex mb-2">
 				<label>Username</label>
-				<a ref={usernameInfoToggle} class="ms-auto clickable" tabIndex={-1}>
-					<AiOutlineInfoCircle/>
-				</a>
+				<OverlayTrigger trigger="focus" placement="auto" overlay={<Popover id="username-info"><Popover.Body>Username is required</Popover.Body></Popover>}>
+					<a class="ms-auto clickable" tabIndex={-1}>
+						<AiOutlineInfoCircle/>
+					</a>
+				</OverlayTrigger>
 			</div>
 			<div class="input-group mb-4">
 				<span class="input-group-text">@</span>
@@ -86,9 +74,11 @@ export default (props: SignInProps) => {
 			</div>
 			<div class="d-flex mb-2">
 				<label>Password</label>
-				<a ref={passwordInfoToggle} class="ms-auto clickable" tabIndex={-1}>
-					<AiOutlineInfoCircle/>
-				</a>
+				<OverlayTrigger trigger="focus" placement="auto" overlay={<Popover id="password-info"><Popover.Body>Password is required</Popover.Body></Popover>}>
+					<a class="ms-auto clickable" tabIndex={-1}>
+						<AiOutlineInfoCircle/>
+					</a>
+				</OverlayTrigger>
 			</div>
 			<div class="input-group mb-4">
 				<input ref={passwordInput} class="form-control" type={showPassword() ? "text" : "password"} placeholder="Password" required={true}/>
