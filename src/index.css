@@ -44,7 +44,7 @@ body {
 	filter: invert(80%);
 }
 
-.card-header > .hstack > a.active {
+.card-header>.hstack>a.active {
 	color: unset;
 	text-decoration: unset;
 	cursor: text;
@@ -65,6 +65,7 @@ body {
 }
 
 @keyframes spin {
+
 	20%,
 	100% {
 		transform: rotate(5turn);
@@ -106,13 +107,13 @@ body {
 	padding-bottom: 0.25rem;
 }
 
-.card-body > .img-fluid {
+.card-body>.img-fluid {
 	display: block;
 	max-height: 25rem;
 	margin: 0 auto;
 }
 
-.card-body > .card {
+.card-body>.card {
 	background-color: var(--bs-secondary-bg-subtle);
 }
 
@@ -182,11 +183,11 @@ body {
 	visibility: hidden;
 }
 
-.autogrow > textarea {
+.autogrow>textarea {
 	resize: none;
 }
 
-.autogrow > textarea,
+.autogrow>textarea,
 .autogrow::after {
 	grid-area: 1 / 1 / 2 / 2;
 	background-color: inherit;
@@ -202,7 +203,7 @@ body {
 	margin: 0.5rem 0;
 }
 
-.card-footer > .row > .col-4 > div {
+.card-footer>.row>.col-4>div {
 	background-color: var(--bs-border-color);
 }
 
@@ -214,7 +215,7 @@ body {
 	z-index: 1;
 }
 
-.emoji-picker-container > .btn.btn-danger {
+.emoji-picker-container>.btn.btn-danger {
 	display: flex;
 	width: 1.5rem;
 	height: 1.5rem;
@@ -237,7 +238,7 @@ body {
 	user-select: none;
 }
 
-.emoji-bar > div {
+.emoji-bar>div {
 	display: flex;
 	align-items: center;
 	background-color: var(--bs-tertiary-bg);
@@ -279,12 +280,6 @@ body {
 	background-color: var(--bs-warning-bg-subtle);
 	color: var(--bs-emphasis-color);
 	border-left-color: revert;
-}
-
-.modal-backdrop {
-	--bs-backdrop-bg: rgb(55, 55, 55);
-	--bs-backdrop-opacity: 0.6;
-	backdrop-filter: blur(2px);
 }
 
 .dropdown-toggle.no-caret::after {

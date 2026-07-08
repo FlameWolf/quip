@@ -162,7 +162,7 @@ export default (props: DisplayPostProps) => {
 					<QuotePost post={post} isOpen={true} onClose={() => setQuoteFlag(false)}/>
 				</Show>
 			</div>
-			<Modal show={confirmDelete()} onHide={() => setConfirmDelete(false)}>
+			<Modal class="modal-fullscreen-sm-down" show={confirmDelete()} onHide={() => setConfirmDelete(false)}>
 				<Modal.Header closeButton={true}>
 					<Modal.Title>Confirm</Modal.Title>
 				</Modal.Header>
