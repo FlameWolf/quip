@@ -13,7 +13,7 @@ export default (props: QuotePostProps) => {
 		props.onClose?.();
 	};
 	return (
-		<Modal class="modal-fullscreen-sm-down" show={isOpen()} onHide={closeModal}>
+		<Modal class="modal-fullscreen-sm-down" centered={true} show={isOpen()} onHide={closeModal}>
 			<Modal.Header closeButton={true}>
 				<Modal.Title>Quote Post</Modal.Title>
 			</Modal.Header>

@@ -282,6 +282,10 @@ body {
 	border-left-color: revert;
 }
 
+.modal-dialog-centered {
+	align-items: safe center;
+}
+
 .dropdown-toggle.no-caret::after {
 	display: none;
 }

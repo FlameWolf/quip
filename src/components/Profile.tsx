@@ -179,7 +179,7 @@ export default (props: ProfileProps) => {
 					</div>
 				</div>
 			</Suspense>
-			<Modal class="modal-fullscreen-sm-down" show={!!actionTrigger()} onHide={() => setActionTrigger(null)}>
+			<Modal class="modal-fullscreen-sm-down" centered={true} show={!!actionTrigger()} onHide={() => setActionTrigger(null)}>
 				<Modal.Header closeButton={true}>
 					<Modal.Title>Specify reason</Modal.Title>
 				</Modal.Header>
