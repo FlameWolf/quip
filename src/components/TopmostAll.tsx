@@ -13,14 +13,16 @@ const topmostUrl = `${import.meta.env.VITE_API_BASE_URL}/topmost`;
 const sortOptions = ["Day", "Week", "Month", "Year", "All"];
 
 export default (props: TopmostAllProps) => {
+	let sortParam = emptyString;
 	const [searchParams, setSearchParams] = useSearchParams<{
 		t: string;
 	}>();
-	const sortParam = searchParams.t ?? emptyString;
+	sortParam = searchParams.t ?? sortParam;
 	if (!sortOptions.includes(toTitleCase(sortParam))) {
+		sortParam = sortOptions[0].toLowerCase();
 		setSearchParams(
 			{
-				t: sortOptions[0].toLowerCase()
+				t: sortParam
 			},
 			{
 				replace: true
