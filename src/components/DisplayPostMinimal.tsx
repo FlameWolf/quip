@@ -24,7 +24,7 @@ export default (props: DisplayPostMinimalProps) => {
 					</div>
 				</div>
 				<div class="card-body px-2 pb-2">
-					<p class="card-text">
+					<p class="card-text text-break">
 						<Show when={post.content}>
 							<span innerHTML={parseContent(post.content)}/>
 						</Show>
@@ -60,12 +60,12 @@ export default (props: DisplayPostMinimalProps) => {
 						<Show when={typeof attachedPost === "string"}>
 							<span>&#xA0;</span>
 							<Show when={attachedPost !== nullId} fallback={<div class="text-bg-secondary border rounded p-3">The quoted post is not available.</div>}>
-								<A href={`/post/${attachedPost as string}`} innerHTML={`${globalThis.location.origin}/post/${attachedPost as string}`} {...({ resolve: false } as any)}></A>
+								<A class="text-break" href={`/post/${attachedPost as string}`} innerHTML={`${globalThis.location.origin}/post/${attachedPost as string}`} {...({ resolve: false } as any)}></A>
 							</Show>
 						</Show>
 						<Show when={typeof attachedPost === "object"}>
 							<span>&#xA0;</span>
-							<A href={`/post/${(attachedPost as Post)._id}`} innerHTML={`${globalThis.location.origin}/post/${(attachedPost as Post)._id}`} {...({ resolve: false } as any)}></A>
+							<A class="text-break" href={`/post/${(attachedPost as Post)._id}`} innerHTML={`${globalThis.location.origin}/post/${(attachedPost as Post)._id}`} {...({ resolve: false } as any)}></A>
 						</Show>
 					</p>
 				</div>

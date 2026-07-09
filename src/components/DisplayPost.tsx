@@ -125,7 +125,7 @@ export default (props: DisplayPostProps) => {
 						</Show>
 						<Show when={typeof attachments!.post === "string"}>
 							<Show when={attachments!.post !== nullId} fallback={<div class="text-bg-secondary border rounded p-3">The quoted post is not available.</div>}>
-								<A href={`/post/${attachments!.post as string}`} innerHTML={`${globalThis.location.origin}/post/${attachments!.post as string}`} {...({ resolve: false } as any)}></A>
+								<A class="text-break" href={`/post/${attachments!.post as string}`} innerHTML={`${globalThis.location.origin}/post/${attachments!.post as string}`} {...({ resolve: false } as any)}></A>
 							</Show>
 						</Show>
 						<Show when={typeof attachments!.post === "object"}>
@@ -162,7 +162,7 @@ export default (props: DisplayPostProps) => {
 					<QuotePost post={post} isOpen={true} onClose={() => setQuoteFlag(false)}/>
 				</Show>
 			</div>
-			<Modal class="modal-fullscreen-sm-down" centered={true} show={confirmDelete()} onHide={() => setConfirmDelete(false)}>
+			<Modal centered={true} scrollable={true} fullscreen="sm-down" show={confirmDelete()} onHide={() => setConfirmDelete(false)}>
 				<Modal.Header closeButton={true}>
 					<Modal.Title>Confirm</Modal.Title>
 				</Modal.Header>
