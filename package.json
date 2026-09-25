@@ -13,16 +13,16 @@
 	},
 	"license": "MIT",
 	"devDependencies": {
-		"@types/node": "^25.7.0",
+		"@types/node": "^26.6.2",
 		"typescript": "^5.9.3",
-		"vite": "^8.0.10",
-		"vite-plugin-solid": "^2.11.12"
+		"vite": "^8.3.1",
+		"vite-plugin-solid": "^2.11.14"
 	},
 	"dependencies": {
 		"@emoji-mart/data": "^1.2.1",
-		"@floating-ui/dom": "^1.7.6",
+		"@floating-ui/dom": "^1.8.0",
 		"@popperjs/core": "^2.11.8",
-		"@solidjs/router": "^0.16.1",
+		"@solidjs/router": "^1.0.0",
 		"bootstrap": "^5.3.8",
 		"bootstrap-icons": "^1.13.1",
 		"caret-pos": "^2.0.0",
@@ -32,6 +32,6 @@
 		"picmo": "^5.8.5",
 		"solid-bootstrap": "^1.0.21",
 		"solid-icons": "^1.2.0",
-		"solid-js": "^1.9.12"
+		"solid-js": "^1.9.15"
 	}
 }
